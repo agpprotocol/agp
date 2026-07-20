@@ -7,7 +7,7 @@
 **Role:** Independent researcher; protocol editor and project founder  
 **Publication date:** 20 July 2026  
 **Document status:** Experimental public review draft  
-**Document license:** To be declared before public release  
+**Document license:** Creative Commons Attribution 4.0 International (CC BY 4.0)  
 **Project:** https://agpprotocol.org  
 **Repository:** https://github.com/agpprotocol/agp
 
