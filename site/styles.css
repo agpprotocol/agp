@@ -263,3 +263,23 @@ footer p { margin: 5px 0 0; }
 .whitepaper-button:hover {
   transform: translateY(-1px);
 }
+
+.demo-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.demo-command {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.demo-command code {
+  white-space: nowrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+

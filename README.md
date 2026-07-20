@@ -9,6 +9,27 @@ coordinator as the sole source of truth.
 > Status: experimental. AGP is not yet a production standard.
 
 
+
+## 120-Second Demo
+
+Run the public AGP demo with no external dependencies:
+
+    python3 examples/120_second_demo/demo.py
+
+Fast mode:
+
+    python3 examples/120_second_demo/demo.py --fast
+
+Valid governance path:
+
+    python3 examples/120_second_demo/demo.py --happy-path --fast
+
+The demo shows a coordinator changing a deployment payload after approval.
+A coordinator-trusting workflow accepts it because the approval count is still present.
+AGP rejects it because the approvals are bound to the exact approved input.
+
+[Read the demo documentation](examples/120_second_demo/README.md)
+
 ## Whitepaper
 
 The current public review draft is:
