@@ -1,35 +1,135 @@
 # Agent Governance Protocol (AGP)
 
-AGP is an experimental governance layer for decisions made by multiple agents.
+**AGP is an experimental governance layer for multi-agent systems.**
 
-- MCP connects agents to tools and data.
-- A2A connects agents to other agents.
-- AGP governs how a group reaches a verifiable decision.
+It defines how independent agents or authorities can propose, review, approve,
+reject, veto and audit high-impact decisions without trusting a single
+coordinator as the sole source of truth.
 
-## Current evidence
+> Status: experimental. AGP is not yet a production standard.
 
-- Semantic conformance: 260/260 vectors
-- Signed envelope conformance: 10/10 vectors
-- Transparency-log conformance: 8/8 vectors
-- Independent Python and Go implementations
-- Byte-identical receipts
+## Why AGP?
 
-## Run
+- **MCP** connects models to tools and data.
+- **A2A-style protocols** let agents communicate.
+- **Workflow engines** coordinate execution.
+- **AGP** governs collective decisions.
+
+A workflow can record that a deployment was approved. AGP additionally aims to
+make the authority snapshot, evidence, ballots, resolution and history
+independently verifiable.
+
+## Core properties
+
+- deterministic resolution;
+- canonical serialization;
+- independent Python and Go implementations;
+- Ed25519 signed envelopes;
+- replay, expiration and revocation checks;
+- append-only transparency log;
+- external audit receipts;
+- conformance and adversarial test vectors.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    P[Proposal] --> E[Evidence]
+    E --> B[Signed ballots]
+    B --> R[Deterministic resolution]
+    R --> L[Transparency log]
+    L --> A[Independent audit]
+```
+
+## AGP vs. a conventional workflow
+
+| Property | Workflow | AGP |
+|---|---:|---:|
+| Coordinates steps | Yes | Yes |
+| Deterministic replay across implementations | Not inherent | Yes |
+| Signed authority actions | Optional/custom | Built into profile |
+| Evidence version validation | Optional/custom | Yes |
+| Revocation-aware decisions | Optional/custom | Yes |
+| Tamper-evident history | Optional/custom | Yes |
+| Independent audit without trusting coordinator | Not inherent | Yes |
+
+AGP is intentionally more complex. For low-risk internal automation, a
+conventional workflow is usually the better choice.
+
+## Reproducible results
+
+```text
+AGP v0.3 Conformance:          260/260 passed
+AGP v0.4 Signed Conformance:    10/10 passed
+AGP v0.5 Transparency:           8/8 passed
+AGP vs Workflow benchmark:       8/8 attacks detected by AGP
+```
+
+The workflow baseline in the benchmark detected 0/8 because it treated
+coordinator state as authoritative. This is a limited experimental benchmark,
+not a claim that all workflow engines are insecure.
+
+## Quick start
+
+Requirements:
+
+- Python 3.10+
+- Go 1.22+
 
 ```bash
+git clone https://github.com/agpprotocol/agp.git
+cd agp
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-v0.4.txt
-python3 run_all_v0.5.py
+python3 run_benchmark_all.py
 ```
 
-## Core claim
+Expected final line:
 
-AGP does not merely route approvals. It defines authority, evidence binding,
-objections, vetoes, deterministic resolution, signatures and a tamper-evident
-decision history.
+```text
+AGP BENCHMARK COMPLETE
+```
 
-## Status
+## Repository map
 
-Experimental. The remaining question is product necessity: whether the added
-guarantees justify the integration cost compared with conventional workflows.
+```text
+spec/           Conformance profile
+python/         Python resolver
+go/             Go resolver
+signed/         Signed envelope conformance
+transparency/   Append-only audit log
+benchmark/      AGP vs workflow experiment
+examples/       Reference scenarios
+docs/           Architecture, threat model and evaluation
+```
+
+## What AGP does not claim
+
+AGP does not:
+
+- replace authentication, authorization or IAM;
+- replace orchestration engines;
+- guarantee that evidence is factually true;
+- eliminate compromised members;
+- solve governance for every multi-agent system;
+- claim production maturity.
+
+## Current research question
+
+> Do high-impact multi-agent systems need a portable, independently verifiable
+> governance layer distinct from communication and orchestration?
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Threat model](docs/THREAT_MODEL.md)
+- [Benchmark](docs/BENCHMARK.md)
+- [Roadmap](ROADMAP.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
+- [Governance](GOVERNANCE.md)
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE).
