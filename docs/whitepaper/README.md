@@ -8,7 +8,7 @@ Version 0.9.2 — Public Review Draft
 
 - [Read the current whitepaper online](./AGP_Whitepaper_v0.9.2.md)
 - [Download the current PDF](./AGP_Whitepaper_v0.9.2.pdf)
-- [Open a technical review issue](https://github.com/agpprotocol/agp/issues/new)
+- [Open a technical review issue](https://github.com/agpprotocol/agp/issues/1)
 
 This document is experimental. It is not a production standard and has not received independent security review.
 

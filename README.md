@@ -17,7 +17,7 @@ The current public review draft is:
 
 - [Read online](docs/whitepaper/AGP_Whitepaper_v0.9.2.md)
 - [Download PDF](https://github.com/agpprotocol/agp/releases/tag/whitepaper-v0.9.2)
-- [Submit technical feedback](https://github.com/agpprotocol/agp/issues/new)
+- [Submit technical feedback](https://github.com/agpprotocol/agp/issues/1)
 
 The whitepaper is experimental, is not a production standard, and has not yet received independent security review.
 
