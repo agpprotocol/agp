@@ -8,6 +8,19 @@ coordinator as the sole source of truth.
 
 > Status: experimental. AGP is not yet a production standard.
 
+
+## Whitepaper
+
+The current public review draft is:
+
+**AGP Whitepaper v0.9.2 — A Deterministic Governance Layer for Multi-Agent Systems**
+
+- [Read online](docs/whitepaper/AGP_Whitepaper_v0.9.2.md)
+- [Download PDF](https://github.com/agpprotocol/agp/releases/tag/whitepaper-v0.9.2)
+- [Submit technical feedback](https://github.com/agpprotocol/agp/issues/new)
+
+The whitepaper is experimental, is not a production standard, and has not yet received independent security review.
+
 ## Why AGP?
 
 - **MCP** connects models to tools and data.
