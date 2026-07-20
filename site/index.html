@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Governance Protocol</title>
+  <meta name="description" content="AGP is an experimental governance layer for high-impact multi-agent decisions.">
+  <meta property="og:title" content="Agent Governance Protocol">
+  <meta property="og:description" content="Portable, deterministic and independently auditable governance for multi-agent systems.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#08111f">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>◈</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="AGP home">
+      <span class="brand-mark">AGP</span>
+      <span>Agent Governance Protocol</span>
+    </a>
+    <nav>
+      <a href="#why">Why AGP</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#results">Results</a>
+      <a href="#status">Status</a>
+      <a class="nav-cta" href="https://github.com/agpprotocol/agp">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="eyebrow">Experimental open protocol</div>
+      <h1>Governance for decisions no single agent should control.</h1>
+      <p class="hero-copy">
+        AGP is a portable governance layer for multi-agent systems. It makes proposals,
+        evidence, authority, ballots, resolution and history independently verifiable.
+      </p>
+      <div class="hero-actions">
+        <a class="button primary" href="https://github.com/agpprotocol/agp">Explore the repository</a>
+        <a class="button secondary" href="#results">See the evidence</a>
+      </div>
+
+      <div class="signal-grid">
+        <article>
+          <strong>260/260</strong>
+          <span>Cross-language conformance vectors</span>
+        </article>
+        <article>
+          <strong>10/10</strong>
+          <span>Signed-envelope vectors</span>
+        </article>
+        <article>
+          <strong>8/8</strong>
+          <span>Transparency vectors</span>
+        </article>
+        <article>
+          <strong>8/8</strong>
+          <span>Adversarial benchmark detections</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="why">
+      <div class="section-heading">
+        <span>01 — Why AGP</span>
+        <h2>Communication and orchestration are not governance.</h2>
+      </div>
+      <div class="comparison">
+        <article class="panel muted">
+          <div class="panel-label">Existing layers</div>
+          <h3>They move work.</h3>
+          <ul>
+            <li>MCP connects models to tools and data.</li>
+            <li>Agent protocols enable communication.</li>
+            <li>Workflow engines coordinate execution.</li>
+          </ul>
+        </article>
+        <article class="panel accent">
+          <div class="panel-label">AGP</div>
+          <h3>It governs authority.</h3>
+          <ul>
+            <li>Who was authorized to decide?</li>
+            <li>Which evidence version was reviewed?</li>
+            <li>How did ballots resolve deterministically?</li>
+            <li>Can an independent auditor replay the decision?</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="architecture">
+      <div class="section-heading">
+        <span>02 — Architecture</span>
+        <h2>A verifiable chain from proposal to audit.</h2>
+      </div>
+      <div class="flow" aria-label="AGP decision flow">
+        <div class="flow-card"><b>01</b><span>Proposal</span><small>Intent and decision scope</small></div>
+        <div class="arrow">→</div>
+        <div class="flow-card"><b>02</b><span>Evidence</span><small>Versioned decision inputs</small></div>
+        <div class="arrow">→</div>
+        <div class="flow-card"><b>03</b><span>Ballots</span><small>Signed authority actions</small></div>
+        <div class="arrow">→</div>
+        <div class="flow-card"><b>04</b><span>Resolution</span><small>Deterministic outcome</small></div>
+        <div class="arrow">→</div>
+        <div class="flow-card"><b>05</b><span>Audit</span><small>Independent replay</small></div>
+      </div>
+      <div class="principles">
+        <article><h3>Deterministic</h3><p>Independent implementations produce byte-identical receipts from the same canonical input.</p></article>
+        <article><h3>Authority-aware</h3><p>Membership, roles, vetoes, revocation and quorum are explicit decision inputs.</p></article>
+        <article><h3>Tamper-evident</h3><p>Hash-linked history exposes omitted, altered, reordered and truncated events.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="results">
+      <div class="section-heading">
+        <span>03 — Reproducible evidence</span>
+        <h2>Claims backed by executable tests.</h2>
+      </div>
+      <div class="terminal">
+        <div class="terminal-bar"><span></span><span></span><span></span></div>
+        <pre><code>$ python3 run_benchmark_all.py
+
+AGP v0.3 Conformance:        260/260 passed
+AGP v0.4 Signed Conformance:  10/10 passed
+AGP v0.5 Transparency:         8/8 passed
+
+Workflow attack detection:    0/8
+AGP attack detection:          8/8
+
+AGP BENCHMARK COMPLETE</code></pre>
+      </div>
+      <p class="disclaimer">
+        The workflow baseline intentionally trusts coordinator state. The benchmark demonstrates
+        AGP's explicit verification model; it is not a universal claim that all workflow engines are insecure.
+      </p>
+    </section>
+
+    <section class="section" id="status">
+      <div class="section-heading">
+        <span>04 — Project status</span>
+        <h2>Experimental by design. Honest about its limits.</h2>
+      </div>
+      <div class="status-grid">
+        <article class="panel">
+          <div class="status-tag ready">Implemented</div>
+          <ul>
+            <li>Python and Go resolvers</li>
+            <li>Signed envelopes</li>
+            <li>Revocation and replay controls</li>
+            <li>Append-only transparency log</li>
+            <li>Automated GitHub conformance</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <div class="status-tag next">Next</div>
+          <ul>
+            <li>Independent reproduction</li>
+            <li>Third implementation</li>
+            <li>Formal schemas</li>
+            <li>Real-world pilot</li>
+            <li>External security review</li>
+          </ul>
+        </article>
+        <article class="panel">
+          <div class="status-tag limit">Not claimed</div>
+          <ul>
+            <li>Production maturity</li>
+            <li>Evidence truthfulness</li>
+            <li>Confidentiality</li>
+            <li>Global consensus</li>
+            <li>Legal enforceability</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="cta">
+      <span>Open research question</span>
+      <h2>Do high-impact multi-agent systems need a governance layer distinct from communication and orchestration?</h2>
+      <p>AGP exists to test that hypothesis in public.</p>
+      <a class="button primary" href="https://github.com/agpprotocol/agp">Review, reproduce or challenge AGP</a>
+    </section>
+  </main>
+
+  <footer>
+    <div>
+      <strong>Agent Governance Protocol</strong>
+      <p>Experimental open-source research.</p>
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/agpprotocol/agp">Repository</a>
+      <a href="https://github.com/agpprotocol/agp/blob/main/docs/ARCHITECTURE.md">Architecture</a>
+      <a href="https://github.com/agpprotocol/agp/blob/main/docs/THREAT_MODEL.md">Threat model</a>
+      <a href="https://github.com/agpprotocol/agp/blob/main/ROADMAP.md">Roadmap</a>
+    </div>
+  </footer>
+</body>
+</html>
