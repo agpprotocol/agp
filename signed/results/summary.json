@@ -1,0 +1,105 @@
+{
+  "profile": "AGP-Signed-Conformance-0.4",
+  "vectors": 10,
+  "passed": 10,
+  "failed": 0,
+  "byte_identical": true,
+  "rows": [
+    {
+      "vector": "001_python_signed_valid.json",
+      "accepted": true,
+      "expected": true,
+      "byte_identical": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "vector": "002_go_key_signed_valid.json",
+      "accepted": true,
+      "expected": true,
+      "byte_identical": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "vector": "003_tampered_payload.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        "INVALID_SIGNATURE"
+      ]
+    },
+    {
+      "vector": "004_tampered_signature.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        "INVALID_SIGNATURE"
+      ]
+    },
+    {
+      "vector": "005_unknown_key.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        "UNKNOWN_KEY"
+      ]
+    },
+    {
+      "vector": "006_expired_envelope.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        "ENVELOPE_EXPIRED"
+      ]
+    },
+    {
+      "vector": "007_replay.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        "REPLAY_DETECTED"
+      ]
+    },
+    {
+      "vector": "008_revoked_key.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        "KEY_REVOKED"
+      ]
+    },
+    {
+      "vector": "009_key_not_yet_valid.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        "KEY_NOT_YET_VALID"
+      ]
+    },
+    {
+      "vector": "010_wrong_public_key.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        "INVALID_SIGNATURE"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"accepted":false,"envelope_id":"urn:agp:env:n5","error_codes":["UNKNOWN_KEY"],"issuer":"agent:python","key_id":"missing","object_type":"ballot","payload_digest":"sha256:4d8835fb02f6b7e7d8bcd960a73871a7d03c6ea103b8da99ee5fe65b55e23117","replay_token":"agent:python|n5"}

@@ -1,0 +1,40 @@
+{
+  "use_case": "Production deployment approval",
+  "decision": "Deploy payments-api 2.4.0",
+  "participants": [
+    {
+      "agent": "security",
+      "authority": "security review",
+      "vote": "approve"
+    },
+    {
+      "agent": "legal",
+      "authority": "regulatory review",
+      "vote": "approve"
+    },
+    {
+      "agent": "operations",
+      "authority": "operational readiness",
+      "vote": "approve"
+    },
+    {
+      "agent": "finance",
+      "authority": "budget impact",
+      "vote": "abstain"
+    }
+  ],
+  "rule": {
+    "quorum": 3,
+    "security_veto": true,
+    "legal_veto": true,
+    "blocking_objection": "escalate"
+  },
+  "attacks_demonstrated": [
+    "coordinator deletes a ballot",
+    "coordinator changes an existing vote",
+    "coordinator reorders history",
+    "coordinator publishes a truncated log",
+    "coordinator forks the history"
+  ],
+  "why_agp": "The deployment may be approved while the process remains independently auditable and tamper-evident."
+}

@@ -1,0 +1,1 @@
+{"accepted":false,"envelope_id":"urn:agp:env:n10","error_codes":["INVALID_SIGNATURE"],"issuer":"agent:python","key_id":"py-key-1","object_type":"ballot","payload_digest":"sha256:ced9cdbf8dc9be32e17d0f9ee5e3c759e7a1ca779cc14530efb972f07d52ee95","replay_token":"agent:python|n10"}

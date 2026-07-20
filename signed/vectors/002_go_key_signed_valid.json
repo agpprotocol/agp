@@ -1,0 +1,41 @@
+{
+  "envelope": {
+    "envelope_id": "urn:agp:env:n2",
+    "expires_at": "2026-07-20T16:00:00Z",
+    "issued_at": "2026-07-20T14:00:00Z",
+    "issuer": "agent:go",
+    "key_id": "go-key-1",
+    "nonce": "n2",
+    "object_type": "ballot",
+    "payload": {
+      "ballot_id": "urn:agp:ballot:n2",
+      "position": "approve",
+      "sequence": 1
+    },
+    "signature": "bsXxc02nUmTiBEXlja/VnvG4tpei1877L98Zf6bX2PxajOe8wKq6UzRmF52Pms4TpawAznKhtbRA/qOwP/kKDg=="
+  },
+  "expected": true,
+  "keyring": [
+    {
+      "algorithm": "Ed25519",
+      "issuer": "agent:python",
+      "key_id": "py-key-1",
+      "public_key": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w=",
+      "revoked_at": null,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_until": "2027-01-01T00:00:00Z"
+    },
+    {
+      "algorithm": "Ed25519",
+      "issuer": "agent:go",
+      "key_id": "go-key-1",
+      "public_key": "gTl3Dqh9F19Wo1Rmw0x+zMuNipG07jeiXfYPW4/Js5Q=",
+      "revoked_at": null,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_until": "2027-01-01T00:00:00Z"
+    }
+  ],
+  "name": "go_key_signed_valid",
+  "seen_nonces": [],
+  "verification_time": "2026-07-20T15:00:00Z"
+}

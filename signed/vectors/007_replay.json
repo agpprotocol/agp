@@ -1,0 +1,43 @@
+{
+  "envelope": {
+    "envelope_id": "urn:agp:env:n7",
+    "expires_at": "2026-07-20T16:00:00Z",
+    "issued_at": "2026-07-20T14:00:00Z",
+    "issuer": "agent:python",
+    "key_id": "py-key-1",
+    "nonce": "n7",
+    "object_type": "ballot",
+    "payload": {
+      "ballot_id": "urn:agp:ballot:n7",
+      "position": "approve",
+      "sequence": 1
+    },
+    "signature": "LLxn2r4hOPKNQi6+FjxcFcpmMRJwIgut0Mah7mKxm/fgt+ZdTnciRNMrXPautOi5ghAg52d9O5qjTz8JFbxhCw=="
+  },
+  "expected": false,
+  "keyring": [
+    {
+      "algorithm": "Ed25519",
+      "issuer": "agent:python",
+      "key_id": "py-key-1",
+      "public_key": "iojj3XQJ8ZX9UtstPLpdcspnCb8dlBIb83SIAbQPb1w=",
+      "revoked_at": null,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_until": "2027-01-01T00:00:00Z"
+    },
+    {
+      "algorithm": "Ed25519",
+      "issuer": "agent:go",
+      "key_id": "go-key-1",
+      "public_key": "gTl3Dqh9F19Wo1Rmw0x+zMuNipG07jeiXfYPW4/Js5Q=",
+      "revoked_at": null,
+      "valid_from": "2026-01-01T00:00:00Z",
+      "valid_until": "2027-01-01T00:00:00Z"
+    }
+  ],
+  "name": "replay",
+  "seen_nonces": [
+    "agent:python|n7"
+  ],
+  "verification_time": "2026-07-20T15:00:00Z"
+}

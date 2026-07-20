@@ -1,0 +1,152 @@
+{
+  "benchmark": "AGP-vs-Workflow-0.1",
+  "scenarios": 9,
+  "attack_scenarios": 8,
+  "workflow_attacks_detected": 0,
+  "agp_attacks_detected": 8,
+  "workflow_detection_rate": 0.0,
+  "agp_detection_rate": 1.0,
+  "workflow_loc": 26,
+  "agp_loc": 60,
+  "workflow_median_ms": 56.788,
+  "agp_median_ms": 59.144,
+  "rows": [
+    {
+      "scenario": "clean",
+      "attack_expected": false,
+      "workflow_detected": false,
+      "agp_detected": false,
+      "workflow_outcome": "approved",
+      "agp_outcome": "approved",
+      "workflow_audit_ok": true,
+      "agp_audit_ok": true,
+      "workflow_ms": 58.59,
+      "agp_ms": 59.371,
+      "agp_errors": []
+    },
+    {
+      "scenario": "omitted_ballot",
+      "attack_expected": true,
+      "workflow_detected": false,
+      "agp_detected": true,
+      "workflow_outcome": "rejected",
+      "agp_outcome": "rejected",
+      "workflow_audit_ok": true,
+      "agp_audit_ok": false,
+      "workflow_ms": 56.487,
+      "agp_ms": 58.961,
+      "agp_errors": [
+        "HISTORY_TAMPERING"
+      ]
+    },
+    {
+      "scenario": "altered_ballot",
+      "attack_expected": true,
+      "workflow_detected": false,
+      "agp_detected": true,
+      "workflow_outcome": "rejected",
+      "agp_outcome": "rejected",
+      "workflow_audit_ok": true,
+      "agp_audit_ok": false,
+      "workflow_ms": 56.351,
+      "agp_ms": 59.132,
+      "agp_errors": [
+        "HISTORY_TAMPERING"
+      ]
+    },
+    {
+      "scenario": "reordered_history",
+      "attack_expected": true,
+      "workflow_detected": false,
+      "agp_detected": true,
+      "workflow_outcome": "approved",
+      "agp_outcome": "approved",
+      "workflow_audit_ok": true,
+      "agp_audit_ok": false,
+      "workflow_ms": 56.788,
+      "agp_ms": 59.09,
+      "agp_errors": [
+        "HISTORY_TAMPERING"
+      ]
+    },
+    {
+      "scenario": "truncated_history",
+      "attack_expected": true,
+      "workflow_detected": false,
+      "agp_detected": true,
+      "workflow_outcome": "approved",
+      "agp_outcome": "approved",
+      "workflow_audit_ok": true,
+      "agp_audit_ok": false,
+      "workflow_ms": 56.695,
+      "agp_ms": 59.144,
+      "agp_errors": [
+        "HISTORY_TAMPERING"
+      ]
+    },
+    {
+      "scenario": "stale_evidence",
+      "attack_expected": true,
+      "workflow_detected": false,
+      "agp_detected": true,
+      "workflow_outcome": "approved",
+      "agp_outcome": "rejected",
+      "workflow_audit_ok": true,
+      "agp_audit_ok": false,
+      "workflow_ms": 56.798,
+      "agp_ms": 59.312,
+      "agp_errors": [
+        "STALE_EVIDENCE"
+      ]
+    },
+    {
+      "scenario": "revoked_voter",
+      "attack_expected": true,
+      "workflow_detected": false,
+      "agp_detected": true,
+      "workflow_outcome": "approved",
+      "agp_outcome": "rejected",
+      "workflow_audit_ok": true,
+      "agp_audit_ok": false,
+      "workflow_ms": 56.718,
+      "agp_ms": 59.228,
+      "agp_errors": [
+        "REVOKED_VOTER"
+      ]
+    },
+    {
+      "scenario": "replaced_root",
+      "attack_expected": true,
+      "workflow_detected": false,
+      "agp_detected": true,
+      "workflow_outcome": "approved",
+      "agp_outcome": "approved",
+      "workflow_audit_ok": true,
+      "agp_audit_ok": false,
+      "workflow_ms": 56.897,
+      "agp_ms": 59.123,
+      "agp_errors": [
+        "REPLACED_DECISION_ROOT"
+      ]
+    },
+    {
+      "scenario": "duplicate_ballot",
+      "attack_expected": true,
+      "workflow_detected": false,
+      "agp_detected": true,
+      "workflow_outcome": "approved",
+      "agp_outcome": "approved",
+      "workflow_audit_ok": true,
+      "agp_audit_ok": false,
+      "workflow_ms": 56.838,
+      "agp_ms": 59.213,
+      "agp_errors": [
+        "DUPLICATE_BALLOT"
+      ]
+    }
+  ],
+  "interpretation": {
+    "workflow": "Simpler and faster, but trusts coordinator state.",
+    "agp": "More code and verification cost, but independently detects governance tampering."
+  }
+}

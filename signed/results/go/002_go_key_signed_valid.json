@@ -1,0 +1,1 @@
+{"accepted":true,"envelope_id":"urn:agp:env:n2","error_codes":[],"issuer":"agent:go","key_id":"go-key-1","object_type":"ballot","payload_digest":"sha256:9243c6fe10aff4ed96d612bc151e33011b87a5cb60a6b790e1c0ec77173fef0e","replay_token":"agent:go|n2"}

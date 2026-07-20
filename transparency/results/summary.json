@@ -1,0 +1,148 @@
+{
+  "profile": "AGP-Transparency-0.5",
+  "vectors": 8,
+  "passed": 8,
+  "failed": 0,
+  "byte_identical": true,
+  "rows": [
+    {
+      "vector": "001_valid_log.json",
+      "accepted": true,
+      "expected": true,
+      "byte_identical": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "vector": "002_tampered_event.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        {
+          "code": "ENTRY_HASH_MISMATCH",
+          "index": 2
+        }
+      ]
+    },
+    {
+      "vector": "003_deleted_entry.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        {
+          "code": "NON_CONTIGUOUS_INDEX",
+          "index": 4
+        },
+        {
+          "code": "NON_CONTIGUOUS_INDEX",
+          "index": 5
+        },
+        {
+          "code": "PREVIOUS_HASH_MISMATCH",
+          "index": 4
+        }
+      ]
+    },
+    {
+      "vector": "004_reordered_entries.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        {
+          "code": "NON_CONTIGUOUS_INDEX",
+          "index": 2
+        },
+        {
+          "code": "NON_CONTIGUOUS_INDEX",
+          "index": 3
+        },
+        {
+          "code": "PREVIOUS_HASH_MISMATCH",
+          "index": 2
+        },
+        {
+          "code": "PREVIOUS_HASH_MISMATCH",
+          "index": 3
+        },
+        {
+          "code": "PREVIOUS_HASH_MISMATCH",
+          "index": 4
+        }
+      ]
+    },
+    {
+      "vector": "005_truncated_log.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        {
+          "code": "CHECKPOINT_MISMATCH",
+          "index": 4
+        }
+      ]
+    },
+    {
+      "vector": "006_forked_history.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        {
+          "code": "PREVIOUS_HASH_MISMATCH",
+          "index": 4
+        },
+        {
+          "code": "PREVIOUS_HASH_MISMATCH",
+          "index": 5
+        }
+      ]
+    },
+    {
+      "vector": "007_replaced_hash.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        {
+          "code": "ENTRY_HASH_MISMATCH",
+          "index": 3
+        },
+        {
+          "code": "PREVIOUS_HASH_MISMATCH",
+          "index": 4
+        }
+      ]
+    },
+    {
+      "vector": "008_duplicate_index.json",
+      "accepted": false,
+      "expected": false,
+      "byte_identical": true,
+      "passed": true,
+      "errors": [
+        {
+          "code": "DUPLICATE_INDEX",
+          "index": 2
+        },
+        {
+          "code": "ENTRY_HASH_MISMATCH",
+          "index": 2
+        },
+        {
+          "code": "NON_CONTIGUOUS_INDEX",
+          "index": 2
+        }
+      ]
+    }
+  ]
+}

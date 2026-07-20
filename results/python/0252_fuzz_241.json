@@ -1,0 +1,1 @@
+{"blocking_objections":[],"blocking_vetoes":[],"input_root":"sha256:3981974c19270d4cadfda6e3e9ef56a18a52bcd41f0b7f7fa5cca41fa34413f1","issues":[],"outcome":"escalated","proposal_id":"urn:agp:proposal:p1","snapshot_id":"urn:agp:snapshot:s1","tally":{"abstain":0,"approve":0,"defer":0,"reject":1},"valid_ballot_ids":["urn:agp:ballot:security:1:reject"],"valid_objection_ids":[]}

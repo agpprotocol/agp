@@ -1,0 +1,82 @@
+{
+  "entries": [
+    {
+      "entry_hash": "sha256:5cf9720409a39ca066fb854d8690bc1462aefd115ba02a81f0e057dac0232118",
+      "event": {
+        "proposal_id": "deploy-2026-07-20",
+        "target": "payments-api",
+        "version": "2.4.0"
+      },
+      "event_id": "evt-001",
+      "event_type": "proposal.created",
+      "index": 0,
+      "previous_hash": "GENESIS",
+      "timestamp": "2026-07-20T15:00:00Z"
+    },
+    {
+      "entry_hash": "sha256:13afe35e67b3d3fe46881e416c14dea1d9ce93e9e92ae775d1976438f66a8955",
+      "event": {
+        "critical_findings": 0,
+        "manifest": "evidence-v1",
+        "tests_passed": 412
+      },
+      "event_id": "evt-002",
+      "event_type": "evidence.published",
+      "index": 1,
+      "previous_hash": "sha256:5cf9720409a39ca066fb854d8690bc1462aefd115ba02a81f0e057dac0232118",
+      "timestamp": "2026-07-20T15:01:00Z"
+    },
+    {
+      "entry_hash": "sha256:f4540f1d8252d336c6da5275d9ddf3ec2b299c9bf50568dd4de448419cd3178d",
+      "event": {
+        "issuer": "agent:security",
+        "position": "approve"
+      },
+      "event_id": "evt-003",
+      "event_type": "ballot.cast",
+      "index": 2,
+      "previous_hash": "sha256:13afe35e67b3d3fe46881e416c14dea1d9ce93e9e92ae775d1976438f66a8955",
+      "timestamp": "2026-07-20T15:02:00Z"
+    },
+    {
+      "entry_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "event": {
+        "issuer": "agent:legal",
+        "position": "approve"
+      },
+      "event_id": "evt-004",
+      "event_type": "ballot.cast",
+      "index": 3,
+      "previous_hash": "sha256:f4540f1d8252d336c6da5275d9ddf3ec2b299c9bf50568dd4de448419cd3178d",
+      "timestamp": "2026-07-20T15:03:00Z"
+    },
+    {
+      "entry_hash": "sha256:190ac8958cd508bc9ab6244f272827ed1663a153542b79adf0a7107134e470ad",
+      "event": {
+        "issuer": "agent:operations",
+        "position": "approve"
+      },
+      "event_id": "evt-005",
+      "event_type": "ballot.cast",
+      "index": 4,
+      "previous_hash": "sha256:957907f803409151dd88766062c281ac72926df2faf85ff76daa225032a7dc6e",
+      "timestamp": "2026-07-20T15:04:00Z"
+    },
+    {
+      "entry_hash": "sha256:67a41f48fb18a4a2b643ebd4f599d6699e251484c11b5d35c1e0dba504170c5e",
+      "event": {
+        "input_root": "sha256:demo",
+        "outcome": "approved"
+      },
+      "event_id": "evt-006",
+      "event_type": "resolution.issued",
+      "index": 5,
+      "previous_hash": "sha256:190ac8958cd508bc9ab6244f272827ed1663a153542b79adf0a7107134e470ad",
+      "timestamp": "2026-07-20T15:05:00Z"
+    }
+  ],
+  "expected": false,
+  "expected_checkpoint": "sha256:67a41f48fb18a4a2b643ebd4f599d6699e251484c11b5d35c1e0dba504170c5e",
+  "log_id": "urn:agp:log:deployment-demo",
+  "name": "replaced_hash"
+}

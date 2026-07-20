@@ -1,0 +1,1 @@
+{"accepted":false,"checkpoint":"sha256:190ac8958cd508bc9ab6244f272827ed1663a153542b79adf0a7107134e470ad","entry_count":5,"error_codes":[{"code":"CHECKPOINT_MISMATCH","index":4}],"log_id":"urn:agp:log:deployment-demo"}

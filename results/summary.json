@@ -1,0 +1,2093 @@
+{
+  "profile": "AGP-Conformance-0.3",
+  "implementations": [
+    "Python",
+    "Go"
+  ],
+  "vectors": 260,
+  "passed": 260,
+  "failed": 0,
+  "byte_identical": true,
+  "rows": [
+    {
+      "vector": "0001_majority.json",
+      "outcome": "approved",
+      "expected": "approved",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0002_legal_veto.json",
+      "outcome": "blocked",
+      "expected": "blocked",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0003_tie.json",
+      "outcome": "escalated",
+      "expected": "escalated",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0004_blocking_objection.json",
+      "outcome": "escalated",
+      "expected": "escalated",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0005_revoked_vote.json",
+      "outcome": "inconclusive",
+      "expected": "inconclusive",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0006_stale_evidence.json",
+      "outcome": "inconclusive",
+      "expected": "inconclusive",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0007_equivocation.json",
+      "outcome": "inconclusive",
+      "expected": "inconclusive",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0008_replacement.json",
+      "outcome": "approved",
+      "expected": "approved",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0009_review_revocation.json",
+      "outcome": "escalated",
+      "expected": "escalated",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0010_non_member.json",
+      "outcome": "inconclusive",
+      "expected": "inconclusive",
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0011_fuzz_000.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0012_fuzz_001.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0013_fuzz_002.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0014_fuzz_003.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0015_fuzz_004.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0016_fuzz_005.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0017_fuzz_006.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0018_fuzz_007.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0019_fuzz_008.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0020_fuzz_009.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0021_fuzz_010.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0022_fuzz_011.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0023_fuzz_012.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0024_fuzz_013.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0025_fuzz_014.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0026_fuzz_015.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0027_fuzz_016.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0028_fuzz_017.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0029_fuzz_018.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0030_fuzz_019.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0031_fuzz_020.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0032_fuzz_021.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0033_fuzz_022.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0034_fuzz_023.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0035_fuzz_024.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0036_fuzz_025.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0037_fuzz_026.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0038_fuzz_027.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0039_fuzz_028.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0040_fuzz_029.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0041_fuzz_030.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0042_fuzz_031.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0043_fuzz_032.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0044_fuzz_033.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0045_fuzz_034.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0046_fuzz_035.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0047_fuzz_036.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0048_fuzz_037.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0049_fuzz_038.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0050_fuzz_039.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0051_fuzz_040.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0052_fuzz_041.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0053_fuzz_042.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0054_fuzz_043.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0055_fuzz_044.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0056_fuzz_045.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0057_fuzz_046.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0058_fuzz_047.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0059_fuzz_048.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0060_fuzz_049.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0061_fuzz_050.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0062_fuzz_051.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0063_fuzz_052.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0064_fuzz_053.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0065_fuzz_054.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0066_fuzz_055.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0067_fuzz_056.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0068_fuzz_057.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0069_fuzz_058.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0070_fuzz_059.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0071_fuzz_060.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0072_fuzz_061.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0073_fuzz_062.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0074_fuzz_063.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0075_fuzz_064.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0076_fuzz_065.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0077_fuzz_066.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0078_fuzz_067.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0079_fuzz_068.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0080_fuzz_069.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0081_fuzz_070.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0082_fuzz_071.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0083_fuzz_072.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0084_fuzz_073.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0085_fuzz_074.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0086_fuzz_075.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0087_fuzz_076.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0088_fuzz_077.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0089_fuzz_078.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0090_fuzz_079.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0091_fuzz_080.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0092_fuzz_081.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0093_fuzz_082.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0094_fuzz_083.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0095_fuzz_084.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0096_fuzz_085.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0097_fuzz_086.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0098_fuzz_087.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0099_fuzz_088.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0100_fuzz_089.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0101_fuzz_090.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0102_fuzz_091.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0103_fuzz_092.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0104_fuzz_093.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0105_fuzz_094.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0106_fuzz_095.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0107_fuzz_096.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0108_fuzz_097.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0109_fuzz_098.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0110_fuzz_099.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0111_fuzz_100.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0112_fuzz_101.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0113_fuzz_102.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0114_fuzz_103.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0115_fuzz_104.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0116_fuzz_105.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0117_fuzz_106.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0118_fuzz_107.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0119_fuzz_108.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0120_fuzz_109.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0121_fuzz_110.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0122_fuzz_111.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0123_fuzz_112.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0124_fuzz_113.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0125_fuzz_114.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0126_fuzz_115.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0127_fuzz_116.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0128_fuzz_117.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0129_fuzz_118.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0130_fuzz_119.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0131_fuzz_120.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0132_fuzz_121.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0133_fuzz_122.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0134_fuzz_123.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0135_fuzz_124.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0136_fuzz_125.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0137_fuzz_126.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0138_fuzz_127.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0139_fuzz_128.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0140_fuzz_129.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0141_fuzz_130.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0142_fuzz_131.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0143_fuzz_132.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0144_fuzz_133.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0145_fuzz_134.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0146_fuzz_135.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0147_fuzz_136.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0148_fuzz_137.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0149_fuzz_138.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0150_fuzz_139.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0151_fuzz_140.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0152_fuzz_141.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0153_fuzz_142.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0154_fuzz_143.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0155_fuzz_144.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0156_fuzz_145.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0157_fuzz_146.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0158_fuzz_147.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0159_fuzz_148.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0160_fuzz_149.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0161_fuzz_150.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0162_fuzz_151.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0163_fuzz_152.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0164_fuzz_153.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0165_fuzz_154.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0166_fuzz_155.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0167_fuzz_156.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0168_fuzz_157.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0169_fuzz_158.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0170_fuzz_159.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0171_fuzz_160.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0172_fuzz_161.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0173_fuzz_162.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0174_fuzz_163.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0175_fuzz_164.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0176_fuzz_165.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0177_fuzz_166.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0178_fuzz_167.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0179_fuzz_168.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0180_fuzz_169.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0181_fuzz_170.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0182_fuzz_171.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0183_fuzz_172.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0184_fuzz_173.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0185_fuzz_174.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0186_fuzz_175.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0187_fuzz_176.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0188_fuzz_177.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0189_fuzz_178.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0190_fuzz_179.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0191_fuzz_180.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0192_fuzz_181.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0193_fuzz_182.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0194_fuzz_183.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0195_fuzz_184.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0196_fuzz_185.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0197_fuzz_186.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0198_fuzz_187.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0199_fuzz_188.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0200_fuzz_189.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0201_fuzz_190.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0202_fuzz_191.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0203_fuzz_192.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0204_fuzz_193.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0205_fuzz_194.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0206_fuzz_195.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0207_fuzz_196.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0208_fuzz_197.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0209_fuzz_198.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0210_fuzz_199.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0211_fuzz_200.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0212_fuzz_201.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0213_fuzz_202.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0214_fuzz_203.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0215_fuzz_204.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0216_fuzz_205.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0217_fuzz_206.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0218_fuzz_207.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0219_fuzz_208.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0220_fuzz_209.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0221_fuzz_210.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0222_fuzz_211.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0223_fuzz_212.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0224_fuzz_213.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0225_fuzz_214.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0226_fuzz_215.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0227_fuzz_216.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0228_fuzz_217.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0229_fuzz_218.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0230_fuzz_219.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0231_fuzz_220.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0232_fuzz_221.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0233_fuzz_222.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0234_fuzz_223.json",
+      "outcome": "approved",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0235_fuzz_224.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0236_fuzz_225.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0237_fuzz_226.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0238_fuzz_227.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0239_fuzz_228.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0240_fuzz_229.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0241_fuzz_230.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0242_fuzz_231.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0243_fuzz_232.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0244_fuzz_233.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0245_fuzz_234.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0246_fuzz_235.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0247_fuzz_236.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0248_fuzz_237.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0249_fuzz_238.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0250_fuzz_239.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0251_fuzz_240.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0252_fuzz_241.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0253_fuzz_242.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0254_fuzz_243.json",
+      "outcome": "blocked",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0255_fuzz_244.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0256_fuzz_245.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0257_fuzz_246.json",
+      "outcome": "rejected",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0258_fuzz_247.json",
+      "outcome": "inconclusive",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0259_fuzz_248.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    },
+    {
+      "vector": "0260_fuzz_249.json",
+      "outcome": "escalated",
+      "expected": null,
+      "byte_identical": true,
+      "expected_ok": true,
+      "passed": true
+    }
+  ]
+}

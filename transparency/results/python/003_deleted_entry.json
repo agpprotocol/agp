@@ -1,0 +1,1 @@
+{"accepted":false,"checkpoint":"sha256:67a41f48fb18a4a2b643ebd4f599d6699e251484c11b5d35c1e0dba504170c5e","entry_count":5,"error_codes":[{"code":"NON_CONTIGUOUS_INDEX","index":4},{"code":"NON_CONTIGUOUS_INDEX","index":5},{"code":"PREVIOUS_HASH_MISMATCH","index":4}],"log_id":"urn:agp:log:deployment-demo"}

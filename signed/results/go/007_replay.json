@@ -1,0 +1,1 @@
+{"accepted":false,"envelope_id":"urn:agp:env:n7","error_codes":["REPLAY_DETECTED"],"issuer":"agent:python","key_id":"py-key-1","object_type":"ballot","payload_digest":"sha256:4fe4914f7e166905352697faf484efbf1cd0238dadaddf9f02b5a76ad33def3a","replay_token":"agent:python|n7"}

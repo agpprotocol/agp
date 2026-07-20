@@ -1,0 +1,125 @@
+{
+  "agp_state": {
+    "ballots": [
+      {
+        "ballot_id": "b-sec",
+        "evidence_version": "evidence-v2",
+        "member_revoked": false,
+        "position": "approve",
+        "role": "security"
+      },
+      {
+        "ballot_id": "b-legal",
+        "evidence_version": "evidence-v2",
+        "member_revoked": false,
+        "position": "approve",
+        "role": "legal"
+      },
+      {
+        "ballot_id": "b-ops",
+        "evidence_version": "evidence-v2",
+        "member_revoked": false,
+        "position": "approve",
+        "role": "operations"
+      }
+    ],
+    "computed_input_root": "sha256:root-v2",
+    "current_evidence_version": "evidence-v2",
+    "declared_input_root": "sha256:root-v2",
+    "entries": [
+      {
+        "entry_hash": "sha256:19f84dca0fc2002bd543ba1cf223c760e6f7560b337192a254260622d8661b8b",
+        "event": {
+          "proposal": "deploy payments-api 2.4.0"
+        },
+        "event_type": "proposal.created",
+        "index": 0,
+        "previous_hash": "GENESIS"
+      },
+      {
+        "entry_hash": "sha256:873c3a588c74cac7eab0c9ec6db18c9d2696c14a681006e51fad33b775db1347",
+        "event": {
+          "version": "evidence-v2"
+        },
+        "event_type": "evidence.published",
+        "index": 1,
+        "previous_hash": "sha256:19f84dca0fc2002bd543ba1cf223c760e6f7560b337192a254260622d8661b8b"
+      },
+      {
+        "entry_hash": "sha256:76e1a2900dc061c0671715d392337c97431052418136b32e5711f79dbc49cad3",
+        "event": {
+          "ballot_id": "b-sec",
+          "position": "approve",
+          "role": "security"
+        },
+        "event_type": "ballot.cast",
+        "index": 2,
+        "previous_hash": "sha256:873c3a588c74cac7eab0c9ec6db18c9d2696c14a681006e51fad33b775db1347"
+      },
+      {
+        "entry_hash": "sha256:808a3490167cc9d7b8105845c9c546fc27bd3cb0d222ed2a9e7ca6e0bc433bf3",
+        "event": {
+          "ballot_id": "b-legal",
+          "position": "approve",
+          "role": "legal"
+        },
+        "event_type": "ballot.cast",
+        "index": 3,
+        "previous_hash": "sha256:76e1a2900dc061c0671715d392337c97431052418136b32e5711f79dbc49cad3"
+      },
+      {
+        "entry_hash": "sha256:e16e23094cee713282bc070431e40f0e97dbc73480411c3cddb9622b6ae3552e",
+        "event": {
+          "ballot_id": "b-ops",
+          "position": "approve",
+          "role": "operations"
+        },
+        "event_type": "ballot.cast",
+        "index": 4,
+        "previous_hash": "sha256:808a3490167cc9d7b8105845c9c546fc27bd3cb0d222ed2a9e7ca6e0bc433bf3"
+      },
+      {
+        "entry_hash": "sha256:5999d4dfd31a272716c0d4701da7b2d1dc4403d9cfa3e351e959ec26cef36c96",
+        "event": {
+          "outcome": "approved"
+        },
+        "event_type": "resolution.issued",
+        "index": 5,
+        "previous_hash": "sha256:e16e23094cee713282bc070431e40f0e97dbc73480411c3cddb9622b6ae3552e"
+      }
+    ],
+    "expected_checkpoint": "sha256:5999d4dfd31a272716c0d4701da7b2d1dc4403d9cfa3e351e959ec26cef36c96",
+    "quorum": 3,
+    "veto_roles": [
+      "security",
+      "legal"
+    ]
+  },
+  "expected": {
+    "agp_outcome": "approved",
+    "workflow_outcome": "approved"
+  },
+  "expected_detection": false,
+  "name": "clean",
+  "workflow_state": {
+    "approvals": [
+      {
+        "position": "approve",
+        "role": "security"
+      },
+      {
+        "position": "approve",
+        "role": "legal"
+      },
+      {
+        "position": "approve",
+        "role": "operations"
+      }
+    ],
+    "quorum": 3,
+    "veto_roles": [
+      "security",
+      "legal"
+    ]
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "active_evidence_manifest": "urn:agp:evidence:v2",
+  "ballots": [
+    {
+      "ballot_id": "urn:agp:ballot:security:1:approve",
+      "evidence_manifest": "urn:agp:evidence:v2",
+      "issued_at": "2026-07-20T14:00:00Z",
+      "position": "approve",
+      "proposal_id": "urn:agp:proposal:p1",
+      "sequence": 1,
+      "snapshot_id": "urn:agp:snapshot:s1",
+      "voter": "agent:security"
+    },
+    {
+      "ballot_id": "urn:agp:ballot:security:2:defer",
+      "evidence_manifest": "urn:agp:evidence:v2",
+      "issued_at": "2026-07-20T14:00:00Z",
+      "position": "defer",
+      "proposal_id": "urn:agp:proposal:p1",
+      "sequence": 2,
+      "snapshot_id": "urn:agp:snapshot:s1",
+      "voter": "agent:security"
+    },
+    {
+      "ballot_id": "urn:agp:ballot:ops:1:reject",
+      "evidence_manifest": "urn:agp:evidence:v2",
+      "issued_at": "2026-07-20T14:00:00Z",
+      "position": "reject",
+      "proposal_id": "urn:agp:proposal:p1",
+      "sequence": 1,
+      "snapshot_id": "urn:agp:snapshot:s1",
+      "voter": "agent:ops"
+    }
+  ],
+  "closing_time": "2026-07-20T15:00:00Z",
+  "expected_outcome": null,
+  "members": [
+    {
+      "member_id": "agent:finance",
+      "roles": [
+        "finance"
+      ],
+      "weight": 1
+    },
+    {
+      "member_id": "agent:security",
+      "roles": [
+        "security"
+      ],
+      "weight": 1
+    },
+    {
+      "member_id": "agent:legal",
+      "roles": [
+        "legal"
+      ],
+      "weight": 1
+    },
+    {
+      "member_id": "agent:ops",
+      "roles": [
+        "operations"
+      ],
+      "weight": 1
+    }
+  ],
+  "name": "fuzz_206",
+  "objections": [
+    {
+      "objection_id": "urn:agp:obj:206",
+      "objector": "agent:security",
+      "proposal_id": "urn:agp:proposal:p1",
+      "severity": "blocking"
+    }
+  ],
+  "proposal_id": "urn:agp:proposal:p1",
+  "revocations": [
+    {
+      "effective_at": "2026-07-20T14:30:00Z",
+      "member_id": "agent:legal",
+      "revocation_id": "urn:agp:rev:206"
+    }
+  ],
+  "rule": {
+    "abstention_counts_toward_quorum": true,
+    "evidence_change_policy": "reconfirmation_required",
+    "formal_objection_effect": "escalate",
+    "quorum_failure": "escalated",
+    "quorum_minimum": 4,
+    "revocation_policy": "human_review_required",
+    "tie_resolution": "human_escalation",
+    "veto_roles": []
+  },
+  "snapshot_id": "urn:agp:snapshot:s1"
+}
