@@ -1,0 +1,14 @@
+.DS_Store
+__pycache__/
+*.pyc
+
+results/
+generated/
+
+*.exe
+*.out
+*.o
+
+agp-log-go
+agp-signed-go
+agp-resolver-go
