@@ -1,0 +1,71 @@
+{
+  "proposal": {
+    "proposal_id": "urn:agp:proposal:deploy-payments-api-2.4.0",
+    "action": "deploy",
+    "artifact": "payments-api",
+    "version": "2.4.0"
+  },
+  "policy": {
+    "policy_id": "urn:agp:policy:production-deployment",
+    "policy_version": "1",
+    "rule": {
+      "abstention_counts_toward_quorum": true,
+      "formal_objection_effect": "escalate",
+      "quorum_minimum": 3,
+      "tie_resolution": "human_escalation",
+      "veto_roles": [
+        "legal",
+        "security"
+      ]
+    }
+  },
+  "authority_set": {
+    "authority_set_id": "urn:agp:authority-set:deployment:v1",
+    "members": [
+      {
+        "member_id": "agent:finance",
+        "roles": [
+          "finance"
+        ],
+        "weight": 1
+      },
+      {
+        "member_id": "agent:security",
+        "roles": [
+          "security"
+        ],
+        "weight": 1
+      },
+      {
+        "member_id": "agent:legal",
+        "roles": [
+          "legal"
+        ],
+        "weight": 1
+      },
+      {
+        "member_id": "agent:ops",
+        "roles": [
+          "operations"
+        ],
+        "weight": 1
+      }
+    ]
+  },
+  "expected_execution_domain": "staging",
+  "verification_time": "2026-07-22T15:00:00Z",
+  "decision_context": {
+    "agp_profile": "AGP-0.6",
+    "context_type": "agp-decision-context",
+    "proposal_root": "sha256:99e5c0b7ff242c5ebf81c4dd3d00ec6543178d5df8fd999f6958b6302ea142e3",
+    "policy_id": "urn:agp:policy:production-deployment",
+    "policy_version": "1",
+    "policy_digest": "sha256:06c498735e0163a628e671c1b7a108da8a4ab83ba87765a33acc0a1012407e6c",
+    "authority_set_id": "urn:agp:authority-set:deployment:v1",
+    "authority_set_digest": "sha256:76c581ddb0f5f662fc39128f790fb4838c4e8a054f50d62b3b3e88521c1f6773",
+    "execution_domain": "production",
+    "valid_from": "2026-07-22T14:00:00Z",
+    "valid_until": "2026-07-22T16:00:00Z",
+    "decision_nonce": "decision-001"
+  }
+}
