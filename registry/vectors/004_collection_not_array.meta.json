@@ -1,0 +1,5 @@
+{
+  "vector": "collection_not_array",
+  "accepted": false,
+  "error_code": "INVALID_COLLECTION"
+}
