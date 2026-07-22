@@ -1,0 +1,91 @@
+{
+  "registry_version": "0.8",
+  "objects": [
+    {
+      "id": "agp.canonicalization-receipt/1",
+      "status": "active",
+      "spec": "spec/AGP-CANONICALIZATION-0.7.md",
+      "description": "Canonicalization acceptance or rejection receipt.",
+      "schema_version": 1,
+      "canonicalization": "agp-c14n/0.7",
+      "digest": "sha-256",
+      "schema": "registry/schemas/agp.canonicalization-receipt-1.schema.json"
+    },
+    {
+      "id": "agp.decision-context/1",
+      "status": "reserved",
+      "spec": "spec/",
+      "description": "Reserved identifier for the historical AGP decision context object.",
+      "schema_version": 1,
+      "canonicalization": "agp-c14n/0.7",
+      "digest": "sha-256",
+      "schema": "registry/schemas/reserved.schema.json"
+    },
+    {
+      "id": "agp.signed-decision-context/1",
+      "status": "reserved",
+      "spec": "spec/",
+      "description": "Reserved identifier for the historical signed decision context object.",
+      "schema_version": 1,
+      "canonicalization": "agp-c14n/0.7",
+      "digest": "sha-256",
+      "schema": "registry/schemas/reserved.schema.json"
+    },
+    {
+      "id": "agp.signed-envelope/1",
+      "status": "reserved",
+      "spec": "spec/",
+      "description": "Reserved identifier for the historical signed envelope object.",
+      "schema_version": 1,
+      "canonicalization": "agp-c14n/0.7",
+      "digest": "sha-256",
+      "schema": "registry/schemas/reserved.schema.json"
+    },
+    {
+      "id": "agp.transparency-record/1",
+      "status": "reserved",
+      "spec": "spec/",
+      "description": "Reserved identifier for the historical transparency record object.",
+      "schema_version": 1,
+      "canonicalization": "agp-c14n/0.7",
+      "digest": "sha-256",
+      "schema": "registry/schemas/reserved.schema.json"
+    }
+  ],
+  "canonicalization_algorithms": [
+    {
+      "id": "agp-c14n/0.7",
+      "status": "active",
+      "spec": "spec/AGP-CANONICALIZATION-0.7.md",
+      "description": "AGP deterministic JSON canonicalization profile 0.7.",
+      "receipt_version": 1
+    }
+  ],
+  "digest_algorithms": [
+    {
+      "id": "sha-256",
+      "status": "active",
+      "spec": "spec/AGP-CANONICALIZATION-0.7.md",
+      "description": "SHA-256 digest encoded as lowercase hexadecimal.",
+      "output_bits": 256
+    }
+  ],
+  "signature_algorithms": [
+    {
+      "id": "ed25519",
+      "status": "active",
+      "spec": "spec/",
+      "description": "Ed25519 signature algorithm with raw public keys and signatures.",
+      "key_type": "Ed25519",
+      "signature_encoding": "raw"
+    },
+    {
+      "id": "ed25519",
+      "status": "active",
+      "spec": "spec/",
+      "description": "Ed25519 signature algorithm with raw public keys and signatures.",
+      "key_type": "Ed25519",
+      "signature_encoding": "raw"
+    }
+  ]
+}

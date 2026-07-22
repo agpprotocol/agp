@@ -1,0 +1,5 @@
+{
+  "vector": "wrong_registry_version",
+  "accepted": false,
+  "error_code": "INVALID_REGISTRY_VERSION"
+}

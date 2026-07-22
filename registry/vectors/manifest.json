@@ -1,0 +1,85 @@
+{
+  "profile": "AGP-SCHEMA-REGISTRY-0.8",
+  "vectors": [
+    {
+      "name": "authoritative_registry",
+      "input": "001_authoritative_registry.input.json",
+      "meta": "001_authoritative_registry.meta.json"
+    },
+    {
+      "name": "unknown_top_level",
+      "input": "002_unknown_top_level.input.json",
+      "meta": "002_unknown_top_level.meta.json"
+    },
+    {
+      "name": "wrong_registry_version",
+      "input": "003_wrong_registry_version.input.json",
+      "meta": "003_wrong_registry_version.meta.json"
+    },
+    {
+      "name": "collection_not_array",
+      "input": "004_collection_not_array.input.json",
+      "meta": "004_collection_not_array.meta.json"
+    },
+    {
+      "name": "invalid_identifier",
+      "input": "005_invalid_identifier.input.json",
+      "meta": "005_invalid_identifier.meta.json"
+    },
+    {
+      "name": "duplicate_identifier",
+      "input": "006_duplicate_identifier.input.json",
+      "meta": "006_duplicate_identifier.meta.json"
+    },
+    {
+      "name": "unsorted_collection",
+      "input": "007_unsorted_collection.input.json",
+      "meta": "007_unsorted_collection.meta.json"
+    },
+    {
+      "name": "invalid_status",
+      "input": "008_invalid_status.input.json",
+      "meta": "008_invalid_status.meta.json"
+    },
+    {
+      "name": "unsafe_integer",
+      "input": "009_unsafe_integer.input.json",
+      "meta": "009_unsafe_integer.meta.json"
+    },
+    {
+      "name": "object_version_mismatch",
+      "input": "010_object_version_mismatch.input.json",
+      "meta": "010_object_version_mismatch.meta.json"
+    },
+    {
+      "name": "missing_reference",
+      "input": "011_missing_reference.input.json",
+      "meta": "011_missing_reference.meta.json"
+    },
+    {
+      "name": "reserved_reference",
+      "input": "012_reserved_reference.input.json",
+      "meta": "012_reserved_reference.meta.json"
+    },
+    {
+      "name": "duplicate_json_member",
+      "input": "013_duplicate_json_member.input.json",
+      "meta": "013_duplicate_json_member.meta.json"
+    },
+    {
+      "name": "utf8_bom",
+      "input": "014_utf8_bom.input.json",
+      "meta": "014_utf8_bom.meta.json"
+    },
+    {
+      "name": "decimal_number",
+      "input": "015_decimal_number.input.json",
+      "meta": "015_decimal_number.meta.json"
+    },
+    {
+      "name": "nonfinite_number",
+      "input": "016_nonfinite_number.input.json",
+      "meta": "016_nonfinite_number.meta.json"
+    }
+  ]
+}

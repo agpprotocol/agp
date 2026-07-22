@@ -1,0 +1,5 @@
+{
+  "vector": "unsafe_integer",
+  "accepted": false,
+  "error_code": "INVALID_SAFE_INTEGER"
+}

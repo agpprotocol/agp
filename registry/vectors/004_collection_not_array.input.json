@@ -1,0 +1,32 @@
+{
+  "registry_version": "0.8",
+  "objects": {},
+  "canonicalization_algorithms": [
+    {
+      "id": "agp-c14n/0.7",
+      "status": "active",
+      "spec": "spec/AGP-CANONICALIZATION-0.7.md",
+      "description": "AGP deterministic JSON canonicalization profile 0.7.",
+      "receipt_version": 1
+    }
+  ],
+  "digest_algorithms": [
+    {
+      "id": "sha-256",
+      "status": "active",
+      "spec": "spec/AGP-CANONICALIZATION-0.7.md",
+      "description": "SHA-256 digest encoded as lowercase hexadecimal.",
+      "output_bits": 256
+    }
+  ],
+  "signature_algorithms": [
+    {
+      "id": "ed25519",
+      "status": "active",
+      "spec": "spec/",
+      "description": "Ed25519 signature algorithm with raw public keys and signatures.",
+      "key_type": "Ed25519",
+      "signature_encoding": "raw"
+    }
+  ]
+}
