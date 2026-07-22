@@ -1,0 +1,5 @@
+{
+  "vector": "invalid_created_at",
+  "accepted": false,
+  "error_code": "INVALID_TIMESTAMP"
+}

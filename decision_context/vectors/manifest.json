@@ -1,0 +1,95 @@
+{
+  "profile": "AGP-DECISION-CONTEXT-0.9",
+  "vectors": [
+    {
+      "name": "authoritative_context",
+      "input": "001_authoritative_context.input.json",
+      "meta": "001_authoritative_context.meta.json"
+    },
+    {
+      "name": "unknown_top_level",
+      "input": "002_unknown_top_level.input.json",
+      "meta": "002_unknown_top_level.meta.json"
+    },
+    {
+      "name": "wrong_object_type",
+      "input": "003_wrong_object_type.input.json",
+      "meta": "003_wrong_object_type.meta.json"
+    },
+    {
+      "name": "invalid_context_id",
+      "input": "004_invalid_context_id.input.json",
+      "meta": "004_invalid_context_id.meta.json"
+    },
+    {
+      "name": "invalid_created_at",
+      "input": "005_invalid_created_at.input.json",
+      "meta": "005_invalid_created_at.meta.json"
+    },
+    {
+      "name": "expires_not_later",
+      "input": "006_expires_not_later.input.json",
+      "meta": "006_expires_not_later.meta.json"
+    },
+    {
+      "name": "invalid_policy_digest",
+      "input": "007_invalid_policy_digest.input.json",
+      "meta": "007_invalid_policy_digest.meta.json"
+    },
+    {
+      "name": "unsafe_policy_version",
+      "input": "008_unsafe_policy_version.input.json",
+      "meta": "008_unsafe_policy_version.meta.json"
+    },
+    {
+      "name": "reserved_result_member",
+      "input": "009_reserved_result_member.input.json",
+      "meta": "009_reserved_result_member.meta.json"
+    },
+    {
+      "name": "empty_participants",
+      "input": "010_empty_participants.input.json",
+      "meta": "010_empty_participants.meta.json"
+    },
+    {
+      "name": "duplicate_participant",
+      "input": "011_duplicate_participant.input.json",
+      "meta": "011_duplicate_participant.meta.json"
+    },
+    {
+      "name": "unsorted_participants",
+      "input": "012_unsorted_participants.input.json",
+      "meta": "012_unsorted_participants.meta.json"
+    },
+    {
+      "name": "invalid_evidence_digest",
+      "input": "013_invalid_evidence_digest.input.json",
+      "meta": "013_invalid_evidence_digest.meta.json"
+    },
+    {
+      "name": "invalid_constraint_parameters",
+      "input": "014_invalid_constraint_parameters.input.json",
+      "meta": "014_invalid_constraint_parameters.meta.json"
+    },
+    {
+      "name": "duplicate_json_member",
+      "input": "015_duplicate_json_member.input.json",
+      "meta": "015_duplicate_json_member.meta.json"
+    },
+    {
+      "name": "utf8_bom",
+      "input": "016_utf8_bom.input.json",
+      "meta": "016_utf8_bom.meta.json"
+    },
+    {
+      "name": "decimal_number",
+      "input": "017_decimal_number.input.json",
+      "meta": "017_decimal_number.meta.json"
+    },
+    {
+      "name": "nonfinite_number",
+      "input": "018_nonfinite_number.input.json",
+      "meta": "018_nonfinite_number.meta.json"
+    }
+  ]
+}

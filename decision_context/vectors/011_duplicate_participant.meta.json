@@ -1,0 +1,5 @@
+{
+  "vector": "duplicate_participant",
+  "accepted": false,
+  "error_code": "DUPLICATE_IDENTIFIER"
+}
