@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "INVALID_UTF8",
+  "input": "022_invalid_utf8.input.json",
+  "name": "invalid_utf8"
+}

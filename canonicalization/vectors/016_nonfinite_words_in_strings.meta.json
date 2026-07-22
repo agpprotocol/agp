@@ -1,0 +1,6 @@
+{
+  "expected": true,
+  "expected_error": null,
+  "input": "016_nonfinite_words_in_strings.input.json",
+  "name": "nonfinite_words_in_strings"
+}

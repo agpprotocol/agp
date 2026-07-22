@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "UTF8_BOM_NOT_ALLOWED",
+  "input": "021_utf8_bom_rejected.input.json",
+  "name": "utf8_bom_rejected"
+}

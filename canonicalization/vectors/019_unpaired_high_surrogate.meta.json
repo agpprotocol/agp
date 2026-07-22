@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "INVALID_UNICODE",
+  "input": "019_unpaired_high_surrogate.input.json",
+  "name": "unpaired_high_surrogate"
+}

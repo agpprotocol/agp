@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "DUPLICATE_KEY",
+  "input": "010_escaped_duplicate_key.input.json",
+  "name": "escaped_duplicate_key"
+}

@@ -1,0 +1,91 @@
+name: AGP Canonicalization Conformance
+
+on:
+  push:
+    branches:
+      - main
+      - feat/canonicalization-0.7
+    paths:
+      - "canonicalization/**"
+      - "spec/AGP-CANONICALIZATION-0.7.md"
+      - ".github/workflows/canonicalization-conformance.yml"
+  pull_request:
+    paths:
+      - "canonicalization/**"
+      - "spec/AGP-CANONICALIZATION-0.7.md"
+      - ".github/workflows/canonicalization-conformance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: canonicalization-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  conformance:
+    name: Python ↔ Go conformance
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: canonicalization/go/go.mod
+          cache-dependency-path: canonicalization/go/go.mod
+
+      - name: Validate Python syntax
+        run: |
+          python -m py_compile             canonicalization/python/canonicalize.py             canonicalization/tools/generate_vectors.py             canonicalization/tools/run_conformance.py
+
+      - name: Verify Go formatting
+        run: |
+          test -z "$(gofmt -l canonicalization/go)"
+
+      - name: Build Go canonicalizer
+        working-directory: canonicalization/go
+        run: |
+          go build ./cmd/agp-canonicalize
+
+      - name: Verify generated vectors are reproducible
+        run: |
+          python canonicalization/tools/generate_vectors.py
+          git diff --exit-code -- canonicalization/vectors
+
+      - name: Run cross-language conformance
+        run: |
+          python canonicalization/tools/run_conformance.py
+
+      - name: Verify expected conformance summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          summary = json.loads(
+              Path("canonicalization/results/summary.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+
+          assert summary["vectors"] == 28, summary
+          assert summary["passed"] == 28, summary
+          assert summary["failed"] == 0, summary
+          assert summary["byte_identical"] is True, summary
+
+          print("Verified 28/28 vectors and byte-identical receipts")
+          PY
+
+      - name: Check whitespace errors
+        run: |
+          git diff --check

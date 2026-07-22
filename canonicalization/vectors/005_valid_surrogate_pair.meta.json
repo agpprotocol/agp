@@ -1,0 +1,6 @@
+{
+  "expected": true,
+  "expected_error": null,
+  "input": "005_valid_surrogate_pair.input.json",
+  "name": "valid_surrogate_pair"
+}

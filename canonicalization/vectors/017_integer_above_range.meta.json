@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "INTEGER_OUT_OF_RANGE",
+  "input": "017_integer_above_range.input.json",
+  "name": "integer_above_range"
+}

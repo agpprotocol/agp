@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "INVALID_JSON",
+  "input": "023_trailing_data.input.json",
+  "name": "trailing_data"
+}

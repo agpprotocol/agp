@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "DECIMAL_NOT_SUPPORTED",
+  "input": "011_decimal_rejected.input.json",
+  "name": "decimal_rejected"
+}
