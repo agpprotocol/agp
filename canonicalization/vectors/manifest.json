@@ -1,0 +1,173 @@
+{
+  "profile": "AGP-Canonicalization-0.7",
+  "vectors": [
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "001_object_key_order.input.json",
+      "name": "object_key_order"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "002_whitespace_removed.input.json",
+      "name": "whitespace_removed"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "003_utf8_text.input.json",
+      "name": "utf8_text"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "004_escaped_characters.input.json",
+      "name": "escaped_characters"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "005_valid_surrogate_pair.input.json",
+      "name": "valid_surrogate_pair"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "006_array_order_preserved.input.json",
+      "name": "array_order_preserved"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "007_safe_integer_min.input.json",
+      "name": "safe_integer_min"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "008_safe_integer_max.input.json",
+      "name": "safe_integer_max"
+    },
+    {
+      "expected": false,
+      "expected_error": "DUPLICATE_KEY",
+      "input": "009_duplicate_key.input.json",
+      "name": "duplicate_key"
+    },
+    {
+      "expected": false,
+      "expected_error": "DUPLICATE_KEY",
+      "input": "010_escaped_duplicate_key.input.json",
+      "name": "escaped_duplicate_key"
+    },
+    {
+      "expected": false,
+      "expected_error": "DECIMAL_NOT_SUPPORTED",
+      "input": "011_decimal_rejected.input.json",
+      "name": "decimal_rejected"
+    },
+    {
+      "expected": false,
+      "expected_error": "DECIMAL_NOT_SUPPORTED",
+      "input": "012_exponent_rejected.input.json",
+      "name": "exponent_rejected"
+    },
+    {
+      "expected": false,
+      "expected_error": "INVALID_NUMBER",
+      "input": "013_nan_rejected.input.json",
+      "name": "nan_rejected"
+    },
+    {
+      "expected": false,
+      "expected_error": "INVALID_NUMBER",
+      "input": "014_infinity_rejected.input.json",
+      "name": "infinity_rejected"
+    },
+    {
+      "expected": false,
+      "expected_error": "INVALID_NUMBER",
+      "input": "015_negative_infinity_rejected.input.json",
+      "name": "negative_infinity_rejected"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "016_nonfinite_words_in_strings.input.json",
+      "name": "nonfinite_words_in_strings"
+    },
+    {
+      "expected": false,
+      "expected_error": "INTEGER_OUT_OF_RANGE",
+      "input": "017_integer_above_range.input.json",
+      "name": "integer_above_range"
+    },
+    {
+      "expected": false,
+      "expected_error": "INTEGER_OUT_OF_RANGE",
+      "input": "018_integer_below_range.input.json",
+      "name": "integer_below_range"
+    },
+    {
+      "expected": false,
+      "expected_error": "INVALID_UNICODE",
+      "input": "019_unpaired_high_surrogate.input.json",
+      "name": "unpaired_high_surrogate"
+    },
+    {
+      "expected": false,
+      "expected_error": "INVALID_UNICODE",
+      "input": "020_unpaired_low_surrogate.input.json",
+      "name": "unpaired_low_surrogate"
+    },
+    {
+      "expected": false,
+      "expected_error": "UTF8_BOM_NOT_ALLOWED",
+      "input": "021_utf8_bom_rejected.input.json",
+      "name": "utf8_bom_rejected"
+    },
+    {
+      "expected": false,
+      "expected_error": "INVALID_UTF8",
+      "input": "022_invalid_utf8.input.json",
+      "name": "invalid_utf8"
+    },
+    {
+      "expected": false,
+      "expected_error": "INVALID_JSON",
+      "input": "023_trailing_data.input.json",
+      "name": "trailing_data"
+    },
+    {
+      "expected": false,
+      "expected_error": "INVALID_JSON",
+      "input": "024_invalid_json.input.json",
+      "name": "invalid_json"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "025_maximum_depth.input.json",
+      "name": "maximum_depth"
+    },
+    {
+      "expected": false,
+      "expected_error": "MAX_DEPTH_EXCEEDED",
+      "input": "026_depth_exceeded.input.json",
+      "name": "depth_exceeded"
+    },
+    {
+      "expected": true,
+      "expected_error": null,
+      "input": "027_maximum_input_size.input.json",
+      "name": "maximum_input_size"
+    },
+    {
+      "expected": false,
+      "expected_error": "INPUT_TOO_LARGE",
+      "input": "028_input_too_large.input.json",
+      "name": "input_too_large"
+    }
+  ]
+}

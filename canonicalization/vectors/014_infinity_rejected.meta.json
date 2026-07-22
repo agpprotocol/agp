@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "INVALID_NUMBER",
+  "input": "014_infinity_rejected.input.json",
+  "name": "infinity_rejected"
+}

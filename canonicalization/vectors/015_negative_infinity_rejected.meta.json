@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "INVALID_NUMBER",
+  "input": "015_negative_infinity_rejected.input.json",
+  "name": "negative_infinity_rejected"
+}

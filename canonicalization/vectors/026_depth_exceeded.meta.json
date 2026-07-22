@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "MAX_DEPTH_EXCEEDED",
+  "input": "026_depth_exceeded.input.json",
+  "name": "depth_exceeded"
+}

@@ -1,0 +1,6 @@
+{
+  "expected": true,
+  "expected_error": null,
+  "input": "002_whitespace_removed.input.json",
+  "name": "whitespace_removed"
+}

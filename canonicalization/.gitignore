@@ -1,0 +1,11 @@
+# Compiled binaries
+/results/agp-canonicalize-go
+
+# Generated conformance receipts
+/results/python/
+/results/go/
+/results/summary.json
+
+# Python cache
+__pycache__/
+*.pyc

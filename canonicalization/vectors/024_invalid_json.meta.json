@@ -1,0 +1,6 @@
+{
+  "expected": false,
+  "expected_error": "INVALID_JSON",
+  "input": "024_invalid_json.input.json",
+  "name": "invalid_json"
+}
