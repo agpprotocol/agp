@@ -1,0 +1,83 @@
+name: Decision Context Conformance
+
+on:
+  push:
+    paths:
+      - "decision_context/**"
+      - "registry/**"
+      - ".github/workflows/decision-context-conformance.yml"
+  pull_request:
+    paths:
+      - "decision_context/**"
+      - "registry/**"
+      - ".github/workflows/decision-context-conformance.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+          cache-dependency-path: |
+            decision_context/go/go.mod
+            registry/go/go.mod
+
+      - name: Compile Python validators and tools
+        run: |
+          python -m py_compile \
+            decision_context/python/validate_decision_context.py \
+            decision_context/tools/generate_vectors.py \
+            decision_context/tools/run_conformance.py \
+            decision_context/tools/run_cross_language_conformance.py \
+            registry/python/validate_registry.py \
+            registry/tools/generate_vectors.py \
+            registry/tools/run_conformance.py \
+            registry/tools/run_cross_language_conformance.py
+
+      - name: Check Go formatting
+        run: |
+          test -z "$(gofmt -l decision_context/go registry/go)"
+
+      - name: Build Go validators
+        run: |
+          (cd decision_context/go && go build ./cmd/agp-decision-context-validate)
+          (cd registry/go && go build ./cmd/agp-registry-validate)
+
+      - name: Regenerate persistent vectors
+        run: |
+          python decision_context/tools/generate_vectors.py
+          python registry/tools/generate_vectors.py
+
+      - name: Verify vector reproducibility
+        run: |
+          git diff --exit-code -- decision_context/vectors registry/vectors
+
+      - name: Run Decision Context Python conformance
+        run: |
+          python decision_context/tools/run_conformance.py
+
+      - name: Run Decision Context cross-language conformance
+        run: |
+          python decision_context/tools/run_cross_language_conformance.py
+
+      - name: Run Schema Registry Python conformance
+        run: |
+          python registry/tools/run_conformance.py
+
+      - name: Run Schema Registry cross-language conformance
+        run: |
+          python registry/tools/run_cross_language_conformance.py
