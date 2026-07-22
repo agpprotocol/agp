@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agpprotocol.org/schema/agp.canonicalization-receipt/1",
+  "title": "AGP Canonicalization Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "accepted",
+    "canonical",
+    "digest",
+    "error_codes"
+  ],
+  "properties": {
+    "accepted": {
+      "type": "boolean"
+    },
+    "canonical": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "digest": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "error_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "accepted": {
+            "const": true
+          }
+        },
+        "required": [
+          "accepted"
+        ]
+      },
+      "then": {
+        "properties": {
+          "canonical": {
+            "type": "string"
+          },
+          "digest": {
+            "type": "string"
+          },
+          "error_codes": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "canonical": {
+            "type": "null"
+          },
+          "digest": {
+            "type": "null"
+          },
+          "error_codes": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}
