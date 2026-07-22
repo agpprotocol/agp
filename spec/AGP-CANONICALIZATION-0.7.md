@@ -1,8 +1,8 @@
 # Agent Governance Protocol (AGP)
 ## Canonicalization Profile 0.7
 
-Status: Draft  
-Version: 0.7  
+Status: Draft
+Version: 0.7
 Profile identifier: `AGP-Canonicalization-0.7`
 
 ## 1. Purpose
