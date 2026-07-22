@@ -2,9 +2,9 @@
 
 ## Consolidated Protocol Architecture and Verification Profile
 
-Status: Draft  
-Protocol: Agent Governance Protocol  
-Protocol version: 0.6  
+Status: Draft
+Protocol: Agent Governance Protocol
+Protocol version: 0.6
 Last updated: 2026-07-22
 
 ## 1. Purpose
