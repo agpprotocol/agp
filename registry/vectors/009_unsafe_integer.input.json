@@ -13,13 +13,13 @@
     },
     {
       "id": "agp.decision-context/1",
-      "status": "reserved",
+      "status": "active",
       "spec": "spec/",
-      "description": "Reserved identifier for the historical AGP decision context object.",
+      "description": "Immutable, canonical input context for an AGP decision, excluding decisions, outcomes, execution state, and transparency position.",
       "schema_version": 1,
       "canonicalization": "agp-c14n/0.7",
       "digest": "sha-256",
-      "schema": "registry/schemas/reserved.schema.json"
+      "schema": "registry/schemas/agp.decision-context-1.schema.json"
     },
     {
       "id": "agp.signed-decision-context/1",
