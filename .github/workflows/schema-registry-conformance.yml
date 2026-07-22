@@ -1,0 +1,102 @@
+name: AGP Schema Registry Conformance
+
+on:
+  push:
+    branches:
+      - main
+      - feat/schema-registry-0.8
+    paths:
+      - "registry/**"
+      - "spec/AGP-SCHEMA-REGISTRY-0.8.md"
+      - ".github/workflows/schema-registry-conformance.yml"
+  pull_request:
+    paths:
+      - "registry/**"
+      - "spec/AGP-SCHEMA-REGISTRY-0.8.md"
+      - ".github/workflows/schema-registry-conformance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: schema-registry-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  conformance:
+    name: Python ↔ Go schema registry
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: registry/go/go.mod
+          cache-dependency-path: registry/go/go.mod
+
+      - name: Validate Python syntax
+        run: |
+          python -m py_compile             registry/python/validate_registry.py             registry/tools/generate_vectors.py             registry/tools/run_conformance.py             registry/tools/run_cross_language_conformance.py
+
+      - name: Verify Go formatting
+        run: |
+          test -z "$(gofmt -l registry/go)"
+
+      - name: Build Go validator
+        working-directory: registry/go
+        run: |
+          go build ./cmd/agp-registry-validate
+
+      - name: Validate authoritative registry
+        run: |
+          python registry/python/validate_registry.py             registry/registry.json
+
+      - name: Run Python conformance
+        run: |
+          python registry/tools/run_conformance.py
+
+      - name: Verify generated vectors are reproducible
+        run: |
+          python registry/tools/generate_vectors.py
+          git diff --exit-code -- registry/vectors
+
+      - name: Run cross-language conformance
+        run: |
+          python registry/tools/run_cross_language_conformance.py
+
+      - name: Verify expected cross-language summary
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          summary = json.loads(
+              Path("registry/results/summary.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+
+          assert summary["vectors"] == 16, summary
+          assert summary["passed"] == 16, summary
+          assert summary["failed"] == 0, summary
+          assert summary["cross_language_identical"] is True, summary
+
+          print(
+              "Verified 16/16 vectors and identical "
+              "Python/Go acceptance and error codes"
+          )
+          PY
+
+      - name: Check whitespace errors
+        run: |
+          git diff --check
