@@ -32,6 +32,7 @@ from verify_signed_decision_context import (
 
 
 from engine import EvaluationState, PrimitiveRegistry
+from primitives.at_most_n_signers import AtMostNSignersPrimitive
 from primitives.exactly_one_of_signers import ExactlyOneOfSignersPrimitive
 from primitives.all_of_signers import AllOfSignersPrimitive
 from primitives.any_of_signers import AnyOfSignersPrimitive
@@ -82,6 +83,7 @@ ALLOWED_ROLES = {
 }
 
 SUPPORTED_PRIMITIVES = {
+    "at_most_n_signers",
     "exactly_one_of_signers",
     "all_of_signers",
     "any_of_signers",
@@ -99,6 +101,7 @@ SUPPORTED_PRIMITIVES = {
 
 PRIMITIVE_REGISTRY = PrimitiveRegistry(
     [
+        AtMostNSignersPrimitive(),
         ExactlyOneOfSignersPrimitive(),
         AllOfSignersPrimitive(),
         AnyOfSignersPrimitive(),

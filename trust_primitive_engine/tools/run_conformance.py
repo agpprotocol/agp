@@ -557,7 +557,7 @@ def result_by_id(
 
 def main() -> int:
     passed = 0
-    total = 50
+    total = 55
 
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-2-conformance-"
@@ -2418,6 +2418,208 @@ def main() -> int:
         )
         print_pass(
             "exactly_one_of_signers_unsorted_ids_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 51
+        at_most_policy = deepcopy(policy)
+        at_most_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:max-two-authorities",
+                "type": "at_most_n_signers",
+                "signer_ids": [
+                    "authority:finance",
+                    "authority:legal",
+                    "authority:security",
+                ],
+                "maximum_matches": 2,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_most_n_signers_below_limit",
+            context=context_value(
+                policy=at_most_policy,
+                participants=participants,
+            ),
+            policy=at_most_policy,
+            signers=[LEGAL],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "at_most_n_signers_below_limit",
+        )
+        item = result_by_id(
+            result,
+            "requirement:max-two-authorities",
+        )
+        if item["matched_signers"] != ["authority:legal"]:
+            raise TestFailure(
+                "at_most_n_signers_below_limit: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {"matched_count": 1}:
+            raise TestFailure(
+                "at_most_n_signers_below_limit: "
+                "unexpected observed"
+            )
+        print_pass(
+            "at_most_n_signers_below_limit",
+            "matched=1/2",
+        )
+        passed += 1
+
+        # 52
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_most_n_signers_at_limit",
+            context=context_value(
+                policy=at_most_policy,
+                participants=participants,
+            ),
+            policy=at_most_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "at_most_n_signers_at_limit",
+        )
+        item = result_by_id(
+            result,
+            "requirement:max-two-authorities",
+        )
+        if item["matched_signers"] != [
+            "authority:legal",
+            "authority:security",
+        ]:
+            raise TestFailure(
+                "at_most_n_signers_at_limit: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {"matched_count": 2}:
+            raise TestFailure(
+                "at_most_n_signers_at_limit: "
+                "unexpected observed"
+            )
+        print_pass(
+            "at_most_n_signers_at_limit",
+            "matched=2/2",
+        )
+        passed += 1
+
+        # 53
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_most_n_signers_exceeded",
+            context=context_value(
+                policy=at_most_policy,
+                participants=participants,
+            ),
+            policy=at_most_policy,
+            signers=[FINANCE, LEGAL, SECURITY],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "at_most_n_signers_exceeded",
+            ["AT_MOST_N_SIGNERS_EXCEEDED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:max-two-authorities",
+        )
+        if item["matched_signers"] != [
+            "authority:finance",
+            "authority:legal",
+            "authority:security",
+        ]:
+            raise TestFailure(
+                "at_most_n_signers_exceeded: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {"matched_count": 3}:
+            raise TestFailure(
+                "at_most_n_signers_exceeded: "
+                "unexpected observed"
+            )
+        print_pass(
+            "at_most_n_signers_exceeded",
+            "failure=AT_MOST_N_SIGNERS_EXCEEDED",
+        )
+        passed += 1
+
+        # 54
+        invalid_at_most_policy = deepcopy(policy)
+        invalid_at_most_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-at-most",
+                "type": "at_most_n_signers",
+                "signer_ids": [
+                    "authority:finance",
+                    "authority:legal",
+                ],
+                "maximum_matches": 2,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_most_n_signers_limit_not_restrictive_rejected",
+            context=context_value(
+                policy=invalid_at_most_policy,
+                participants=participants,
+            ),
+            policy=invalid_at_most_policy,
+            signers=[FINANCE, LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "at_most_n_signers_limit_not_restrictive_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "at_most_n_signers_limit_not_restrictive_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 55
+        invalid_at_most_order_policy = deepcopy(policy)
+        invalid_at_most_order_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-at-most-order",
+                "type": "at_most_n_signers",
+                "signer_ids": [
+                    "authority:security",
+                    "authority:legal",
+                ],
+                "maximum_matches": 1,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_most_n_signers_unsorted_ids_rejected",
+            context=context_value(
+                policy=invalid_at_most_order_policy,
+                participants=participants,
+            ),
+            policy=invalid_at_most_order_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_error(
+            completed,
+            result,
+            "at_most_n_signers_unsorted_ids_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "at_most_n_signers_unsorted_ids_rejected",
             "error=INVALID_TRUST_POLICY",
         )
         passed += 1
