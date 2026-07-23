@@ -557,7 +557,7 @@ def result_by_id(
 
 def main() -> int:
     passed = 0
-    total = 34
+    total = 38
 
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-2-conformance-"
@@ -1778,6 +1778,160 @@ def main() -> int:
         )
         print_pass(
             "separation_of_duties_unsorted_roles_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 35
+        mutual_policy = deepcopy(policy)
+        mutual_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:legal-security-exclusive",
+                "type": "mutual_exclusion",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:security",
+                ],
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="mutual_exclusion_none_present",
+            context=context_value(
+                policy=mutual_policy,
+                participants=participants,
+            ),
+            policy=mutual_policy,
+            signers=[FINANCE],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "mutual_exclusion_none_present",
+        )
+        item = result_by_id(
+            result,
+            "requirement:legal-security-exclusive",
+        )
+        if item["matched_signers"] != []:
+            raise TestFailure(
+                "mutual_exclusion_none_present: "
+                "unexpected matched_signers"
+            )
+        print_pass(
+            "mutual_exclusion_none_present",
+            "present=0",
+        )
+        passed += 1
+
+        # 36
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="mutual_exclusion_one_present",
+            context=context_value(
+                policy=mutual_policy,
+                participants=participants,
+            ),
+            policy=mutual_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "mutual_exclusion_one_present",
+        )
+        item = result_by_id(
+            result,
+            "requirement:legal-security-exclusive",
+        )
+        if item["matched_signers"] != ["authority:legal"]:
+            raise TestFailure(
+                "mutual_exclusion_one_present: "
+                "unexpected matched_signers"
+            )
+        print_pass(
+            "mutual_exclusion_one_present",
+            "present=1",
+        )
+        passed += 1
+
+        # 37
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="mutual_exclusion_both_present",
+            context=context_value(
+                policy=mutual_policy,
+                participants=participants,
+            ),
+            policy=mutual_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "mutual_exclusion_both_present",
+            ["MUTUAL_EXCLUSION_VIOLATED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:legal-security-exclusive",
+        )
+        if item["matched_signers"] != [
+            "authority:legal",
+            "authority:security",
+        ]:
+            raise TestFailure(
+                "mutual_exclusion_both_present: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {
+            "present_signer_ids": [
+                "authority:legal",
+                "authority:security",
+            ]
+        }:
+            raise TestFailure(
+                "mutual_exclusion_both_present: "
+                "unexpected observed"
+            )
+        print_pass(
+            "mutual_exclusion_both_present",
+            "failure=MUTUAL_EXCLUSION_VIOLATED",
+        )
+        passed += 1
+
+        # 38
+        invalid_mutual_policy = deepcopy(policy)
+        invalid_mutual_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-mutual",
+                "type": "mutual_exclusion",
+                "signer_ids": [
+                    "authority:security",
+                    "authority:legal",
+                ],
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="mutual_exclusion_unsorted_ids_rejected",
+            context=context_value(
+                policy=invalid_mutual_policy,
+                participants=participants,
+            ),
+            policy=invalid_mutual_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_error(
+            completed,
+            result,
+            "mutual_exclusion_unsorted_ids_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "mutual_exclusion_unsorted_ids_rejected",
             "error=INVALID_TRUST_POLICY",
         )
         passed += 1

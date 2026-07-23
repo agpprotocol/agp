@@ -88,6 +88,17 @@ positions necessarily requires distinct participant identities.
 Unsatisfied when either required role is absent, with failure code
 `SEPARATION_OF_DUTIES_NOT_SATISFIED`.
 
+### 4.9 mutual_exclusion
+
+Satisfied when no more than one identity listed in `signer_ids` appears in the
+normalized matched signer set.
+
+`signer_ids` MUST contain exactly two distinct signer identifiers in
+lexicographic order.
+
+Unsatisfied when both identities are present simultaneously, with failure code
+`MUTUAL_EXCLUSION_VIOLATED`.
+
 ## 5. Identity normalization
 
 Multiple valid signatures from the same signer identity count as one identity.
@@ -126,6 +137,7 @@ policy requires lexical ordering by `requirement_id`.
 - `ROLE_WEIGHT_THRESHOLD_NOT_REACHED`
 - `PROHIBITED_SIGNER_PRESENT`
 - `SEPARATION_OF_DUTIES_NOT_SATISFIED`
+- `MUTUAL_EXCLUSION_VIOLATED`
 
 Validation and binding errors remain fatal evaluation errors rather than
 unsatisfied requirements.

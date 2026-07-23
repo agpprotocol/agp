@@ -66,6 +66,9 @@
           },
           {
             "$ref": "#/$defs/separationOfDuties"
+          },
+          {
+            "$ref": "#/$defs/mutualExclusion"
           }
         ]
       }
@@ -283,6 +286,32 @@
               "reviewer",
               "voter"
             ]
+          }
+        }
+      }
+    },
+    "mutualExclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "signer_ids"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "mutual_exclusion"
+        },
+        "signer_ids": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
           }
         }
       }
