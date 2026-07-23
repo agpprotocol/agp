@@ -60,6 +60,9 @@
           },
           {
             "$ref": "#/$defs/roleWeightThreshold"
+          },
+          {
+            "$ref": "#/$defs/prohibitedSigner"
           }
         ]
       }
@@ -226,6 +229,26 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 9007199254740991
+        }
+      }
+    },
+    "prohibitedSigner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "signer_id"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "prohibited_signer"
+        },
+        "signer_id": {
+          "$ref": "#/$defs/identifier"
         }
       }
     }

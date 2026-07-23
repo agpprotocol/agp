@@ -557,7 +557,7 @@ def result_by_id(
 
 def main() -> int:
     passed = 0
-    total = 26
+    total = 30
 
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-2-conformance-"
@@ -1464,6 +1464,158 @@ def main() -> int:
         )
         print_pass(
             "role_weight_threshold_invalid_role_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 27
+        prohibited_policy = deepcopy(policy)
+        prohibited_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:no-security",
+                "type": "prohibited_signer",
+                "signer_id": "authority:security",
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="prohibited_signer_absent",
+            context=context_value(
+                policy=prohibited_policy,
+                participants=participants,
+            ),
+            policy=prohibited_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "prohibited_signer_absent",
+        )
+        item = result_by_id(
+            result,
+            "requirement:no-security",
+        )
+        if item["matched_signers"] != []:
+            raise TestFailure(
+                "prohibited_signer_absent: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {"present": False}:
+            raise TestFailure(
+                "prohibited_signer_absent: unexpected observed"
+            )
+        print_pass(
+            "prohibited_signer_absent",
+            "security=absent",
+        )
+        passed += 1
+
+        # 28
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="prohibited_signer_present",
+            context=context_value(
+                policy=prohibited_policy,
+                participants=participants,
+            ),
+            policy=prohibited_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "prohibited_signer_present",
+            ["PROHIBITED_SIGNER_PRESENT"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:no-security",
+        )
+        if item["matched_signers"] != ["authority:security"]:
+            raise TestFailure(
+                "prohibited_signer_present: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {"present": True}:
+            raise TestFailure(
+                "prohibited_signer_present: unexpected observed"
+            )
+        print_pass(
+            "prohibited_signer_present",
+            "failure=PROHIBITED_SIGNER_PRESENT",
+        )
+        passed += 1
+
+        # 29
+        prohibited_observer_policy = deepcopy(policy)
+        prohibited_observer_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:no-observer",
+                "type": "prohibited_signer",
+                "signer_id": "authority:observer",
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="prohibited_signer_ineligible_excluded",
+            context=context_value(
+                policy=prohibited_observer_policy,
+                participants=participants,
+            ),
+            policy=prohibited_observer_policy,
+            signers=[LEGAL, OBSERVER],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "prohibited_signer_ineligible_excluded",
+        )
+        item = result_by_id(
+            result,
+            "requirement:no-observer",
+        )
+        if item["observed"] != {"present": False}:
+            raise TestFailure(
+                "prohibited_signer_ineligible_excluded: "
+                "observer entered matched signer set"
+            )
+        print_pass(
+            "prohibited_signer_ineligible_excluded",
+            "observer=not_matched",
+        )
+        passed += 1
+
+        # 30
+        invalid_prohibited_policy = deepcopy(policy)
+        invalid_prohibited_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-prohibited",
+                "type": "prohibited_signer",
+                "signer_id": "INVALID SIGNER",
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="prohibited_signer_invalid_id_rejected",
+            context=context_value(
+                policy=invalid_prohibited_policy,
+                participants=participants,
+            ),
+            policy=invalid_prohibited_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_error(
+            completed,
+            result,
+            "prohibited_signer_invalid_id_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "prohibited_signer_invalid_id_rejected",
             "error=INVALID_TRUST_POLICY",
         )
         passed += 1

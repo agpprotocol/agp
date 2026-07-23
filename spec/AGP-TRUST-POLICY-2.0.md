@@ -65,6 +65,17 @@ whose participant role equals `role` is at least `minimum_weight`.
 Only matched identities with the required role contribute weight. Signers with
 another role contribute zero to this primitive.
 
+### 4.7 prohibited_signer
+
+Satisfied when `signer_id` is absent from the normalized matched signer set.
+
+Unsatisfied when that identity is present, with failure code
+`PROHIBITED_SIGNER_PRESENT`.
+
+The primitive is evaluated against identities admitted to the matched signer
+set after signature verification, participant lookup, role eligibility, and
+identity deduplication.
+
 ## 5. Identity normalization
 
 Multiple valid signatures from the same signer identity count as one identity.
@@ -101,6 +112,7 @@ policy requires lexical ordering by `requirement_id`.
 - `GLOBAL_WEIGHT_THRESHOLD_NOT_REACHED`
 - `ROLE_THRESHOLD_NOT_REACHED`
 - `ROLE_WEIGHT_THRESHOLD_NOT_REACHED`
+- `PROHIBITED_SIGNER_PRESENT`
 
 Validation and binding errors remain fatal evaluation errors rather than
 unsatisfied requirements.
