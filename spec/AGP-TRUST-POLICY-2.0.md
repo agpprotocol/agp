@@ -146,6 +146,18 @@ lexicographic order. `maximum_matches` MUST be an integer from zero through
 Unsatisfied when the matched identity count exceeds `maximum_matches`, with
 failure code `AT_MOST_N_SIGNERS_EXCEEDED`.
 
+### 4.14 at_least_n_signers
+
+Satisfied when at least `minimum_matches` identities listed in `signer_ids`
+appear in the normalized matched signer set.
+
+`signer_ids` MUST contain at least two distinct signer identifiers in
+lexicographic order. `minimum_matches` MUST be an integer from one through
+`len(signer_ids)`.
+
+Unsatisfied when the matched identity count is below `minimum_matches`, with
+failure code `AT_LEAST_N_SIGNERS_NOT_REACHED`.
+
 ## 5. Identity normalization
 
 Multiple valid signatures from the same signer identity count as one identity.
@@ -189,6 +201,7 @@ policy requires lexical ordering by `requirement_id`.
 - `ALL_OF_SIGNERS_NOT_SATISFIED`
 - `EXACTLY_ONE_OF_SIGNERS_NOT_SATISFIED`
 - `AT_MOST_N_SIGNERS_EXCEEDED`
+- `AT_LEAST_N_SIGNERS_NOT_REACHED`
 
 Validation and binding errors remain fatal evaluation errors rather than
 unsatisfied requirements.

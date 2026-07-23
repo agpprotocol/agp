@@ -81,6 +81,9 @@
           },
           {
             "$ref": "#/$defs/atMostNSigners"
+          },
+          {
+            "$ref": "#/$defs/atLeastNSigners"
           }
         ]
       }
@@ -430,6 +433,36 @@
         "maximum_matches": {
           "type": "integer",
           "minimum": 0
+        }
+      }
+    },
+    "atLeastNSigners": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "signer_ids",
+        "minimum_matches"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "at_least_n_signers"
+        },
+        "signer_ids": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "minimum_matches": {
+          "type": "integer",
+          "minimum": 1
         }
       }
     }
