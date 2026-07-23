@@ -57,6 +57,9 @@
           },
           {
             "$ref": "#/$defs/roleThreshold"
+          },
+          {
+            "$ref": "#/$defs/roleWeightThreshold"
           }
         ]
       }
@@ -188,6 +191,38 @@
           ]
         },
         "minimum_signatures": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "roleWeightThreshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "role",
+        "minimum_weight"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "role_weight_threshold"
+        },
+        "role": {
+          "enum": [
+            "approver",
+            "observer",
+            "proposer",
+            "reviewer",
+            "voter"
+          ]
+        },
+        "minimum_weight": {
           "type": "integer",
           "minimum": 1,
           "maximum": 9007199254740991

@@ -57,6 +57,14 @@ Only identities already admitted to the normalized matched signer set may
 contribute. A valid signature from a participant with another role does not
 contribute to this primitive.
 
+### 4.6 role_weight_threshold
+
+Satisfied when the sum of participant weights for distinct matched identities
+whose participant role equals `role` is at least `minimum_weight`.
+
+Only matched identities with the required role contribute weight. Signers with
+another role contribute zero to this primitive.
+
 ## 5. Identity normalization
 
 Multiple valid signatures from the same signer identity count as one identity.
@@ -92,6 +100,7 @@ policy requires lexical ordering by `requirement_id`.
 - `GLOBAL_SIGNATURE_THRESHOLD_NOT_REACHED`
 - `GLOBAL_WEIGHT_THRESHOLD_NOT_REACHED`
 - `ROLE_THRESHOLD_NOT_REACHED`
+- `ROLE_WEIGHT_THRESHOLD_NOT_REACHED`
 
 Validation and binding errors remain fatal evaluation errors rather than
 unsatisfied requirements.

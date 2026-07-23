@@ -8,6 +8,7 @@ from .global_weight_threshold import (
 )
 from .required_signer import RequiredSignerPrimitive
 from .role_threshold import RoleThresholdPrimitive
+from .role_weight_threshold import RoleWeightThresholdPrimitive
 from .signer_threshold import SignerThresholdPrimitive
 
 __all__ = [
@@ -15,5 +16,6 @@ __all__ = [
     "GlobalWeightThresholdPrimitive",
     "RequiredSignerPrimitive",
     "RoleThresholdPrimitive",
+    "RoleWeightThresholdPrimitive",
     "SignerThresholdPrimitive",
 ]

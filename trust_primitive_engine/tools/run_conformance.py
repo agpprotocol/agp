@@ -557,7 +557,7 @@ def result_by_id(
 
 def main() -> int:
     passed = 0
-    total = 22
+    total = 26
 
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-2-conformance-"
@@ -1292,6 +1292,178 @@ def main() -> int:
         )
         print_pass(
             "role_threshold_invalid_role_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 23
+        role_weight_policy = deepcopy(policy)
+        role_weight_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:approver-weight",
+                "type": "role_weight_threshold",
+                "role": "approver",
+                "minimum_weight": 3,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="role_weight_threshold_satisfied",
+            context=context_value(
+                policy=role_weight_policy,
+                participants=participants,
+            ),
+            policy=role_weight_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "role_weight_threshold_satisfied",
+        )
+        item = result_by_id(
+            result,
+            "requirement:approver-weight",
+        )
+        if item["matched_signers"] != [
+            "authority:finance",
+            "authority:legal",
+        ]:
+            raise TestFailure(
+                "role_weight_threshold_satisfied: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {
+            "role": "approver",
+            "weight": 3,
+        }:
+            raise TestFailure(
+                "role_weight_threshold_satisfied: "
+                "unexpected observed"
+            )
+        print_pass(
+            "role_weight_threshold_satisfied",
+            "approver_weight=3/3",
+        )
+        passed += 1
+
+        # 24
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="role_weight_threshold_not_reached",
+            context=context_value(
+                policy=role_weight_policy,
+                participants=participants,
+            ),
+            policy=role_weight_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "role_weight_threshold_not_reached",
+            ["ROLE_WEIGHT_THRESHOLD_NOT_REACHED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:approver-weight",
+        )
+        if item["matched_signers"] != ["authority:legal"]:
+            raise TestFailure(
+                "role_weight_threshold_not_reached: "
+                "reviewer was incorrectly counted"
+            )
+        if item["observed"] != {
+            "role": "approver",
+            "weight": 2,
+        }:
+            raise TestFailure(
+                "role_weight_threshold_not_reached: "
+                "unexpected observed"
+            )
+        print_pass(
+            "role_weight_threshold_not_reached",
+            "approver_weight=2/3",
+        )
+        passed += 1
+
+        # 25
+        reviewer_weight_policy = deepcopy(policy)
+        reviewer_weight_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:reviewer-weight",
+                "type": "role_weight_threshold",
+                "role": "reviewer",
+                "minimum_weight": 1,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="role_weight_threshold_other_role_excluded",
+            context=context_value(
+                policy=reviewer_weight_policy,
+                participants=participants,
+            ),
+            policy=reviewer_weight_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "role_weight_threshold_other_role_excluded",
+            ["ROLE_WEIGHT_THRESHOLD_NOT_REACHED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:reviewer-weight",
+        )
+        if item["matched_signers"] != []:
+            raise TestFailure(
+                "role_weight_threshold_other_role_excluded: "
+                "approvers were incorrectly counted"
+            )
+        if item["observed"]["weight"] != 0:
+            raise TestFailure(
+                "role_weight_threshold_other_role_excluded: "
+                "unexpected weight"
+            )
+        print_pass(
+            "role_weight_threshold_other_role_excluded",
+            "approver_weight=not_counted",
+        )
+        passed += 1
+
+        # 26
+        invalid_role_weight_policy = deepcopy(policy)
+        invalid_role_weight_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-role-weight",
+                "type": "role_weight_threshold",
+                "role": "administrator",
+                "minimum_weight": 1,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="role_weight_threshold_invalid_role_rejected",
+            context=context_value(
+                policy=invalid_role_weight_policy,
+                participants=participants,
+            ),
+            policy=invalid_role_weight_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_error(
+            completed,
+            result,
+            "role_weight_threshold_invalid_role_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "role_weight_threshold_invalid_role_rejected",
             "error=INVALID_TRUST_POLICY",
         )
         passed += 1
