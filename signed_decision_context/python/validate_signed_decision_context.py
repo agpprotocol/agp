@@ -134,9 +134,7 @@ def structural_validate(value: Any, schema_dir: Path) -> dict[str, Any]:
     )
 
     order_keys: list[tuple[str, str, str, str, str]] = []
-    seen_ids: set[str] = set()
-    seen_attestations: set[tuple[str, str, str, str, str, str]] = set()
-    seen_exact: set[tuple[bytes, str]] = set()
+    validated_entries: list[tuple[str, dict[str, Any], str, bytes]] = []
 
     for index, entry in enumerate(signatures):
         if not isinstance(entry, dict):
@@ -214,20 +212,38 @@ def structural_validate(value: Any, schema_dir: Path) -> dict[str, Any]:
             )
         )
 
-        if signature_id in seen_ids:
-            raise ValidationFailure(
-                "DUPLICATE_SIGNATURE_ID", f"duplicate signature_id: {signature_id}"
-            )
-        seen_ids.add(signature_id)
-
         try:
-            exact = (canonical_bytes(statement), signature)
+            statement_bytes = canonical_bytes(statement)
         except CanonicalizationError as exc:
             raise ValidationFailure(
                 "INVALID_SIGNATURE_STATEMENT",
                 f"signature[{index}]: {exc.code}",
             ) from exc
 
+        validated_entries.append(
+            (signature_id, statement, signature, statement_bytes)
+        )
+
+    if order_keys != sorted(order_keys):
+        raise ValidationFailure(
+            "UNSORTED_SIGNATURES",
+            "signatures are not in deterministic order",
+        )
+
+    seen_ids: set[str] = set()
+    for signature_id, _, _, _ in validated_entries:
+        if signature_id in seen_ids:
+            raise ValidationFailure(
+                "DUPLICATE_SIGNATURE_ID",
+                f"duplicate signature_id: {signature_id}",
+            )
+        seen_ids.add(signature_id)
+
+    seen_exact: set[tuple[bytes, str]] = set()
+    for index, (_, _, signature, statement_bytes) in enumerate(
+        validated_entries
+    ):
+        exact = (statement_bytes, signature)
         if exact in seen_exact:
             raise ValidationFailure(
                 "DUPLICATE_SIGNATURE_ENTRY",
@@ -235,6 +251,11 @@ def structural_validate(value: Any, schema_dir: Path) -> dict[str, Any]:
             )
         seen_exact.add(exact)
 
+    seen_attestations: set[
+        tuple[str, str, str, str, str, str]
+    ] = set()
+
+    for index, (_, statement, _, _) in enumerate(validated_entries):
         attestation = (
             statement["context_digest"]["algorithm"],
             statement["context_digest"]["value"],
@@ -249,12 +270,6 @@ def structural_validate(value: Any, schema_dir: Path) -> dict[str, Any]:
                 f"duplicate semantic attestation at signature[{index}]",
             )
         seen_attestations.add(attestation)
-
-    if order_keys != sorted(order_keys):
-        raise ValidationFailure(
-            "UNSORTED_SIGNATURES",
-            "signatures are not in deterministic order",
-        )
 
     return {
         "status": "valid",

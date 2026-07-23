@@ -210,6 +210,26 @@ def main() -> int:
     x["signatures"].append(second)
     cases.append(("duplicate_attestation", x, "DUPLICATE_ATTESTATION"))
 
+    x = deepcopy(valid)
+
+    first = deepcopy(x["signatures"][0])
+    first["signature_id"] = "sig:z-authority:0001"
+    first["statement"]["signer_id"] = "authority:z"
+    first["statement"]["key_id"] = "key:authority-z:2026"
+
+    second = deepcopy(x["signatures"][0])
+    second["signature_id"] = "sig:z-authority:0001"
+    second["statement"]["signer_id"] = "authority:a"
+    second["statement"]["key_id"] = "key:authority-a:2026"
+
+    x["signatures"] = [first, second]
+
+    cases.append((
+        "unsorted_precedes_duplicate_signature_id",
+        x,
+        "UNSORTED_SIGNATURES",
+    ))
+
     structured_ok = all(run_case(*case) for case in cases)
 
     valid_raw = json.dumps(valid, separators=(",", ":")).encode("utf-8")
