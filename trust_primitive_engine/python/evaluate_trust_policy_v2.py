@@ -31,6 +31,10 @@ from verify_signed_decision_context import (
 )
 
 
+from engine import EvaluationState, PrimitiveRegistry
+from primitives.required_signer import RequiredSignerPrimitive
+
+
 POLICY_OBJECT_TYPE = "agp.trust-policy/2"
 EVALUATION_OBJECT_TYPE = "agp.trust-policy-evaluation/2"
 
@@ -64,6 +68,13 @@ SUPPORTED_PRIMITIVES = {
     "global_signature_threshold",
     "global_weight_threshold",
 }
+
+
+PRIMITIVE_REGISTRY = PrimitiveRegistry(
+    [
+        RequiredSignerPrimitive(),
+    ]
+)
 
 
 class EvaluationFailure(Exception):
@@ -192,25 +203,6 @@ def validate_sorted_unique_identifiers(
     return identifiers
 
 
-def validate_required_signer(
-    requirement: dict[str, Any],
-) -> dict[str, Any]:
-    expected = COMMON_REQUIREMENT_MEMBERS | {"signer_id"}
-    validate_exact_members(requirement, expected, "required_signer")
-
-    return {
-        "requirement_id": validate_identifier(
-            requirement["requirement_id"],
-            "requirements[].requirement_id",
-        ),
-        "type": "required_signer",
-        "signer_id": validate_identifier(
-            requirement["signer_id"],
-            "requirements[].signer_id",
-        ),
-    }
-
-
 def validate_signer_threshold(
     requirement: dict[str, Any],
 ) -> dict[str, Any]:
@@ -321,7 +313,6 @@ PRIMITIVE_VALIDATORS: dict[
     str,
     Callable[[dict[str, Any]], dict[str, Any]],
 ] = {
-    "required_signer": validate_required_signer,
     "signer_threshold": validate_signer_threshold,
     "global_signature_threshold": validate_global_signature_threshold,
     "global_weight_threshold": validate_global_weight_threshold,
@@ -342,6 +333,17 @@ def validate_requirement(value: Any) -> dict[str, Any]:
             "UNSUPPORTED_TRUST_PRIMITIVE",
             f"unsupported primitive type: {primitive_type!r}",
         )
+
+    if PRIMITIVE_REGISTRY.contains(primitive_type):
+        try:
+            return PRIMITIVE_REGISTRY.resolve(
+                primitive_type
+            ).validate(value)
+        except ValueError as exc:
+            raise EvaluationFailure(
+                "INVALID_TRUST_POLICY",
+                str(exc),
+            ) from exc
 
     return PRIMITIVE_VALIDATORS[primitive_type](value)
 
@@ -467,24 +469,6 @@ def result(
     }
 
 
-def evaluate_required_signer(
-    requirement: dict[str, Any],
-    state: dict[str, Any],
-) -> dict[str, Any]:
-    signer_id = requirement["signer_id"]
-    matched = [signer_id] if signer_id in state["matched_set"] else []
-    satisfied = bool(matched)
-
-    return result(
-        requirement,
-        satisfied=satisfied,
-        matched_signers=matched,
-        observed={"present": satisfied},
-        expected={"signer_id": signer_id},
-        failure_code="REQUIRED_SIGNER_MISSING",
-    )
-
-
 def evaluate_signer_threshold(
     requirement: dict[str, Any],
     state: dict[str, Any],
@@ -545,7 +529,6 @@ PRIMITIVE_EVALUATORS: dict[
     str,
     Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]],
 ] = {
-    "required_signer": evaluate_required_signer,
     "signer_threshold": evaluate_signer_threshold,
     "global_signature_threshold": evaluate_global_signature_threshold,
     "global_weight_threshold": evaluate_global_weight_threshold,
@@ -630,13 +613,34 @@ def evaluate_verified_object(
         "participants": participants,
     }
 
-    requirement_results = [
-        PRIMITIVE_EVALUATORS[requirement["type"]](
-            requirement,
-            state,
-        )
-        for requirement in policy["requirements"]
-    ]
+    engine_state = EvaluationState.create(
+        matched_signers=matched_signers,
+        participants=participants,
+        weight=total_weight,
+    )
+
+    requirement_results: list[dict[str, Any]] = []
+
+    for requirement in policy["requirements"]:
+        primitive_type = requirement["type"]
+
+        if PRIMITIVE_REGISTRY.contains(primitive_type):
+            primitive_result = PRIMITIVE_REGISTRY.resolve(
+                primitive_type
+            ).evaluate(
+                requirement,
+                engine_state,
+            )
+            requirement_results.append(
+                primitive_result.to_dict()
+            )
+        else:
+            requirement_results.append(
+                PRIMITIVE_EVALUATORS[primitive_type](
+                    requirement,
+                    state,
+                )
+            )
 
     failures = [
         item["failure_code"]
