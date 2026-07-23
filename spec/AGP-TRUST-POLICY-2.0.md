@@ -176,10 +176,22 @@ Multiple valid signatures from the same signer identity count as one identity.
 Unknown participants and participants whose roles are not eligible do not
 contribute to any primitive.
 
+Signer identifier arrays MUST be lexicographically sorted and MUST NOT contain
+duplicates. Cardinality values MUST remain within the bounds defined by their
+primitive, including rejection of zero where the primitive requires at least
+one match.
+
+Implementations MUST treat JSON booleans as booleans, not as integers. A
+boolean supplied for any numeric threshold or cardinality field MUST be
+rejected as `INVALID_TRUST_POLICY`.
+
 ## 6. Composition
 
 Phase 1 uses AND composition. A policy is satisfied only if every requirement
 is satisfied.
+
+When multiple requirements fail, requirement results MUST remain deterministic
+and ordered by `requirement_id`.
 
 ## 7. Evaluation result
 

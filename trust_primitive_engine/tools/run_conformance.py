@@ -557,7 +557,7 @@ def result_by_id(
 
 def main() -> int:
     passed = 0
-    total = 65
+    total = 75
 
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-2-conformance-"
@@ -3012,6 +3012,387 @@ def main() -> int:
         print_pass(
             "exactly_n_signers_unsorted_ids_rejected",
             "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 66
+        boolean_at_most_policy = deepcopy(policy)
+        boolean_at_most_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:boolean-at-most",
+                "type": "at_most_n_signers",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:security",
+                ],
+                "maximum_matches": True,
+            }
+        ]
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_most_n_signers_boolean_limit_rejected",
+            context=context_value(
+                policy=boolean_at_most_policy,
+                participants=participants,
+            ),
+            policy=boolean_at_most_policy,
+            signers=[LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "at_most_n_signers_boolean_limit_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "at_most_n_signers_boolean_limit_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 67
+        boolean_at_least_policy = deepcopy(policy)
+        boolean_at_least_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:boolean-at-least",
+                "type": "at_least_n_signers",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:security",
+                ],
+                "minimum_matches": True,
+            }
+        ]
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_least_n_signers_boolean_limit_rejected",
+            context=context_value(
+                policy=boolean_at_least_policy,
+                participants=participants,
+            ),
+            policy=boolean_at_least_policy,
+            signers=[LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "at_least_n_signers_boolean_limit_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "at_least_n_signers_boolean_limit_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 68
+        boolean_exactly_n_policy = deepcopy(policy)
+        boolean_exactly_n_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:boolean-exactly-n",
+                "type": "exactly_n_signers",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:security",
+                ],
+                "exact_matches": True,
+            }
+        ]
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="exactly_n_signers_boolean_limit_rejected",
+            context=context_value(
+                policy=boolean_exactly_n_policy,
+                participants=participants,
+            ),
+            policy=boolean_exactly_n_policy,
+            signers=[LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "exactly_n_signers_boolean_limit_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "exactly_n_signers_boolean_limit_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 69
+        zero_at_least_policy = deepcopy(policy)
+        zero_at_least_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:zero-at-least",
+                "type": "at_least_n_signers",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:security",
+                ],
+                "minimum_matches": 0,
+            }
+        ]
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_least_n_signers_zero_rejected",
+            context=context_value(
+                policy=zero_at_least_policy,
+                participants=participants,
+            ),
+            policy=zero_at_least_policy,
+            signers=[LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "at_least_n_signers_zero_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "at_least_n_signers_zero_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 70
+        zero_exactly_n_policy = deepcopy(policy)
+        zero_exactly_n_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:zero-exactly-n",
+                "type": "exactly_n_signers",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:security",
+                ],
+                "exact_matches": 0,
+            }
+        ]
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="exactly_n_signers_zero_rejected",
+            context=context_value(
+                policy=zero_exactly_n_policy,
+                participants=participants,
+            ),
+            policy=zero_exactly_n_policy,
+            signers=[LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "exactly_n_signers_zero_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "exactly_n_signers_zero_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 71
+        duplicate_at_most_policy = deepcopy(policy)
+        duplicate_at_most_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:duplicate-at-most",
+                "type": "at_most_n_signers",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:legal",
+                ],
+                "maximum_matches": 1,
+            }
+        ]
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_most_n_signers_duplicate_ids_rejected",
+            context=context_value(
+                policy=duplicate_at_most_policy,
+                participants=participants,
+            ),
+            policy=duplicate_at_most_policy,
+            signers=[LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "at_most_n_signers_duplicate_ids_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "at_most_n_signers_duplicate_ids_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 72
+        duplicate_at_least_policy = deepcopy(policy)
+        duplicate_at_least_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:duplicate-at-least",
+                "type": "at_least_n_signers",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:legal",
+                ],
+                "minimum_matches": 1,
+            }
+        ]
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="at_least_n_signers_duplicate_ids_rejected",
+            context=context_value(
+                policy=duplicate_at_least_policy,
+                participants=participants,
+            ),
+            policy=duplicate_at_least_policy,
+            signers=[LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "at_least_n_signers_duplicate_ids_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "at_least_n_signers_duplicate_ids_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 73
+        duplicate_exactly_n_policy = deepcopy(policy)
+        duplicate_exactly_n_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:duplicate-exactly-n",
+                "type": "exactly_n_signers",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:legal",
+                ],
+                "exact_matches": 1,
+            }
+        ]
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="exactly_n_signers_duplicate_ids_rejected",
+            context=context_value(
+                policy=duplicate_exactly_n_policy,
+                participants=participants,
+            ),
+            policy=duplicate_exactly_n_policy,
+            signers=[LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "exactly_n_signers_duplicate_ids_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "exactly_n_signers_duplicate_ids_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 74
+        composition_policy = deepcopy(policy)
+        composition_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:01-min-two",
+                "type": "at_least_n_signers",
+                "signer_ids": [
+                    "authority:finance",
+                    "authority:legal",
+                    "authority:security",
+                ],
+                "minimum_matches": 2,
+            },
+            {
+                "requirement_id": "requirement:02-max-two",
+                "type": "at_most_n_signers",
+                "signer_ids": [
+                    "authority:finance",
+                    "authority:legal",
+                    "authority:security",
+                ],
+                "maximum_matches": 2,
+            },
+            {
+                "requirement_id": "requirement:03-legal",
+                "type": "required_signer",
+                "signer_id": "authority:legal",
+            },
+        ]
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="cardinality_composition_satisfied",
+            context=context_value(
+                policy=composition_policy,
+                participants=participants,
+            ),
+            policy=composition_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "cardinality_composition_satisfied",
+        )
+        if [
+            item["requirement_id"]
+            for item in result["requirement_results"]
+        ] != [
+            "requirement:01-min-two",
+            "requirement:02-max-two",
+            "requirement:03-legal",
+        ]:
+            raise TestFailure(
+                "cardinality_composition_satisfied: "
+                "requirements not deterministically ordered"
+            )
+        print_pass(
+            "cardinality_composition_satisfied",
+            "all=conjunctively-satisfied",
+        )
+        passed += 1
+
+        # 75
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="cardinality_composition_multiple_failures",
+            context=context_value(
+                policy=composition_policy,
+                participants=participants,
+            ),
+            policy=composition_policy,
+            signers=[FINANCE],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "cardinality_composition_multiple_failures",
+            [
+                "AT_LEAST_N_SIGNERS_NOT_REACHED",
+                "REQUIRED_SIGNER_MISSING",
+            ],
+        )
+        failures = [
+            item["requirement_id"]
+            for item in result["requirement_results"]
+            if item["status"] == "unsatisfied"
+        ]
+        if failures != [
+            "requirement:01-min-two",
+            "requirement:03-legal",
+        ]:
+            raise TestFailure(
+                "cardinality_composition_multiple_failures: "
+                f"unexpected failure order {failures!r}"
+            )
+        print_pass(
+            "cardinality_composition_multiple_failures",
+            "order=requirement_id",
         )
         passed += 1
 
