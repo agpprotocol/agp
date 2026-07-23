@@ -1,0 +1,5 @@
+{
+  "vector": "padded_public_key",
+  "verified": false,
+  "error_code": "INVALID_PUBLIC_KEY_ENCODING"
+}

@@ -1,0 +1,5 @@
+{
+  "vector": "wrong_public_key",
+  "verified": false,
+  "error_code": "SIGNATURE_VERIFICATION_FAILED"
+}

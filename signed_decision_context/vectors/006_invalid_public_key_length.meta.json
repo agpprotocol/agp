@@ -1,0 +1,5 @@
+{
+  "vector": "invalid_public_key_length",
+  "verified": false,
+  "error_code": "INVALID_PUBLIC_KEY_LENGTH"
+}

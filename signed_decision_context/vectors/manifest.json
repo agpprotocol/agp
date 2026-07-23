@@ -1,0 +1,53 @@
+{
+  "profile": "AGP-SIGNED-DECISION-CONTEXT-1.0-CRYPTO",
+  "vectors": [
+    {
+      "name": "valid_ed25519_signature",
+      "input": "001_valid_ed25519_signature.input.json",
+      "keyring": "001_valid_ed25519_signature.keyring.json",
+      "meta": "001_valid_ed25519_signature.meta.json"
+    },
+    {
+      "name": "tampered_signature",
+      "input": "002_tampered_signature.input.json",
+      "keyring": "002_tampered_signature.keyring.json",
+      "meta": "002_tampered_signature.meta.json"
+    },
+    {
+      "name": "wrong_public_key",
+      "input": "003_wrong_public_key.input.json",
+      "keyring": "003_wrong_public_key.keyring.json",
+      "meta": "003_wrong_public_key.meta.json"
+    },
+    {
+      "name": "unknown_key",
+      "input": "004_unknown_key.input.json",
+      "keyring": "004_unknown_key.keyring.json",
+      "meta": "004_unknown_key.meta.json"
+    },
+    {
+      "name": "unsupported_algorithm",
+      "input": "005_unsupported_algorithm.input.json",
+      "keyring": "005_unsupported_algorithm.keyring.json",
+      "meta": "005_unsupported_algorithm.meta.json"
+    },
+    {
+      "name": "invalid_public_key_length",
+      "input": "006_invalid_public_key_length.input.json",
+      "keyring": "006_invalid_public_key_length.keyring.json",
+      "meta": "006_invalid_public_key_length.meta.json"
+    },
+    {
+      "name": "invalid_signature_length",
+      "input": "007_invalid_signature_length.input.json",
+      "keyring": "007_invalid_signature_length.keyring.json",
+      "meta": "007_invalid_signature_length.meta.json"
+    },
+    {
+      "name": "padded_public_key",
+      "input": "008_padded_public_key.input.json",
+      "keyring": "008_padded_public_key.keyring.json",
+      "meta": "008_padded_public_key.meta.json"
+    }
+  ]
+}
