@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agpprotocol.org/schema/agp.trust-policy-1.schema.json",
+  "title": "AGP Trust Policy 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "object_type",
+    "policy_id",
+    "version",
+    "eligible_roles",
+    "required_signers",
+    "any_of_signers",
+    "minimum_signatures",
+    "minimum_weight"
+  ],
+  "properties": {
+    "object_type": {
+      "const": "agp.trust-policy/1"
+    },
+    "policy_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._:/-]{1,127}[a-z0-9]$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "eligible_roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "proposer",
+          "voter",
+          "reviewer",
+          "approver",
+          "observer"
+        ]
+      }
+    },
+    "required_signers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._:/-]{1,127}[a-z0-9]$"
+      }
+    },
+    "any_of_signers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9._:/-]{1,127}[a-z0-9]$"
+      }
+    },
+    "minimum_signatures": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "minimum_weight": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "anyOf": [
+    {
+      "properties": {
+        "required_signers": {
+          "minItems": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "any_of_signers": {
+          "minItems": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "minimum_signatures": {
+          "minimum": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "minimum_weight": {
+          "minimum": 1
+        }
+      }
+    }
+  ]
+}
