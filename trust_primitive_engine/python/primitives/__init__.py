@@ -1,3 +1,4 @@
+from .exactly_n_signers import ExactlyNSignersPrimitive
 from .at_least_n_signers import AtLeastNSignersPrimitive
 from .at_most_n_signers import AtMostNSignersPrimitive
 from .exactly_one_of_signers import ExactlyOneOfSignersPrimitive
@@ -20,6 +21,7 @@ from .separation_of_duties import SeparationOfDutiesPrimitive
 from .signer_threshold import SignerThresholdPrimitive
 
 __all__ = [
+    "ExactlyNSignersPrimitive",
     "AtLeastNSignersPrimitive",
     "AtMostNSignersPrimitive",
     "ExactlyOneOfSignersPrimitive",

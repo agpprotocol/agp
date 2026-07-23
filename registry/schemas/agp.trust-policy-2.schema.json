@@ -84,6 +84,9 @@
           },
           {
             "$ref": "#/$defs/atLeastNSigners"
+          },
+          {
+            "$ref": "#/$defs/exactlyNSigners"
           }
         ]
       }
@@ -461,6 +464,36 @@
           }
         },
         "minimum_matches": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "exactlyNSigners": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "signer_ids",
+        "exact_matches"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "exactly_n_signers"
+        },
+        "signer_ids": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "exact_matches": {
           "type": "integer",
           "minimum": 1
         }

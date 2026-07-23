@@ -557,7 +557,7 @@ def result_by_id(
 
 def main() -> int:
     passed = 0
-    total = 60
+    total = 65
 
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-2-conformance-"
@@ -2822,6 +2822,195 @@ def main() -> int:
         )
         print_pass(
             "at_least_n_signers_unsorted_ids_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 61
+        exactly_n_policy = deepcopy(policy)
+        exactly_n_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:exactly-two-authorities",
+                "type": "exactly_n_signers",
+                "signer_ids": [
+                    "authority:finance",
+                    "authority:legal",
+                    "authority:security",
+                ],
+                "exact_matches": 2,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="exactly_n_signers_exact_match",
+            context=context_value(
+                policy=exactly_n_policy,
+                participants=participants,
+            ),
+            policy=exactly_n_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "exactly_n_signers_exact_match",
+        )
+        item = result_by_id(
+            result,
+            "requirement:exactly-two-authorities",
+        )
+        if item["matched_signers"] != [
+            "authority:legal",
+            "authority:security",
+        ]:
+            raise TestFailure(
+                "exactly_n_signers_exact_match: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {"matched_count": 2}:
+            raise TestFailure(
+                "exactly_n_signers_exact_match: "
+                "unexpected observed"
+            )
+        print_pass(
+            "exactly_n_signers_exact_match",
+            "matched=2",
+        )
+        passed += 1
+
+        # 62
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="exactly_n_signers_below_exact",
+            context=context_value(
+                policy=exactly_n_policy,
+                participants=participants,
+            ),
+            policy=exactly_n_policy,
+            signers=[LEGAL],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "exactly_n_signers_below_exact",
+            ["EXACTLY_N_SIGNERS_NOT_SATISFIED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:exactly-two-authorities",
+        )
+        if item["observed"] != {"matched_count": 1}:
+            raise TestFailure(
+                "exactly_n_signers_below_exact: "
+                "unexpected observed"
+            )
+        print_pass(
+            "exactly_n_signers_below_exact",
+            "matched=1 expected=2",
+        )
+        passed += 1
+
+        # 63
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="exactly_n_signers_above_exact",
+            context=context_value(
+                policy=exactly_n_policy,
+                participants=participants,
+            ),
+            policy=exactly_n_policy,
+            signers=[FINANCE, LEGAL, SECURITY],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "exactly_n_signers_above_exact",
+            ["EXACTLY_N_SIGNERS_NOT_SATISFIED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:exactly-two-authorities",
+        )
+        if item["observed"] != {"matched_count": 3}:
+            raise TestFailure(
+                "exactly_n_signers_above_exact: "
+                "unexpected observed"
+            )
+        print_pass(
+            "exactly_n_signers_above_exact",
+            "matched=3 expected=2",
+        )
+        passed += 1
+
+        # 64
+        invalid_exactly_n_policy = deepcopy(policy)
+        invalid_exactly_n_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-exactly-n",
+                "type": "exactly_n_signers",
+                "signer_ids": [
+                    "authority:finance",
+                    "authority:legal",
+                ],
+                "exact_matches": 3,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="exactly_n_signers_limit_exceeds_set_rejected",
+            context=context_value(
+                policy=invalid_exactly_n_policy,
+                participants=participants,
+            ),
+            policy=invalid_exactly_n_policy,
+            signers=[FINANCE, LEGAL],
+        )
+        expect_error(
+            completed,
+            result,
+            "exactly_n_signers_limit_exceeds_set_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "exactly_n_signers_limit_exceeds_set_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 65
+        invalid_exactly_n_order_policy = deepcopy(policy)
+        invalid_exactly_n_order_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-exactly-n-order",
+                "type": "exactly_n_signers",
+                "signer_ids": [
+                    "authority:security",
+                    "authority:legal",
+                ],
+                "exact_matches": 1,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="exactly_n_signers_unsorted_ids_rejected",
+            context=context_value(
+                policy=invalid_exactly_n_order_policy,
+                participants=participants,
+            ),
+            policy=invalid_exactly_n_order_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_error(
+            completed,
+            result,
+            "exactly_n_signers_unsorted_ids_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "exactly_n_signers_unsorted_ids_rejected",
             "error=INVALID_TRUST_POLICY",
         )
         passed += 1
