@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""End-to-end conformance tests for AGP Trust Policy 2.0 / TPE Phase 1."""
+"""End-to-end conformance tests for AGP Trust Policy 2.0."""
 
 from __future__ import annotations
 
@@ -557,7 +557,7 @@ def result_by_id(
 
 def main() -> int:
     passed = 0
-    total = 18
+    total = 22
 
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-2-conformance-"
@@ -1135,6 +1135,164 @@ def main() -> int:
         print_pass(
             "deterministic_evaluation",
             "bytes=identical",
+        )
+        passed += 1
+
+        # 19
+        role_threshold_policy = deepcopy(policy)
+        role_threshold_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:approver-threshold",
+                "type": "role_threshold",
+                "role": "approver",
+                "minimum_signatures": 2,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="role_threshold_satisfied",
+            context=context_value(
+                policy=role_threshold_policy,
+                participants=participants,
+            ),
+            policy=role_threshold_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "role_threshold_satisfied",
+        )
+        item = result_by_id(
+            result,
+            "requirement:approver-threshold",
+        )
+        if item["matched_signers"] != [
+            "authority:finance",
+            "authority:legal",
+        ]:
+            raise TestFailure(
+                "role_threshold_satisfied: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {
+            "role": "approver",
+            "signature_count": 2,
+        }:
+            raise TestFailure(
+                "role_threshold_satisfied: unexpected observed"
+            )
+        print_pass(
+            "role_threshold_satisfied",
+            "approver=2/2",
+        )
+        passed += 1
+
+        # 20
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="role_threshold_not_reached",
+            context=context_value(
+                policy=role_threshold_policy,
+                participants=participants,
+            ),
+            policy=role_threshold_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "role_threshold_not_reached",
+            ["ROLE_THRESHOLD_NOT_REACHED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:approver-threshold",
+        )
+        if item["matched_signers"] != ["authority:legal"]:
+            raise TestFailure(
+                "role_threshold_not_reached: "
+                "reviewer was incorrectly counted"
+            )
+        print_pass(
+            "role_threshold_not_reached",
+            "approver=1/2",
+        )
+        passed += 1
+
+        # 21
+        reviewer_policy = deepcopy(policy)
+        reviewer_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:reviewer-threshold",
+                "type": "role_threshold",
+                "role": "reviewer",
+                "minimum_signatures": 1,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="role_threshold_other_role_excluded",
+            context=context_value(
+                policy=reviewer_policy,
+                participants=participants,
+            ),
+            policy=reviewer_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "role_threshold_other_role_excluded",
+            ["ROLE_THRESHOLD_NOT_REACHED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:reviewer-threshold",
+        )
+        if item["matched_signers"] != []:
+            raise TestFailure(
+                "role_threshold_other_role_excluded: "
+                "approvers were incorrectly counted"
+            )
+        print_pass(
+            "role_threshold_other_role_excluded",
+            "approvers=not_counted",
+        )
+        passed += 1
+
+        # 22
+        invalid_role_policy = deepcopy(policy)
+        invalid_role_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-role",
+                "type": "role_threshold",
+                "role": "administrator",
+                "minimum_signatures": 1,
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="role_threshold_invalid_role_rejected",
+            context=context_value(
+                policy=invalid_role_policy,
+                participants=participants,
+            ),
+            policy=invalid_role_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_error(
+            completed,
+            result,
+            "role_threshold_invalid_role_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "role_threshold_invalid_role_rejected",
+            "error=INVALID_TRUST_POLICY",
         )
         passed += 1
 

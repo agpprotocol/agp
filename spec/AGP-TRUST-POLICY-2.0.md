@@ -27,7 +27,7 @@ A policy contains:
 Requirements MUST be sorted lexicographically by `requirement_id`.
 Requirement identifiers MUST be unique.
 
-## 4. Phase 1 primitives
+## 4. Trust primitives
 
 ### 4.1 required_signer
 
@@ -47,6 +47,15 @@ Satisfied when the total number of distinct matched identities is at least
 
 Satisfied when the sum of participant weights for distinct matched identities
 is at least `minimum_weight`.
+
+### 4.5 role_threshold
+
+Satisfied when at least `minimum_signatures` distinct matched identities have
+the participant role named by `role`.
+
+Only identities already admitted to the normalized matched signer set may
+contribute. A valid signature from a participant with another role does not
+contribute to this primitive.
 
 ## 5. Identity normalization
 
@@ -82,6 +91,7 @@ policy requires lexical ordering by `requirement_id`.
 - `SIGNER_THRESHOLD_NOT_REACHED`
 - `GLOBAL_SIGNATURE_THRESHOLD_NOT_REACHED`
 - `GLOBAL_WEIGHT_THRESHOLD_NOT_REACHED`
+- `ROLE_THRESHOLD_NOT_REACHED`
 
 Validation and binding errors remain fatal evaluation errors rather than
 unsatisfied requirements.

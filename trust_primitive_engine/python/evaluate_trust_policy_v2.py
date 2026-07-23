@@ -39,6 +39,7 @@ from primitives.global_weight_threshold import (
     GlobalWeightThresholdPrimitive,
 )
 from primitives.required_signer import RequiredSignerPrimitive
+from primitives.role_threshold import RoleThresholdPrimitive
 from primitives.signer_threshold import SignerThresholdPrimitive
 
 
@@ -74,6 +75,7 @@ SUPPORTED_PRIMITIVES = {
     "signer_threshold",
     "global_signature_threshold",
     "global_weight_threshold",
+    "role_threshold",
 }
 
 
@@ -82,6 +84,7 @@ PRIMITIVE_REGISTRY = PrimitiveRegistry(
         GlobalSignatureThresholdPrimitive(),
         GlobalWeightThresholdPrimitive(),
         RequiredSignerPrimitive(),
+        RoleThresholdPrimitive(),
         SignerThresholdPrimitive(),
     ]
 )
