@@ -75,6 +75,9 @@
           },
           {
             "$ref": "#/$defs/allOfSigners"
+          },
+          {
+            "$ref": "#/$defs/exactlyOneOfSigners"
           }
         ]
       }
@@ -361,6 +364,31 @@
         },
         "type": {
           "const": "all_of_signers"
+        },
+        "signer_ids": {
+          "type": "array",
+          "minItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        }
+      }
+    },
+    "exactlyOneOfSigners": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "signer_ids"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "exactly_one_of_signers"
         },
         "signer_ids": {
           "type": "array",

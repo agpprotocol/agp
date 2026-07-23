@@ -1,3 +1,4 @@
+from .exactly_one_of_signers import ExactlyOneOfSignersPrimitive
 from .all_of_signers import AllOfSignersPrimitive
 from .any_of_signers import AnyOfSignersPrimitive
 """Built-in Trust Primitive Engine plugins."""
@@ -17,6 +18,7 @@ from .separation_of_duties import SeparationOfDutiesPrimitive
 from .signer_threshold import SignerThresholdPrimitive
 
 __all__ = [
+    "ExactlyOneOfSignersPrimitive",
     "AllOfSignersPrimitive",
     "AnyOfSignersPrimitive",
     "GlobalSignatureThresholdPrimitive",
