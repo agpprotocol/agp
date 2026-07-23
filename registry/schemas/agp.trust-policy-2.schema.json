@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agp.example/schema/agp.trust-policy-2.schema.json",
+  "title": "AGP Trust Policy 2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "object_type",
+    "policy_id",
+    "version",
+    "eligible_roles",
+    "requirements"
+  ],
+  "properties": {
+    "object_type": {
+      "const": "agp.trust-policy/2"
+    },
+    "policy_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._:/-]{1,127}[a-z0-9]$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "eligible_roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "approver",
+          "observer",
+          "proposer",
+          "reviewer",
+          "voter"
+        ]
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/requiredSigner"
+          },
+          {
+            "$ref": "#/$defs/signerThreshold"
+          },
+          {
+            "$ref": "#/$defs/globalSignatureThreshold"
+          },
+          {
+            "$ref": "#/$defs/globalWeightThreshold"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._:/-]{1,127}[a-z0-9]$"
+    },
+    "requiredSigner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "signer_id"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "required_signer"
+        },
+        "signer_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "signerThreshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "signer_ids",
+        "minimum_signatures"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "signer_threshold"
+        },
+        "signer_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "minimum_signatures": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "globalSignatureThreshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "minimum_signatures"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "global_signature_threshold"
+        },
+        "minimum_signatures": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "globalWeightThreshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "minimum_weight"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "global_weight_threshold"
+        },
+        "minimum_weight": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        }
+      }
+    }
+  }
+}

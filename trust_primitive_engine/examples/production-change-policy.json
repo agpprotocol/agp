@@ -1,0 +1,35 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:production-change",
+  "version": 2,
+  "eligible_roles": [
+    "approver",
+    "reviewer"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:global-count",
+      "type": "global_signature_threshold",
+      "minimum_signatures": 2
+    },
+    {
+      "requirement_id": "requirement:global-weight",
+      "type": "global_weight_threshold",
+      "minimum_weight": 3
+    },
+    {
+      "requirement_id": "requirement:legal",
+      "type": "required_signer",
+      "signer_id": "authority:legal"
+    },
+    {
+      "requirement_id": "requirement:risk-function",
+      "type": "signer_threshold",
+      "signer_ids": [
+        "authority:finance",
+        "authority:security"
+      ],
+      "minimum_signatures": 1
+    }
+  ]
+}
