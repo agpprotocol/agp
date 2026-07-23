@@ -33,6 +33,7 @@ from verify_signed_decision_context import (
 
 from engine import EvaluationState, PrimitiveRegistry
 from primitives.required_signer import RequiredSignerPrimitive
+from primitives.signer_threshold import SignerThresholdPrimitive
 
 
 POLICY_OBJECT_TYPE = "agp.trust-policy/2"
@@ -73,6 +74,7 @@ SUPPORTED_PRIMITIVES = {
 PRIMITIVE_REGISTRY = PrimitiveRegistry(
     [
         RequiredSignerPrimitive(),
+        SignerThresholdPrimitive(),
     ]
 )
 
@@ -203,43 +205,6 @@ def validate_sorted_unique_identifiers(
     return identifiers
 
 
-def validate_signer_threshold(
-    requirement: dict[str, Any],
-) -> dict[str, Any]:
-    expected = COMMON_REQUIREMENT_MEMBERS | {
-        "signer_ids",
-        "minimum_signatures",
-    }
-    validate_exact_members(requirement, expected, "signer_threshold")
-
-    signer_ids = validate_sorted_unique_identifiers(
-        requirement["signer_ids"],
-        "requirements[].signer_ids",
-        allow_empty=False,
-    )
-    minimum = validate_safe_integer(
-        requirement["minimum_signatures"],
-        "requirements[].minimum_signatures",
-        minimum=1,
-    )
-
-    if minimum > len(signer_ids):
-        raise EvaluationFailure(
-            "INVALID_TRUST_POLICY",
-            "signer_threshold minimum exceeds signer_ids length",
-        )
-
-    return {
-        "requirement_id": validate_identifier(
-            requirement["requirement_id"],
-            "requirements[].requirement_id",
-        ),
-        "type": "signer_threshold",
-        "signer_ids": signer_ids,
-        "minimum_signatures": minimum,
-    }
-
-
 def validate_global_signature_threshold(
     requirement: dict[str, Any],
 ) -> dict[str, Any]:
@@ -313,7 +278,6 @@ PRIMITIVE_VALIDATORS: dict[
     str,
     Callable[[dict[str, Any]], dict[str, Any]],
 ] = {
-    "signer_threshold": validate_signer_threshold,
     "global_signature_threshold": validate_global_signature_threshold,
     "global_weight_threshold": validate_global_weight_threshold,
 }
@@ -469,26 +433,6 @@ def result(
     }
 
 
-def evaluate_signer_threshold(
-    requirement: dict[str, Any],
-    state: dict[str, Any],
-) -> dict[str, Any]:
-    matched = sorted(
-        state["matched_set"].intersection(requirement["signer_ids"])
-    )
-    minimum = requirement["minimum_signatures"]
-    satisfied = len(matched) >= minimum
-
-    return result(
-        requirement,
-        satisfied=satisfied,
-        matched_signers=matched,
-        observed={"signature_count": len(matched)},
-        expected={"minimum_signatures": minimum},
-        failure_code="SIGNER_THRESHOLD_NOT_REACHED",
-    )
-
-
 def evaluate_global_signature_threshold(
     requirement: dict[str, Any],
     state: dict[str, Any],
@@ -529,7 +473,6 @@ PRIMITIVE_EVALUATORS: dict[
     str,
     Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]],
 ] = {
-    "signer_threshold": evaluate_signer_threshold,
     "global_signature_threshold": evaluate_global_signature_threshold,
     "global_weight_threshold": evaluate_global_weight_threshold,
 }
