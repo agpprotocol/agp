@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a deterministic AGP Signed Decision Context 1.0."""
+"""Create or append to an AGP Signed Decision Context 1.0."""
 
 from __future__ import annotations
 
@@ -8,7 +8,10 @@ import base64
 import binascii
 import hashlib
 import json
+import os
 import sys
+import tempfile
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -44,6 +47,7 @@ from validate_decision_context import (
 )
 from validate_signed_decision_context import (
     ValidationFailure,
+    load_json,
     structural_validate,
 )
 
@@ -92,6 +96,7 @@ def decode_private_key(value: Any) -> bytes:
         ) from exc
 
     canonical = b64url_unpadded(decoded)
+
     if canonical != value:
         raise SigningFailure(
             "INVALID_PRIVATE_KEY_ENCODING",
@@ -180,25 +185,55 @@ def load_context(path: Path) -> dict[str, Any]:
     return value
 
 
-def create_signed_decision_context(
-    context: dict[str, Any],
-    private_key: Ed25519PrivateKey,
-    *,
-    signer_id: str,
-    key_id: str,
-    signature_id: str,
-    signed_at: str,
+def load_signed_context(
+    path: Path,
     schema_dir: Path,
 ) -> dict[str, Any]:
     try:
-        context_canonical = canonical_bytes(context)
+        value = load_json(path)
+        structural_validate(value, schema_dir)
+    except ValidationFailure as exc:
+        raise SigningFailure(
+            exc.code,
+            exc.detail,
+        ) from exc
+    except OSError as exc:
+        raise SigningFailure(
+            "SIGNED_CONTEXT_READ_FAILED",
+            str(exc),
+        ) from exc
+
+    if not isinstance(value, dict):
+        raise SigningFailure(
+            "INVALID_OBJECT",
+            "signed decision context must be an object",
+        )
+
+    return value
+
+
+def context_digest(context: dict[str, Any]) -> str:
+    try:
+        encoded = canonical_bytes(context)
     except CanonicalizationError as exc:
         raise SigningFailure(
             "INVALID_CONTEXT",
             f"context canonicalization failed: {exc.code}",
         ) from exc
 
-    digest = hashlib.sha256(context_canonical).hexdigest()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def create_signature_entry(
+    *,
+    context: dict[str, Any],
+    private_key: Ed25519PrivateKey,
+    signer_id: str,
+    key_id: str,
+    signature_id: str,
+    signed_at: str,
+) -> tuple[dict[str, Any], str]:
+    digest = context_digest(context)
 
     statement = {
         "object_type": "agp.signature-statement/1",
@@ -215,14 +250,43 @@ def create_signed_decision_context(
     }
 
     try:
-        statement_canonical = canonical_bytes(statement)
+        message = canonical_bytes(statement)
     except CanonicalizationError as exc:
         raise SigningFailure(
             "INVALID_SIGNATURE_STATEMENT",
             exc.code,
         ) from exc
 
-    signature = private_key.sign(statement_canonical)
+    signature = private_key.sign(message)
+
+    return (
+        {
+            "signature_id": signature_id,
+            "statement": statement,
+            "signature": b64url_unpadded(signature),
+        },
+        digest,
+    )
+
+
+def create_signed_decision_context(
+    context: dict[str, Any],
+    private_key: Ed25519PrivateKey,
+    *,
+    signer_id: str,
+    key_id: str,
+    signature_id: str,
+    signed_at: str,
+    schema_dir: Path,
+) -> dict[str, Any]:
+    signature_entry, digest = create_signature_entry(
+        context=context,
+        private_key=private_key,
+        signer_id=signer_id,
+        key_id=key_id,
+        signature_id=signature_id,
+        signed_at=signed_at,
+    )
 
     result = {
         "object_type": "agp.signed-decision-context/1",
@@ -231,14 +295,67 @@ def create_signed_decision_context(
             "algorithm": "sha-256",
             "value": digest,
         },
-        "signatures": [
-            {
-                "signature_id": signature_id,
-                "statement": statement,
-                "signature": b64url_unpadded(signature),
-            }
-        ],
+        "signatures": [signature_entry],
     }
+
+    try:
+        structural_validate(result, schema_dir)
+    except ValidationFailure as exc:
+        raise SigningFailure(
+            exc.code,
+            exc.detail,
+        ) from exc
+
+    return result
+
+
+def append_signature(
+    signed_context: dict[str, Any],
+    private_key: Ed25519PrivateKey,
+    *,
+    signer_id: str,
+    key_id: str,
+    signature_id: str,
+    signed_at: str,
+    schema_dir: Path,
+) -> dict[str, Any]:
+    result = deepcopy(signed_context)
+
+    existing_ids = {
+        entry["signature_id"]
+        for entry in result["signatures"]
+    }
+
+    if signature_id in existing_ids:
+        raise SigningFailure(
+            "DUPLICATE_SIGNATURE_ID",
+            f"signature_id already exists: {signature_id}",
+        )
+
+    signature_entry, digest = create_signature_entry(
+        context=result["context"],
+        private_key=private_key,
+        signer_id=signer_id,
+        key_id=key_id,
+        signature_id=signature_id,
+        signed_at=signed_at,
+    )
+
+    existing_digest = result["context_digest"]
+
+    if (
+        existing_digest.get("algorithm") != "sha-256"
+        or existing_digest.get("value") != digest
+    ):
+        raise SigningFailure(
+            "CONTEXT_DIGEST_MISMATCH",
+            "existing context_digest does not match context",
+        )
+
+    result["signatures"].append(signature_entry)
+    result["signatures"].sort(
+        key=lambda entry: entry["signature_id"]
+    )
 
     try:
         structural_validate(result, schema_dir)
@@ -254,9 +371,36 @@ def create_signed_decision_context(
 def write_output(path: Path, value: dict[str, Any]) -> None:
     try:
         encoded = canonical_bytes(value) + b"\n"
+    except CanonicalizationError as exc:
+        raise SigningFailure(
+            "OUTPUT_WRITE_FAILED",
+            exc.code,
+        ) from exc
+
+    try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(encoded)
-    except (OSError, CanonicalizationError) as exc:
+
+        descriptor, temporary_name = tempfile.mkstemp(
+            prefix=f".{path.name}.",
+            suffix=".tmp",
+            dir=path.parent,
+        )
+
+        temporary_path = Path(temporary_name)
+
+        try:
+            with os.fdopen(descriptor, "wb") as handle:
+                handle.write(encoded)
+                handle.flush()
+                os.fsync(handle.fileno())
+
+            os.replace(temporary_path, path)
+
+        except Exception:
+            temporary_path.unlink(missing_ok=True)
+            raise
+
+    except OSError as exc:
         raise SigningFailure(
             "OUTPUT_WRITE_FAILED",
             str(exc),
@@ -266,10 +410,11 @@ def write_output(path: Path, value: dict[str, Any]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Create an AGP Signed Decision Context 1.0 "
+            "Create or append to an AGP Signed Decision Context 1.0 "
             "using an Ed25519 private key."
         )
     )
+
     parser.add_argument("input", type=Path)
     parser.add_argument("--private-key", required=True, type=Path)
     parser.add_argument("--signer-id", required=True)
@@ -277,26 +422,59 @@ def main() -> int:
     parser.add_argument("--signature-id", required=True)
     parser.add_argument("--signed-at", required=True)
     parser.add_argument("--output", required=True, type=Path)
+
+    parser.add_argument(
+        "--append",
+        action="store_true",
+        help=(
+            "Treat input as an existing signed decision context "
+            "and append one signature."
+        ),
+    )
+
     parser.add_argument(
         "--schema-dir",
         type=Path,
         default=Path("registry/schemas"),
     )
+
     args = parser.parse_args()
 
     try:
-        context = load_context(args.input)
         private_key = load_private_key(args.private_key)
 
-        result = create_signed_decision_context(
-            context,
-            private_key,
-            signer_id=args.signer_id,
-            key_id=args.key_id,
-            signature_id=args.signature_id,
-            signed_at=args.signed_at,
-            schema_dir=args.schema_dir,
-        )
+        if args.append:
+            signed_context = load_signed_context(
+                args.input,
+                args.schema_dir,
+            )
+
+            result = append_signature(
+                signed_context,
+                private_key,
+                signer_id=args.signer_id,
+                key_id=args.key_id,
+                signature_id=args.signature_id,
+                signed_at=args.signed_at,
+                schema_dir=args.schema_dir,
+            )
+
+            status = "signature_appended"
+
+        else:
+            context = load_context(args.input)
+
+            result = create_signed_decision_context(
+                context,
+                private_key,
+                signer_id=args.signer_id,
+                key_id=args.key_id,
+                signature_id=args.signature_id,
+                signed_at=args.signed_at,
+                schema_dir=args.schema_dir,
+            )
+
+            status = "signed"
 
         write_output(args.output, result)
 
@@ -316,13 +494,15 @@ def main() -> int:
     print(
         json.dumps(
             {
-                "status": "signed",
+                "status": status,
                 "output": str(args.output),
                 "signature_id": args.signature_id,
+                "signature_count": len(result["signatures"]),
             },
             separators=(",", ":"),
         )
     )
+
     return 0
 
 
