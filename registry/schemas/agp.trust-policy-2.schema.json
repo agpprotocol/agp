@@ -69,6 +69,9 @@
           },
           {
             "$ref": "#/$defs/mutualExclusion"
+          },
+          {
+            "$ref": "#/$defs/anyOfSigners"
           }
         ]
       }
@@ -309,6 +312,31 @@
           "type": "array",
           "minItems": 2,
           "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        }
+      }
+    },
+    "anyOfSigners": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "signer_ids"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "any_of_signers"
+        },
+        "signer_ids": {
+          "type": "array",
+          "minItems": 2,
           "uniqueItems": true,
           "items": {
             "$ref": "#/$defs/identifier"

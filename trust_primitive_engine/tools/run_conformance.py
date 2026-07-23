@@ -557,7 +557,7 @@ def result_by_id(
 
 def main() -> int:
     passed = 0
-    total = 38
+    total = 42
 
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-2-conformance-"
@@ -1932,6 +1932,160 @@ def main() -> int:
         )
         print_pass(
             "mutual_exclusion_unsorted_ids_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 39
+        any_of_policy = deepcopy(policy)
+        any_of_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:legal-or-security",
+                "type": "any_of_signers",
+                "signer_ids": [
+                    "authority:legal",
+                    "authority:security",
+                ],
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="any_of_signers_first_present",
+            context=context_value(
+                policy=any_of_policy,
+                participants=participants,
+            ),
+            policy=any_of_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "any_of_signers_first_present",
+        )
+        item = result_by_id(
+            result,
+            "requirement:legal-or-security",
+        )
+        if item["matched_signers"] != ["authority:legal"]:
+            raise TestFailure(
+                "any_of_signers_first_present: "
+                "unexpected matched_signers"
+            )
+        print_pass(
+            "any_of_signers_first_present",
+            "legal=matched",
+        )
+        passed += 1
+
+        # 40
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="any_of_signers_multiple_present",
+            context=context_value(
+                policy=any_of_policy,
+                participants=participants,
+            ),
+            policy=any_of_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "any_of_signers_multiple_present",
+        )
+        item = result_by_id(
+            result,
+            "requirement:legal-or-security",
+        )
+        if item["matched_signers"] != [
+            "authority:legal",
+            "authority:security",
+        ]:
+            raise TestFailure(
+                "any_of_signers_multiple_present: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {"matched_count": 2}:
+            raise TestFailure(
+                "any_of_signers_multiple_present: "
+                "unexpected observed"
+            )
+        print_pass(
+            "any_of_signers_multiple_present",
+            "matched=2",
+        )
+        passed += 1
+
+        # 41
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="any_of_signers_none_present",
+            context=context_value(
+                policy=any_of_policy,
+                participants=participants,
+            ),
+            policy=any_of_policy,
+            signers=[FINANCE],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "any_of_signers_none_present",
+            ["ANY_OF_SIGNERS_MISSING"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:legal-or-security",
+        )
+        if item["matched_signers"] != []:
+            raise TestFailure(
+                "any_of_signers_none_present: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {"matched_count": 0}:
+            raise TestFailure(
+                "any_of_signers_none_present: "
+                "unexpected observed"
+            )
+        print_pass(
+            "any_of_signers_none_present",
+            "failure=ANY_OF_SIGNERS_MISSING",
+        )
+        passed += 1
+
+        # 42
+        invalid_any_of_policy = deepcopy(policy)
+        invalid_any_of_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-any-of",
+                "type": "any_of_signers",
+                "signer_ids": [
+                    "authority:security",
+                    "authority:legal",
+                ],
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="any_of_signers_unsorted_ids_rejected",
+            context=context_value(
+                policy=invalid_any_of_policy,
+                participants=participants,
+            ),
+            policy=invalid_any_of_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_error(
+            completed,
+            result,
+            "any_of_signers_unsorted_ids_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "any_of_signers_unsorted_ids_rejected",
             "error=INVALID_TRUST_POLICY",
         )
         passed += 1

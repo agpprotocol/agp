@@ -99,6 +99,18 @@ lexicographic order.
 Unsatisfied when both identities are present simultaneously, with failure code
 `MUTUAL_EXCLUSION_VIOLATED`.
 
+### 4.10 any_of_signers
+
+Satisfied when at least one identity listed in `signer_ids` appears in the
+normalized matched signer set.
+
+`signer_ids` MUST contain at least two distinct signer identifiers in
+lexicographic order.
+
+All matching identities are reported deterministically. Unsatisfied when none
+of the listed identities is present, with failure code
+`ANY_OF_SIGNERS_MISSING`.
+
 ## 5. Identity normalization
 
 Multiple valid signatures from the same signer identity count as one identity.
@@ -138,6 +150,7 @@ policy requires lexical ordering by `requirement_id`.
 - `PROHIBITED_SIGNER_PRESENT`
 - `SEPARATION_OF_DUTIES_NOT_SATISFIED`
 - `MUTUAL_EXCLUSION_VIOLATED`
+- `ANY_OF_SIGNERS_MISSING`
 
 Validation and binding errors remain fatal evaluation errors rather than
 unsatisfied requirements.
