@@ -32,6 +32,7 @@ from verify_signed_decision_context import (
 
 
 from engine import EvaluationState, PrimitiveRegistry
+from primitives.all_of_signers import AllOfSignersPrimitive
 from primitives.any_of_signers import AnyOfSignersPrimitive
 from primitives.global_signature_threshold import (
     GlobalSignatureThresholdPrimitive,
@@ -80,6 +81,7 @@ ALLOWED_ROLES = {
 }
 
 SUPPORTED_PRIMITIVES = {
+    "all_of_signers",
     "any_of_signers",
     "required_signer",
     "signer_threshold",
@@ -95,6 +97,7 @@ SUPPORTED_PRIMITIVES = {
 
 PRIMITIVE_REGISTRY = PrimitiveRegistry(
     [
+        AllOfSignersPrimitive(),
         AnyOfSignersPrimitive(),
         GlobalSignatureThresholdPrimitive(),
         GlobalWeightThresholdPrimitive(),

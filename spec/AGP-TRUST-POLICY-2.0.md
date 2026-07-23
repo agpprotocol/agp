@@ -111,6 +111,18 @@ All matching identities are reported deterministically. Unsatisfied when none
 of the listed identities is present, with failure code
 `ANY_OF_SIGNERS_MISSING`.
 
+### 4.11 all_of_signers
+
+Satisfied when every identity listed in `signer_ids` appears in the normalized
+matched signer set.
+
+`signer_ids` MUST contain at least two distinct signer identifiers in
+lexicographic order.
+
+Matched and missing identities are reported deterministically. Unsatisfied when
+one or more listed identities is absent, with failure code
+`ALL_OF_SIGNERS_NOT_SATISFIED`.
+
 ## 5. Identity normalization
 
 Multiple valid signatures from the same signer identity count as one identity.
@@ -151,6 +163,7 @@ policy requires lexical ordering by `requirement_id`.
 - `SEPARATION_OF_DUTIES_NOT_SATISFIED`
 - `MUTUAL_EXCLUSION_VIOLATED`
 - `ANY_OF_SIGNERS_MISSING`
+- `ALL_OF_SIGNERS_NOT_SATISFIED`
 
 Validation and binding errors remain fatal evaluation errors rather than
 unsatisfied requirements.
