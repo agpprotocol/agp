@@ -32,6 +32,12 @@ from verify_signed_decision_context import (
 
 
 from engine import EvaluationState, PrimitiveRegistry
+from primitives.global_signature_threshold import (
+    GlobalSignatureThresholdPrimitive,
+)
+from primitives.global_weight_threshold import (
+    GlobalWeightThresholdPrimitive,
+)
 from primitives.required_signer import RequiredSignerPrimitive
 from primitives.signer_threshold import SignerThresholdPrimitive
 
@@ -73,6 +79,8 @@ SUPPORTED_PRIMITIVES = {
 
 PRIMITIVE_REGISTRY = PrimitiveRegistry(
     [
+        GlobalSignatureThresholdPrimitive(),
+        GlobalWeightThresholdPrimitive(),
         RequiredSignerPrimitive(),
         SignerThresholdPrimitive(),
     ]
@@ -205,54 +213,6 @@ def validate_sorted_unique_identifiers(
     return identifiers
 
 
-def validate_global_signature_threshold(
-    requirement: dict[str, Any],
-) -> dict[str, Any]:
-    expected = COMMON_REQUIREMENT_MEMBERS | {"minimum_signatures"}
-    validate_exact_members(
-        requirement,
-        expected,
-        "global_signature_threshold",
-    )
-
-    return {
-        "requirement_id": validate_identifier(
-            requirement["requirement_id"],
-            "requirements[].requirement_id",
-        ),
-        "type": "global_signature_threshold",
-        "minimum_signatures": validate_safe_integer(
-            requirement["minimum_signatures"],
-            "requirements[].minimum_signatures",
-            minimum=1,
-        ),
-    }
-
-
-def validate_global_weight_threshold(
-    requirement: dict[str, Any],
-) -> dict[str, Any]:
-    expected = COMMON_REQUIREMENT_MEMBERS | {"minimum_weight"}
-    validate_exact_members(
-        requirement,
-        expected,
-        "global_weight_threshold",
-    )
-
-    return {
-        "requirement_id": validate_identifier(
-            requirement["requirement_id"],
-            "requirements[].requirement_id",
-        ),
-        "type": "global_weight_threshold",
-        "minimum_weight": validate_safe_integer(
-            requirement["minimum_weight"],
-            "requirements[].minimum_weight",
-            minimum=1,
-        ),
-    }
-
-
 def validate_exact_members(
     value: dict[str, Any],
     expected: set[str],
@@ -274,15 +234,6 @@ def validate_exact_members(
         )
 
 
-PRIMITIVE_VALIDATORS: dict[
-    str,
-    Callable[[dict[str, Any]], dict[str, Any]],
-] = {
-    "global_signature_threshold": validate_global_signature_threshold,
-    "global_weight_threshold": validate_global_weight_threshold,
-}
-
-
 def validate_requirement(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise EvaluationFailure(
@@ -298,18 +249,20 @@ def validate_requirement(value: Any) -> dict[str, Any]:
             f"unsupported primitive type: {primitive_type!r}",
         )
 
-    if PRIMITIVE_REGISTRY.contains(primitive_type):
-        try:
-            return PRIMITIVE_REGISTRY.resolve(
-                primitive_type
-            ).validate(value)
-        except ValueError as exc:
-            raise EvaluationFailure(
-                "INVALID_TRUST_POLICY",
-                str(exc),
-            ) from exc
-
-    return PRIMITIVE_VALIDATORS[primitive_type](value)
+    try:
+        return PRIMITIVE_REGISTRY.resolve(
+            primitive_type
+        ).validate(value)
+    except KeyError as exc:
+        raise EvaluationFailure(
+            "UNSUPPORTED_TRUST_PRIMITIVE",
+            f"primitive is not registered: {primitive_type!r}",
+        ) from exc
+    except ValueError as exc:
+        raise EvaluationFailure(
+            "INVALID_TRUST_POLICY",
+            str(exc),
+        ) from exc
 
 
 def validate_policy(value: Any) -> dict[str, Any]:
@@ -433,51 +386,6 @@ def result(
     }
 
 
-def evaluate_global_signature_threshold(
-    requirement: dict[str, Any],
-    state: dict[str, Any],
-) -> dict[str, Any]:
-    minimum = requirement["minimum_signatures"]
-    count = state["signature_count"]
-    satisfied = count >= minimum
-
-    return result(
-        requirement,
-        satisfied=satisfied,
-        matched_signers=state["matched_signers"],
-        observed={"signature_count": count},
-        expected={"minimum_signatures": minimum},
-        failure_code="GLOBAL_SIGNATURE_THRESHOLD_NOT_REACHED",
-    )
-
-
-def evaluate_global_weight_threshold(
-    requirement: dict[str, Any],
-    state: dict[str, Any],
-) -> dict[str, Any]:
-    minimum = requirement["minimum_weight"]
-    weight = state["weight"]
-    satisfied = weight >= minimum
-
-    return result(
-        requirement,
-        satisfied=satisfied,
-        matched_signers=state["matched_signers"],
-        observed={"weight": weight},
-        expected={"minimum_weight": minimum},
-        failure_code="GLOBAL_WEIGHT_THRESHOLD_NOT_REACHED",
-    )
-
-
-PRIMITIVE_EVALUATORS: dict[
-    str,
-    Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]],
-] = {
-    "global_signature_threshold": evaluate_global_signature_threshold,
-    "global_weight_threshold": evaluate_global_weight_threshold,
-}
-
-
 def evaluate_verified_object(
     signed_context: dict[str, Any],
     policy: dict[str, Any],
@@ -548,14 +456,6 @@ def evaluate_verified_object(
         for signer_id in matched_signers
     )
 
-    state = {
-        "matched_signers": matched_signers,
-        "matched_set": set(matched_signers),
-        "signature_count": len(matched_signers),
-        "weight": total_weight,
-        "participants": participants,
-    }
-
     engine_state = EvaluationState.create(
         matched_signers=matched_signers,
         participants=participants,
@@ -567,23 +467,22 @@ def evaluate_verified_object(
     for requirement in policy["requirements"]:
         primitive_type = requirement["type"]
 
-        if PRIMITIVE_REGISTRY.contains(primitive_type):
-            primitive_result = PRIMITIVE_REGISTRY.resolve(
+        try:
+            primitive = PRIMITIVE_REGISTRY.resolve(
                 primitive_type
-            ).evaluate(
+            )
+        except KeyError as exc:
+            raise EvaluationFailure(
+                "UNSUPPORTED_TRUST_PRIMITIVE",
+                f"primitive is not registered: {primitive_type!r}",
+            ) from exc
+
+        requirement_results.append(
+            primitive.evaluate(
                 requirement,
                 engine_state,
-            )
-            requirement_results.append(
-                primitive_result.to_dict()
-            )
-        else:
-            requirement_results.append(
-                PRIMITIVE_EVALUATORS[primitive_type](
-                    requirement,
-                    state,
-                )
-            )
+            ).to_dict()
+        )
 
     failures = [
         item["failure_code"]
