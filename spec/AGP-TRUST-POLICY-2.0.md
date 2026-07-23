@@ -76,6 +76,18 @@ The primitive is evaluated against identities admitted to the matched signer
 set after signature verification, participant lookup, role eligibility, and
 identity deduplication.
 
+### 4.8 separation_of_duties
+
+Satisfied when both roles listed in `roles` are represented by at least one
+matched signer identity.
+
+`roles` MUST contain exactly two distinct role names in lexicographic order.
+Because each participant has one normalized role, satisfying both role
+positions necessarily requires distinct participant identities.
+
+Unsatisfied when either required role is absent, with failure code
+`SEPARATION_OF_DUTIES_NOT_SATISFIED`.
+
 ## 5. Identity normalization
 
 Multiple valid signatures from the same signer identity count as one identity.
@@ -113,6 +125,7 @@ policy requires lexical ordering by `requirement_id`.
 - `ROLE_THRESHOLD_NOT_REACHED`
 - `ROLE_WEIGHT_THRESHOLD_NOT_REACHED`
 - `PROHIBITED_SIGNER_PRESENT`
+- `SEPARATION_OF_DUTIES_NOT_SATISFIED`
 
 Validation and binding errors remain fatal evaluation errors rather than
 unsatisfied requirements.

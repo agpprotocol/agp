@@ -10,6 +10,7 @@ from .prohibited_signer import ProhibitedSignerPrimitive
 from .required_signer import RequiredSignerPrimitive
 from .role_threshold import RoleThresholdPrimitive
 from .role_weight_threshold import RoleWeightThresholdPrimitive
+from .separation_of_duties import SeparationOfDutiesPrimitive
 from .signer_threshold import SignerThresholdPrimitive
 
 __all__ = [
@@ -19,5 +20,6 @@ __all__ = [
     "RequiredSignerPrimitive",
     "RoleThresholdPrimitive",
     "RoleWeightThresholdPrimitive",
+    "SeparationOfDutiesPrimitive",
     "SignerThresholdPrimitive",
 ]

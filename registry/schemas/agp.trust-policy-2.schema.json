@@ -63,6 +63,9 @@
           },
           {
             "$ref": "#/$defs/prohibitedSigner"
+          },
+          {
+            "$ref": "#/$defs/separationOfDuties"
           }
         ]
       }
@@ -249,6 +252,38 @@
         },
         "signer_id": {
           "$ref": "#/$defs/identifier"
+        }
+      }
+    },
+    "separationOfDuties": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "roles"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "separation_of_duties"
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "approver",
+              "observer",
+              "proposer",
+              "reviewer",
+              "voter"
+            ]
+          }
         }
       }
     }

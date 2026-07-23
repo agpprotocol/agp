@@ -557,7 +557,7 @@ def result_by_id(
 
 def main() -> int:
     passed = 0
-    total = 30
+    total = 34
 
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-2-conformance-"
@@ -1616,6 +1616,168 @@ def main() -> int:
         )
         print_pass(
             "prohibited_signer_invalid_id_rejected",
+            "error=INVALID_TRUST_POLICY",
+        )
+        passed += 1
+
+        # 31
+        separation_policy = deepcopy(policy)
+        separation_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:approver-reviewer",
+                "type": "separation_of_duties",
+                "roles": ["approver", "reviewer"],
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="separation_of_duties_satisfied",
+            context=context_value(
+                policy=separation_policy,
+                participants=participants,
+            ),
+            policy=separation_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_satisfied(
+            completed,
+            result,
+            "separation_of_duties_satisfied",
+        )
+        item = result_by_id(
+            result,
+            "requirement:approver-reviewer",
+        )
+        if item["matched_signers"] != [
+            "authority:legal",
+            "authority:security",
+        ]:
+            raise TestFailure(
+                "separation_of_duties_satisfied: "
+                "unexpected matched_signers"
+            )
+        if item["observed"] != {
+            "present_roles": ["approver", "reviewer"],
+            "missing_roles": [],
+        }:
+            raise TestFailure(
+                "separation_of_duties_satisfied: "
+                "unexpected observed"
+            )
+        print_pass(
+            "separation_of_duties_satisfied",
+            "approver+reviewer=present",
+        )
+        passed += 1
+
+        # 32
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="separation_of_duties_missing_role",
+            context=context_value(
+                policy=separation_policy,
+                participants=participants,
+            ),
+            policy=separation_policy,
+            signers=[LEGAL, FINANCE],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "separation_of_duties_missing_role",
+            ["SEPARATION_OF_DUTIES_NOT_SATISFIED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:approver-reviewer",
+        )
+        if item["observed"] != {
+            "present_roles": ["approver"],
+            "missing_roles": ["reviewer"],
+        }:
+            raise TestFailure(
+                "separation_of_duties_missing_role: "
+                "unexpected observed"
+            )
+        print_pass(
+            "separation_of_duties_missing_role",
+            "reviewer=missing",
+        )
+        passed += 1
+
+        # 33
+        observer_separation_policy = deepcopy(policy)
+        observer_separation_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:approver-observer",
+                "type": "separation_of_duties",
+                "roles": ["approver", "observer"],
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="separation_of_duties_ineligible_role_excluded",
+            context=context_value(
+                policy=observer_separation_policy,
+                participants=participants,
+            ),
+            policy=observer_separation_policy,
+            signers=[LEGAL, OBSERVER],
+        )
+        expect_unsatisfied(
+            completed,
+            result,
+            "separation_of_duties_ineligible_role_excluded",
+            ["SEPARATION_OF_DUTIES_NOT_SATISFIED"],
+        )
+        item = result_by_id(
+            result,
+            "requirement:approver-observer",
+        )
+        if item["observed"] != {
+            "present_roles": ["approver"],
+            "missing_roles": ["observer"],
+        }:
+            raise TestFailure(
+                "separation_of_duties_ineligible_role_excluded: "
+                "observer entered matched signer set"
+            )
+        print_pass(
+            "separation_of_duties_ineligible_role_excluded",
+            "observer=not_matched",
+        )
+        passed += 1
+
+        # 34
+        invalid_separation_policy = deepcopy(policy)
+        invalid_separation_policy["requirements"] = [
+            {
+                "requirement_id": "requirement:invalid-separation",
+                "type": "separation_of_duties",
+                "roles": ["reviewer", "approver"],
+            }
+        ]
+
+        completed, result, _, _ = execute_case(
+            directory=temp,
+            name="separation_of_duties_unsorted_roles_rejected",
+            context=context_value(
+                policy=invalid_separation_policy,
+                participants=participants,
+            ),
+            policy=invalid_separation_policy,
+            signers=[LEGAL, SECURITY],
+        )
+        expect_error(
+            completed,
+            result,
+            "separation_of_duties_unsorted_roles_rejected",
+            "INVALID_TRUST_POLICY",
+        )
+        print_pass(
+            "separation_of_duties_unsorted_roles_rejected",
             "error=INVALID_TRUST_POLICY",
         )
         passed += 1

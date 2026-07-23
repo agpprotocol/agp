@@ -44,6 +44,9 @@ from primitives.role_threshold import RoleThresholdPrimitive
 from primitives.role_weight_threshold import (
     RoleWeightThresholdPrimitive,
 )
+from primitives.separation_of_duties import (
+    SeparationOfDutiesPrimitive,
+)
 from primitives.signer_threshold import SignerThresholdPrimitive
 
 
@@ -82,6 +85,7 @@ SUPPORTED_PRIMITIVES = {
     "prohibited_signer",
     "role_threshold",
     "role_weight_threshold",
+    "separation_of_duties",
 }
 
 
@@ -93,6 +97,7 @@ PRIMITIVE_REGISTRY = PrimitiveRegistry(
         RequiredSignerPrimitive(),
         RoleThresholdPrimitive(),
         RoleWeightThresholdPrimitive(),
+        SeparationOfDutiesPrimitive(),
         SignerThresholdPrimitive(),
     ]
 )
