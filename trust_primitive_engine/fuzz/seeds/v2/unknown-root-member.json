@@ -1,0 +1,13 @@
+{
+  "description": "Unknown root members must be rejected.",
+  "expected_error_code": "INVALID_TRUST_POLICY",
+  "expected_outcome": "reject",
+  "format": "agp-tpe-v2-fuzz-seed",
+  "format_version": 1,
+  "value": {
+    "policy_id": "fuzz",
+    "policy_version": 2,
+    "requirements": [],
+    "unknown": "💥"
+  }
+}

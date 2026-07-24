@@ -1,0 +1,8 @@
+{
+  "description": "Root value is null.",
+  "expected_error_code": "INVALID_TRUST_POLICY",
+  "expected_outcome": "reject",
+  "format": "agp-tpe-v2-fuzz-seed",
+  "format_version": 1,
+  "value": null
+}

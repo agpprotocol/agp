@@ -65,6 +65,11 @@ class RoleWeightThresholdPrimitive(Primitive):
                 "is not a valid identifier"
             )
 
+        if not isinstance(role, str):
+            raise ValueError(
+                "role_weight_threshold.role must be a string"
+            )
+
         if role not in ALLOWED_ROLES:
             raise ValueError(
                 "role_weight_threshold.role must be one of: "

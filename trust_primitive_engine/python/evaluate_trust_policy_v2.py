@@ -244,6 +244,12 @@ def validate_requirement(value: Any) -> dict[str, Any]:
 
     primitive_type = value.get("type")
 
+    if not isinstance(primitive_type, str):
+        raise EvaluationFailure(
+            "INVALID_TRUST_POLICY",
+            "primitive type must be a string",
+        )
+
     if primitive_type not in SUPPORTED_PRIMITIVES:
         raise EvaluationFailure(
             "UNSUPPORTED_TRUST_PRIMITIVE",

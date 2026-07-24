@@ -1,0 +1,22 @@
+{
+  "description": "A non-string primitive type must be rejected without leaking TypeError.",
+  "expected_error_code": "INVALID_TRUST_POLICY",
+  "expected_outcome": "reject",
+  "format": "agp-tpe-v2-fuzz-seed",
+  "format_version": 1,
+  "value": {
+    "eligible_roles": [
+      "approver"
+    ],
+    "object_type": "agp.trust-policy/2",
+    "policy_id": "policy:fuzz:unhashable-type",
+    "requirements": [
+      {
+        "minimum_signatures": 1,
+        "requirement_id": "requirement:fuzz",
+        "type": []
+      }
+    ],
+    "version": 2
+  }
+}
