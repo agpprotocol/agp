@@ -21,6 +21,7 @@ from .policy_evaluation import (
     PolicyEvaluationResult,
     evaluate_indexed_policy,
     evaluate_policy_reference_requirement,
+    project_recursive_failure_codes,
 )
 from .policy_set import (
     PolicyReferenceIdentity,
@@ -41,6 +42,7 @@ __all__ = [
     "RequirementEvaluationContext",
     "evaluate_indexed_policy",
     "evaluate_policy_reference_requirement",
+    "project_recursive_failure_codes",
     "create_policy_evaluation_state",
     "PolicyReferenceIdentity",
     "PolicySetEntry",

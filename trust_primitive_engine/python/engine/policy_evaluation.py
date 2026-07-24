@@ -53,10 +53,12 @@ class PolicyEvaluationResult:
     satisfied: bool
     requirement_results: tuple[PrimitiveResult, ...]
     matched_signers: tuple[str, ...]
+    failure_codes: tuple[str, ...]
 
     def __post_init__(self) -> None:
         normalized_results = tuple(self.requirement_results)
         normalized_signers = tuple(self.matched_signers)
+        normalized_failure_codes = tuple(self.failure_codes)
 
         if not all(
             isinstance(result, PrimitiveResult)
@@ -79,10 +81,33 @@ class PolicyEvaluationResult:
                 "matched_signers must not contain duplicates"
             )
 
+        if not all(
+            isinstance(code, str) and code
+            for code in normalized_failure_codes
+        ):
+            raise ValueError(
+                "failure_codes must contain non-empty strings"
+            )
+
+        if self.satisfied and normalized_failure_codes:
+            raise ValueError(
+                "satisfied policy must not contain failure_codes"
+            )
+
+        if not self.satisfied and not normalized_failure_codes:
+            raise ValueError(
+                "unsatisfied policy must contain failure_codes"
+            )
+
         object.__setattr__(
             self,
             "requirement_results",
             normalized_results,
+        )
+        object.__setattr__(
+            self,
+            "failure_codes",
+            normalized_failure_codes,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -99,6 +124,7 @@ class PolicyEvaluationResult:
                 result.to_dict()
                 for result in self.requirement_results
             ],
+            "failure_codes": list(self.failure_codes),
         }
 
 
@@ -110,6 +136,113 @@ def _aggregate_top_level_matched_signers(
         for result in results
         for signer_id in result.matched_signers
     }))
+
+
+def project_recursive_failure_codes(
+    top_level_results: tuple[PrimitiveResult, ...],
+) -> tuple[str, ...]:
+    """Project failures across policy-reference boundaries.
+
+    For trees without policy references this preserves the TPE 2.2
+    ordering rule based on emitting requirement_id.
+
+    Failures inside a referenced policy are ordered beneath the
+    requirement path of the visible policy_reference boundary.
+    Repeated failure-code strings remain present once per emitting node.
+    """
+
+    projected: list[
+        tuple[tuple[str, ...], int, str]
+    ] = []
+    emission_index = 0
+
+    def emit(
+        path: tuple[str, ...],
+        failure_code: str,
+    ) -> None:
+        nonlocal emission_index
+
+        projected.append(
+            (
+                path,
+                emission_index,
+                failure_code,
+            )
+        )
+        emission_index += 1
+
+    def visit(
+        result: PrimitiveResult,
+        *,
+        path_prefix: tuple[str, ...],
+    ) -> None:
+        if result.satisfied:
+            return
+
+        result_path = (
+            path_prefix
+            + (result.requirement_id,)
+        )
+
+        emit(
+            result_path,
+            result.failure_code,
+        )
+
+        if result.primitive_type == "all_of":
+            for child in result.children:
+                if not child.satisfied:
+                    visit(
+                        child,
+                        path_prefix=path_prefix,
+                    )
+            return
+
+        if result.primitive_type == "any_of":
+            for child in result.children:
+                visit(
+                    child,
+                    path_prefix=path_prefix,
+                )
+            return
+
+        if result.primitive_type == "not":
+            return
+
+        if result.primitive_type == "policy_reference":
+            referenced_policy = result.referenced_policy
+
+            if referenced_policy is None:
+                raise ValueError(
+                    "policy_reference result is missing "
+                    "referenced_policy evidence"
+                )
+
+            for nested_result in (
+                referenced_policy.requirement_results
+            ):
+                visit(
+                    nested_result,
+                    path_prefix=result_path,
+                )
+
+    for result in top_level_results:
+        visit(
+            result,
+            path_prefix=(),
+        )
+
+    projected.sort(
+        key=lambda item: (
+            item[0],
+            item[1],
+        )
+    )
+
+    return tuple(
+        failure_code
+        for _, _, failure_code in projected
+    )
 
 
 def evaluate_policy_reference_requirement(
@@ -235,6 +368,10 @@ def evaluate_indexed_policy(
         for result in requirement_results
     )
 
+    failure_codes = project_recursive_failure_codes(
+        requirement_results
+    )
+
     return PolicyEvaluationResult(
         policy_id=entry.identity.policy_id,
         policy_version=entry.identity.policy_version,
@@ -246,4 +383,5 @@ def evaluate_indexed_policy(
                 requirement_results
             )
         ),
+        failure_codes=failure_codes,
     )
