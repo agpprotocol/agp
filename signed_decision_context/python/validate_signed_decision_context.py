@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage 1 structural validator for agp.signed-decision-context/1."""
+"""Stage 1 structural validator for Signed Decision Context 1 and 2."""
 
 from __future__ import annotations
 
@@ -17,6 +17,21 @@ except ImportError as exc:
     raise SystemExit("jsonschema is required: pip install jsonschema") from exc
 
 IDENTIFIER_RE = re.compile(r"^[a-z0-9][a-z0-9._:/-]{1,126}[a-z0-9]$")
+
+SIGNED_CONTEXT_VERSIONS = {
+    "agp.signed-decision-context/1": {
+        "context_type": "agp.decision-context/1",
+        "context_schema": "agp.decision-context-1.schema.json",
+        "statement_type": "agp.signature-statement/1",
+        "statement_schema": "agp.signature-statement-1.schema.json",
+    },
+    "agp.signed-decision-context/2": {
+        "context_type": "agp.decision-context/2",
+        "context_schema": "agp.decision-context-2.schema.json",
+        "statement_type": "agp.signature-statement/2",
+        "statement_schema": "agp.signature-statement-2.schema.json",
+    },
+}
 
 ROOT = Path(__file__).resolve().parents[2]
 CANONICALIZATION_PYTHON = ROOT / "canonicalization" / "python"
@@ -79,8 +94,14 @@ def structural_validate(value: Any, schema_dir: Path) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise ValidationFailure("INVALID_OBJECT_TYPE", "top level must be object")
 
-    if value.get("object_type") != "agp.signed-decision-context/1":
-        raise ValidationFailure("INVALID_OBJECT_TYPE", "unexpected object_type")
+    signed_object_type = value.get("object_type")
+    version_config = SIGNED_CONTEXT_VERSIONS.get(signed_object_type)
+
+    if version_config is None:
+        raise ValidationFailure(
+            "INVALID_OBJECT_TYPE",
+            "unexpected object_type",
+        )
 
     allowed = {"object_type", "context", "context_digest", "signatures"}
     unknown = sorted(set(value) - allowed)
@@ -90,10 +111,23 @@ def structural_validate(value: Any, schema_dir: Path) -> dict[str, Any]:
             f"unknown top-level member: {unknown[0]}",
         )
 
+    context = value.get("context")
+    expected_context_type = version_config["context_type"]
+
+    if (
+        not isinstance(context, dict)
+        or context.get("object_type") != expected_context_type
+    ):
+        raise ValidationFailure(
+            "INVALID_CONTEXT",
+            f"context object_type must be {expected_context_type}",
+        )
+
     context_validator = schema_validator(
-        schema_dir, "agp.decision-context-1.schema.json"
+        schema_dir,
+        version_config["context_schema"],
     )
-    error = first_schema_error(context_validator, value.get("context"))
+    error = first_schema_error(context_validator, context)
     if error:
         raise ValidationFailure("INVALID_CONTEXT", error.message)
 
@@ -130,8 +164,10 @@ def structural_validate(value: Any, schema_dir: Path) -> dict[str, Any]:
         )
 
     statement_validator = schema_validator(
-        schema_dir, "agp.signature-statement-1.schema.json"
+        schema_dir,
+        version_config["statement_schema"],
     )
+    expected_statement_type = version_config["statement_type"]
 
     order_keys: list[tuple[str, str, str, str, str]] = []
     validated_entries: list[tuple[str, dict[str, Any], str, bytes]] = []
@@ -166,13 +202,19 @@ def structural_validate(value: Any, schema_dir: Path) -> dict[str, Any]:
                 f"signature[{index}].statement must be object",
             )
 
-        if (
-            "context_object_type" in statement
-            and statement["context_object_type"] != "agp.decision-context/1"
-        ):
+        if statement.get("context_object_type") != expected_context_type:
             raise ValidationFailure(
                 "STATEMENT_CONTEXT_TYPE_MISMATCH",
                 f"signature[{index}] context type mismatch",
+            )
+
+        if statement.get("object_type") != expected_statement_type:
+            raise ValidationFailure(
+                "INVALID_SIGNATURE_STATEMENT",
+                (
+                    f"signature[{index}] statement object_type "
+                    f"must be {expected_statement_type}"
+                ),
             )
 
         error = first_schema_error(statement_validator, statement)

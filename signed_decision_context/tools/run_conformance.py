@@ -23,9 +23,9 @@ if str(CANONICALIZATION_PYTHON) not in sys.path:
 from canonicalize import canonical_bytes
 
 
-def base_context() -> dict[str, Any]:
-    return {
-        "object_type": "agp.decision-context/1",
+def base_context(version: int = 1) -> dict[str, Any]:
+    context = {
+        "object_type": f"agp.decision-context/{version}",
         "context_id": "ctx:example:001",
         "created_at": "2026-07-22T20:00:00Z",
         "expires_at": None,
@@ -45,14 +45,19 @@ def base_context() -> dict[str, Any]:
         "constraints": [],
     }
 
+    if version == 2:
+        context["evaluation_time"] = 1784894400
 
-def valid_object() -> dict[str, Any]:
-    context = base_context()
+    return context
+
+
+def valid_object(version: int = 1) -> dict[str, Any]:
+    context = base_context(version)
     digest = hashlib.sha256(canonical_bytes(context)).hexdigest()
     statement = {
-        "object_type": "agp.signature-statement/1",
+        "object_type": f"agp.signature-statement/{version}",
         "purpose": "decision-context-attestation",
-        "context_object_type": "agp.decision-context/1",
+        "context_object_type": f"agp.decision-context/{version}",
         "context_digest": {"algorithm": "sha-256", "value": digest},
         "signer_id": "authority:legal",
         "key_id": "key:authority-legal:2026-q3",
@@ -60,7 +65,7 @@ def valid_object() -> dict[str, Any]:
         "signed_at": "2026-07-22T20:00:00Z",
     }
     return {
-        "object_type": "agp.signed-decision-context/1",
+        "object_type": f"agp.signed-decision-context/{version}",
         "context": context,
         "context_digest": {"algorithm": "sha-256", "value": digest},
         "signatures": [{
@@ -133,10 +138,68 @@ def run_raw_case(name: str, raw: bytes, expected_code: str) -> bool:
 
 
 def main() -> int:
-    valid = valid_object()
+    valid = valid_object(1)
+    valid_v2 = valid_object(2)
+
     cases: list[tuple[str, Any, str | None]] = [
-        ("valid_single_signature", valid, None),
+        ("valid_single_signature_v1", valid, None),
+        ("valid_single_signature_v2", valid_v2, None),
     ]
+
+    x = deepcopy(valid_v2)
+    del x["context"]["evaluation_time"]
+    cases.append(("v2_missing_evaluation_time", x, "INVALID_CONTEXT"))
+
+    x = deepcopy(valid_v2)
+    x["context"]["evaluation_time"] = True
+    cases.append(("v2_boolean_evaluation_time", x, "INVALID_CONTEXT"))
+
+    x = deepcopy(valid_v2)
+    x["context"]["evaluation_time"] = -1
+    cases.append(("v2_negative_evaluation_time", x, "INVALID_CONTEXT"))
+
+    x = deepcopy(valid_v2)
+    x["context"]["evaluation_time"] = 9007199254740992
+    cases.append(("v2_unsafe_evaluation_time", x, "INVALID_JSON"))
+
+    x = deepcopy(valid_v2)
+    x["context"]["object_type"] = "agp.decision-context/1"
+    cases.append(("wrapper_v2_context_v1_mismatch", x, "INVALID_CONTEXT"))
+
+    x = deepcopy(valid)
+    x["context"]["object_type"] = "agp.decision-context/2"
+    x["context"]["evaluation_time"] = 1784894400
+    cases.append(("wrapper_v1_context_v2_mismatch", x, "INVALID_CONTEXT"))
+
+    x = deepcopy(valid_v2)
+    x["signatures"][0]["statement"]["object_type"] = (
+        "agp.signature-statement/1"
+    )
+    cases.append((
+        "wrapper_v2_statement_v1_mismatch",
+        x,
+        "INVALID_SIGNATURE_STATEMENT",
+    ))
+
+    x = deepcopy(valid_v2)
+    x["signatures"][0]["statement"]["context_object_type"] = (
+        "agp.decision-context/1"
+    )
+    cases.append((
+        "v2_statement_context_v1_mismatch",
+        x,
+        "STATEMENT_CONTEXT_TYPE_MISMATCH",
+    ))
+
+    x = deepcopy(valid)
+    x["signatures"][0]["statement"]["object_type"] = (
+        "agp.signature-statement/2"
+    )
+    cases.append((
+        "wrapper_v1_statement_v2_mismatch",
+        x,
+        "INVALID_SIGNATURE_STATEMENT",
+    ))
 
     x = deepcopy(valid)
     x["object_type"] = "agp.invalid/1"
