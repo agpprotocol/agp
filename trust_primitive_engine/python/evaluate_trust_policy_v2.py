@@ -33,6 +33,7 @@ from verify_signed_decision_context import (
 
 from engine import (
     EvaluationState,
+    PolicyReferenceIdentity,
     PolicySetIndex,
     PrimitiveRegistry,
     UnsupportedPrimitiveError,
@@ -89,6 +90,10 @@ POLICY_REFERENCE_MEMBERS = {
     "policy_version",
     "policy_digest",
 }
+
+MAX_POLICY_REFERENCE_DEPTH = 8
+MAX_REFERENCED_POLICIES = 32
+MAX_EXPANDED_REQUIREMENT_NODES = 2048
 
 COMMON_REQUIREMENT_MEMBERS = {
     "requirement_id",
@@ -366,6 +371,241 @@ def resolve_policy_reference(
         )
 
     return entry.to_policy()
+
+
+def iter_requirement_nodes(
+    requirements: list[dict[str, Any]],
+):
+    """Yield every validated requirement node deterministically."""
+
+    for requirement in requirements:
+        yield requirement
+
+        requirement_type = requirement["type"]
+
+        if requirement_type in {"all_of", "any_of"}:
+            yield from iter_requirement_nodes(
+                requirement["requirements"]
+            )
+        elif requirement_type == "not":
+            yield from iter_requirement_nodes(
+                [requirement["requirement"]]
+            )
+
+
+def validate_policy_reference_graph(
+    root_policy: dict[str, Any],
+    policy_set_index: PolicySetIndex,
+    *,
+    max_reference_depth: int = MAX_POLICY_REFERENCE_DEPTH,
+    max_referenced_policies: int = MAX_REFERENCED_POLICIES,
+    max_expanded_nodes: int = MAX_EXPANDED_REQUIREMENT_NODES,
+) -> dict[str, Any]:
+    """Validate the complete reachable policy-reference graph."""
+
+    if (
+        not isinstance(max_reference_depth, int)
+        or isinstance(max_reference_depth, bool)
+        or max_reference_depth < 1
+        or max_reference_depth > MAX_POLICY_REFERENCE_DEPTH
+    ):
+        raise ValueError(
+            "max_reference_depth must be an integer from "
+            f"1 to {MAX_POLICY_REFERENCE_DEPTH}"
+        )
+
+    if (
+        not isinstance(max_referenced_policies, int)
+        or isinstance(max_referenced_policies, bool)
+        or max_referenced_policies < 1
+        or max_referenced_policies > MAX_REFERENCED_POLICIES
+    ):
+        raise ValueError(
+            "max_referenced_policies must be an integer from "
+            f"1 to {MAX_REFERENCED_POLICIES}"
+        )
+
+    if (
+        not isinstance(max_expanded_nodes, int)
+        or isinstance(max_expanded_nodes, bool)
+        or max_expanded_nodes < MAX_EXPANDED_REQUIREMENT_NODES
+    ):
+        raise ValueError(
+            "max_expanded_nodes must be an integer greater than "
+            f"or equal to {MAX_EXPANDED_REQUIREMENT_NODES}"
+        )
+
+    normalized_root = validate_policy(root_policy)
+
+    root_identity = PolicyReferenceIdentity(
+        policy_id=normalized_root["policy_id"],
+        policy_version=normalized_root["version"],
+        policy_digest=policy_digest(normalized_root),
+    )
+
+    active_path: set[PolicyReferenceIdentity] = set()
+    completed: set[PolicyReferenceIdentity] = set()
+    reachable: dict[
+        PolicyReferenceIdentity,
+        dict[str, Any],
+    ] = {}
+    resolution_order: list[PolicyReferenceIdentity] = []
+
+    expanded_node_count = sum(
+        1
+        for _ in iter_requirement_nodes(
+            normalized_root["requirements"]
+        )
+    )
+
+    if expanded_node_count > max_expanded_nodes:
+        raise EvaluationFailure(
+            "POLICY_REFERENCE_NODE_LIMIT_EXCEEDED",
+            (
+                f"expanded_requirement_count="
+                f"{expanded_node_count} "
+                f"limit={max_expanded_nodes}"
+            ),
+        )
+
+    def visit_policy(
+        policy: dict[str, Any],
+        identity: PolicyReferenceIdentity,
+        *,
+        reference_depth: int,
+    ) -> None:
+        nonlocal expanded_node_count
+
+        active_path.add(identity)
+
+        try:
+            for requirement in iter_requirement_nodes(
+                policy["requirements"]
+            ):
+                if requirement["type"] != POLICY_REFERENCE_TYPE:
+                    continue
+
+                resolved_policy = resolve_policy_reference(
+                    requirement,
+                    policy_set_index,
+                )
+
+                entry = policy_set_index.resolve(
+                    requirement["policy_id"],
+                    requirement["policy_version"],
+                )
+
+                if entry is None:
+                    raise EvaluationFailure(
+                        "POLICY_REFERENCE_NOT_FOUND",
+                        (
+                            f"policy_id="
+                            f"{requirement['policy_id']} "
+                            f"policy_version="
+                            f"{requirement['policy_version']}"
+                        ),
+                    )
+
+                referenced_identity = entry.identity
+
+                if referenced_identity in active_path:
+                    raise EvaluationFailure(
+                        "POLICY_REFERENCE_CYCLE",
+                        (
+                            f"policy_id="
+                            f"{referenced_identity.policy_id} "
+                            f"policy_version="
+                            f"{referenced_identity.policy_version} "
+                            f"policy_digest="
+                            f"{referenced_identity.policy_digest}"
+                        ),
+                    )
+
+                if referenced_identity in completed:
+                    continue
+
+                next_depth = reference_depth + 1
+
+                if next_depth > max_reference_depth:
+                    raise EvaluationFailure(
+                        "POLICY_REFERENCE_DEPTH_EXCEEDED",
+                        (
+                            f"reference_depth={next_depth} "
+                            f"limit={max_reference_depth}"
+                        ),
+                    )
+
+                if referenced_identity not in reachable:
+                    if (
+                        len(reachable) + 1
+                        > max_referenced_policies
+                    ):
+                        raise EvaluationFailure(
+                            "POLICY_REFERENCE_COUNT_EXCEEDED",
+                            (
+                                f"referenced_policy_count="
+                                f"{len(reachable) + 1} "
+                                f"limit="
+                                f"{max_referenced_policies}"
+                            ),
+                        )
+
+                    referenced_node_count = sum(
+                        1
+                        for _ in iter_requirement_nodes(
+                            resolved_policy["requirements"]
+                        )
+                    )
+
+                    expanded_node_count += referenced_node_count
+
+                    if expanded_node_count > max_expanded_nodes:
+                        raise EvaluationFailure(
+                            "POLICY_REFERENCE_NODE_LIMIT_EXCEEDED",
+                            (
+                                f"expanded_requirement_count="
+                                f"{expanded_node_count} "
+                                f"limit={max_expanded_nodes}"
+                            ),
+                        )
+
+                    reachable[referenced_identity] = (
+                        resolved_policy
+                    )
+                    resolution_order.append(
+                        referenced_identity
+                    )
+
+                visit_policy(
+                    resolved_policy,
+                    referenced_identity,
+                    reference_depth=next_depth,
+                )
+        finally:
+            active_path.remove(identity)
+
+        completed.add(identity)
+
+    visit_policy(
+        normalized_root,
+        root_identity,
+        reference_depth=0,
+    )
+
+    return {
+        "root_policy": normalized_root,
+        "root_identity": root_identity,
+        "reachable_policies": tuple(
+            (
+                identity,
+                reachable[identity],
+            )
+            for identity in sorted(reachable)
+        ),
+        "resolution_order": tuple(resolution_order),
+        "referenced_policy_count": len(reachable),
+        "expanded_requirement_count": expanded_node_count,
+    }
 
 
 def validate_requirement(value: Any) -> dict[str, Any]:
