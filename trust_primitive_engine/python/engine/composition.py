@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import Any
 
 from .registry import PrimitiveRegistry
 from .result import PrimitiveResult
 from .state import EvaluationState
+
+
+RequirementEvaluator = Callable[
+    [dict[str, Any], EvaluationState, PrimitiveRegistry],
+    PrimitiveResult,
+]
 
 
 def _aggregate_matched_signers(
@@ -19,18 +26,26 @@ def _aggregate_matched_signers(
     })
 
 
-def evaluate_requirement(
+def evaluate_composition(
     requirement: dict[str, Any],
     state: EvaluationState,
     registry: PrimitiveRegistry,
+    *,
+    evaluate_child: RequirementEvaluator,
 ) -> PrimitiveResult:
-    """Evaluate one validated leaf or composition requirement."""
+    """Evaluate one validated composition requirement.
+
+    Structural dispatch is intentionally handled outside this module.
+    Recursive child evaluation is supplied by the dispatcher so that
+    additional structural requirement types can be introduced without
+    coupling them to composition logic.
+    """
 
     requirement_type = requirement["type"]
 
     if requirement_type in {"all_of", "any_of"}:
         children = tuple(
-            evaluate_requirement(child, state, registry)
+            evaluate_child(child, state, registry)
             for child in requirement["requirements"]
         )
 
@@ -82,7 +97,7 @@ def evaluate_requirement(
         return factory(**kwargs)
 
     if requirement_type == "not":
-        child = evaluate_requirement(
+        child = evaluate_child(
             requirement["requirement"],
             state,
             registry,
@@ -117,8 +132,10 @@ def evaluate_requirement(
 
         return factory(**kwargs)
 
-    primitive = registry.resolve(requirement_type)
-    return primitive.evaluate(requirement, state)
+    raise ValueError(
+        "evaluate_composition received non-composition "
+        f"requirement type: {requirement_type!r}"
+    )
 
 
 def project_failure_codes(

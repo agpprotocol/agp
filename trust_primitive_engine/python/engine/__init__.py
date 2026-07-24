@@ -2,9 +2,10 @@
 
 from .primitive import Primitive
 from .composition import (
-    evaluate_requirement,
+    evaluate_composition,
     project_failure_codes,
 )
+from .dispatcher import evaluate_requirement
 from .policy_tree import (
     COMPOSITION_TYPES,
     MAX_REQUIREMENT_DEPTH,
@@ -28,6 +29,7 @@ __all__ = [
     "PolicySetIndex",
     "build_policy_set_index",
     "project_failure_codes",
+    "evaluate_composition",
     "evaluate_requirement",
     "validate_requirement_tree",
     "UnsupportedPrimitiveError",
