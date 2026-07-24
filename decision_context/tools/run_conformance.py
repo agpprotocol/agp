@@ -51,6 +51,10 @@ BASE = {
     ],
 }
 
+BASE_V2 = copy.deepcopy(BASE)
+BASE_V2["object_type"] = "agp.decision-context/2"
+BASE_V2["evaluation_time"] = 1784894400
+
 def encoded(value):
     return json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
 
@@ -59,6 +63,7 @@ def add(name, raw, accepted, error):
     cases.append((name, raw, accepted, error))
 
 add("authoritative_context", encoded(BASE), True, None)
+add("authoritative_context_v2", encoded(BASE_V2), True, None)
 
 def mutate(name, fn, error):
     value = copy.deepcopy(BASE)
@@ -66,7 +71,7 @@ def mutate(name, fn, error):
     add(name, encoded(value), False, error)
 
 mutate("unknown_top_level", lambda x: x.__setitem__("result", "accepted"), "UNKNOWN_TOP_LEVEL_MEMBER")
-mutate("wrong_object_type", lambda x: x.__setitem__("object_type", "agp.decision-context/2"), "INVALID_OBJECT_TYPE")
+mutate("wrong_object_type", lambda x: x.__setitem__("object_type", "agp.invalid/1"), "INVALID_OBJECT_TYPE")
 mutate("invalid_context_id", lambda x: x.__setitem__("context_id", "Bad ID"), "INVALID_CONTEXT_ID")
 mutate("invalid_created_at", lambda x: x.__setitem__("created_at", "2026-02-30T20:00:00Z"), "INVALID_TIMESTAMP")
 mutate("expires_not_later", lambda x: x.__setitem__("expires_at", x["created_at"]), "INVALID_TIMESTAMP")
@@ -78,6 +83,37 @@ mutate("duplicate_participant", lambda x: x["participants"].append(copy.deepcopy
 mutate("unsorted_participants", lambda x: x["participants"].reverse(), "UNSORTED_COLLECTION")
 mutate("invalid_evidence_digest", lambda x: x["evidence"][0].__setitem__("digest", "b" * 63), "INVALID_EVIDENCE")
 mutate("invalid_constraint_parameters", lambda x: x["constraints"][0].__setitem__("parameters", []), "INVALID_CONSTRAINTS")
+
+def mutate_v2(name, fn, error):
+    value = copy.deepcopy(BASE_V2)
+    fn(value)
+    add(name, encoded(value), False, error)
+
+mutate_v2(
+    "v2_missing_evaluation_time",
+    lambda x: x.pop("evaluation_time"),
+    "INVALID_OBJECT",
+)
+mutate_v2(
+    "v2_boolean_evaluation_time",
+    lambda x: x.__setitem__("evaluation_time", True),
+    "INVALID_SAFE_INTEGER",
+)
+mutate_v2(
+    "v2_negative_evaluation_time",
+    lambda x: x.__setitem__("evaluation_time", -1),
+    "INVALID_SAFE_INTEGER",
+)
+mutate_v2(
+    "v2_unsafe_evaluation_time",
+    lambda x: x.__setitem__("evaluation_time", 9007199254740992),
+    "INVALID_SAFE_INTEGER",
+)
+mutate_v2(
+    "v2_unknown_top_level",
+    lambda x: x.__setitem__("extra", True),
+    "UNKNOWN_TOP_LEVEL_MEMBER",
+)
 
 add(
     "duplicate_json_member",
@@ -112,5 +148,5 @@ for name, raw, expected_accepted, expected_error in cases:
         f"accepted={result['accepted']} error={result['error_code']}"
     )
 
-print(f"AGP Decision Context 0.9: {passed}/{len(cases)} passed")
+print(f"AGP Decision Context 1/2: {passed}/{len(cases)} passed")
 raise SystemExit(0 if passed == len(cases) else 1)

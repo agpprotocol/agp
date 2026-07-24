@@ -19,10 +19,11 @@ RESERVED_RESULT_MEMBERS = {
     "decision", "result", "outcome", "accepted", "approved",
     "rejected", "resolution", "execution_state",
 }
-TOP_LEVEL = {
+TOP_LEVEL_V1 = {
     "object_type", "context_id", "created_at", "expires_at",
     "policy", "proposal", "participants", "evidence", "constraints",
 }
+TOP_LEVEL_V2 = TOP_LEVEL_V1 | {"evaluation_time"}
 
 class ValidationError(Exception):
     def __init__(self, code: str, detail: str):
@@ -83,6 +84,11 @@ def positive_safe_integer(value: Any, where: str) -> int:
         reject("INVALID_SAFE_INTEGER", f"{where} must be a positive safe integer")
     return value
 
+def nonnegative_safe_integer(value: Any, where: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or not (0 <= value <= SAFE_MAX):
+        reject("INVALID_SAFE_INTEGER", f"{where} must be a non-negative safe integer")
+    return value
+
 def timestamp(value: Any, where: str) -> datetime:
     if not isinstance(value, str) or not TIMESTAMP_RE.fullmatch(value):
         reject("INVALID_TIMESTAMP", f"{where} must be a whole-second UTC timestamp")
@@ -102,14 +108,25 @@ def validate_object(value: Any) -> None:
     if not isinstance(value, dict):
         reject("INVALID_OBJECT", "decision context must be an object")
 
-    unknown = set(value) - TOP_LEVEL
+    object_type = value.get("object_type")
+    if object_type == "agp.decision-context/1":
+        top_level = TOP_LEVEL_V1
+    elif object_type == "agp.decision-context/2":
+        top_level = TOP_LEVEL_V2
+    else:
+        reject(
+            "INVALID_OBJECT_TYPE",
+            "object_type must be agp.decision-context/1 or agp.decision-context/2",
+        )
+
+    unknown = set(value) - top_level
     if unknown:
         reject("UNKNOWN_TOP_LEVEL_MEMBER", f"unknown top-level member: {sorted(unknown)[0]}")
-    if set(value) != TOP_LEVEL:
+    if set(value) != top_level:
         reject("INVALID_OBJECT", "decision context is missing required top-level members")
 
-    if value["object_type"] != "agp.decision-context/1":
-        reject("INVALID_OBJECT_TYPE", "object_type must be agp.decision-context/1")
+    if object_type == "agp.decision-context/2":
+        nonnegative_safe_integer(value["evaluation_time"], "evaluation_time")
 
     context_id = value["context_id"]
     if not isinstance(context_id, str) or not CONTEXT_ID_RE.fullmatch(context_id):

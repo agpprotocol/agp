@@ -23,9 +23,14 @@ var (
 	mediaTypeRE  = regexp.MustCompile(`^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$`)
 )
 
-var topLevel = setOf(
+var topLevelV1 = setOf(
 	"object_type", "context_id", "created_at", "expires_at",
 	"policy", "proposal", "participants", "evidence", "constraints",
+)
+
+var topLevelV2 = setOf(
+	"object_type", "context_id", "created_at", "expires_at",
+	"evaluation_time", "policy", "proposal", "participants", "evidence", "constraints",
 )
 
 var roles = setOf("proposer", "voter", "reviewer", "approver", "observer")
@@ -179,6 +184,14 @@ func positiveSafeInteger(value any, where string) (int64, error) {
 	return number, nil
 }
 
+func nonnegativeSafeInteger(value any, where string) (int64, error) {
+	number, ok := value.(int64)
+	if !ok || number < 0 || number > safeMax {
+		return 0, reject("INVALID_SAFE_INTEGER", where+" must be a non-negative safe integer")
+	}
+	return number, nil
+}
+
 func timestamp(value any, where string) (time.Time, error) {
 	text, ok := value.(string)
 	if !ok || !timestampRE.MatchString(text) {
@@ -218,6 +231,27 @@ func validateObject(value any) error {
 		return reject("INVALID_OBJECT", "decision context must be an object")
 	}
 
+	objectType, ok := obj["object_type"].(string)
+	if !ok {
+		return reject(
+			"INVALID_OBJECT_TYPE",
+			"object_type must be agp.decision-context/1 or agp.decision-context/2",
+		)
+	}
+
+	var topLevel map[string]struct{}
+	switch objectType {
+	case "agp.decision-context/1":
+		topLevel = topLevelV1
+	case "agp.decision-context/2":
+		topLevel = topLevelV2
+	default:
+		return reject(
+			"INVALID_OBJECT_TYPE",
+			"object_type must be agp.decision-context/1 or agp.decision-context/2",
+		)
+	}
+
 	for key := range obj {
 		if _, allowed := topLevel[key]; !allowed {
 			return reject("UNKNOWN_TOP_LEVEL_MEMBER", "unknown top-level member: "+key)
@@ -232,9 +266,12 @@ func validateObject(value any) error {
 		}
 	}
 
-	if objectType, ok := obj["object_type"].(string); !ok || objectType != "agp.decision-context/1" {
-		return reject("INVALID_OBJECT_TYPE", "object_type must be agp.decision-context/1")
+	if objectType == "agp.decision-context/2" {
+		if _, err := nonnegativeSafeInteger(obj["evaluation_time"], "evaluation_time"); err != nil {
+			return err
+		}
 	}
+
 	contextID, ok := obj["context_id"].(string)
 	if !ok || !contextIDRE.MatchString(contextID) {
 		return reject("INVALID_CONTEXT_ID", "context_id is invalid")
