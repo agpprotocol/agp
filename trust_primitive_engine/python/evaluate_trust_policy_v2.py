@@ -212,42 +212,6 @@ def validate_safe_integer(
     return value
 
 
-def validate_sorted_unique_identifiers(
-    value: Any,
-    field: str,
-    *,
-    allow_empty: bool,
-) -> list[str]:
-    if not isinstance(value, list):
-        raise EvaluationFailure(
-            "INVALID_TRUST_POLICY",
-            f"{field} must be an array",
-        )
-
-    if not allow_empty and not value:
-        raise EvaluationFailure(
-            "INVALID_TRUST_POLICY",
-            f"{field} must not be empty",
-        )
-
-    identifiers = [
-        validate_identifier(item, f"{field}[]")
-        for item in value
-    ]
-
-    if identifiers != sorted(identifiers):
-        raise EvaluationFailure(
-            "INVALID_TRUST_POLICY",
-            f"{field} must be lexicographically sorted",
-        )
-
-    if len(identifiers) != len(set(identifiers)):
-        raise EvaluationFailure(
-            "INVALID_TRUST_POLICY",
-            f"{field} must not contain duplicates",
-        )
-
-    return identifiers
 
 
 def validate_exact_members(

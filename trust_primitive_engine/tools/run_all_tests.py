@@ -40,6 +40,11 @@ SUITES = [
         ROOT / "trust_primitive_engine/tools/test_golden_policy_corpus.py",
         14,
     ),
+    (
+        "mutation observability",
+        ROOT / "trust_primitive_engine/tools/test_mutation_observability.py",
+        6,
+    ),
 ]
 
 
