@@ -37,6 +37,7 @@ from engine import (
     PolicyReferenceIdentity,
     PolicySetIndex,
     PrimitiveRegistry,
+    build_policy_set_index,
     UnsupportedPrimitiveError,
     evaluate_policy_document,
     evaluate_requirement,
@@ -157,6 +158,29 @@ class EvaluationFailure(Exception):
         super().__init__(detail)
         self.code = code
         self.detail = detail
+
+
+def load_policy_set_index(
+    path: Path,
+) -> PolicySetIndex:
+    """Load and deterministically index one explicit policy set."""
+
+    raw_policy_set = load_json(
+        path,
+        "INVALID_TRUST_POLICY_SET",
+    )
+
+    try:
+        return build_policy_set_index(
+            raw_policy_set,
+            validate_policy=validate_policy,
+            compute_digest=policy_digest,
+        )
+    except ValueError as exc:
+        raise EvaluationFailure(
+            "INVALID_TRUST_POLICY_SET",
+            str(exc),
+        ) from exc
 
 
 def reject_duplicate_members(
@@ -970,6 +994,14 @@ def main() -> int:
     )
     parser.add_argument("input", type=Path)
     parser.add_argument("--policy", required=True, type=Path)
+    parser.add_argument(
+        "--policy-set",
+        type=Path,
+        help=(
+            "optional JSON array of referenced Trust Policy "
+            "objects"
+        ),
+    )
     parser.add_argument("--keyring", required=True, type=Path)
     parser.add_argument(
         "--schema-dir",
@@ -987,6 +1019,13 @@ def main() -> int:
             args.policy,
             "INVALID_TRUST_POLICY",
         )
+
+        policy_set_index = (
+            load_policy_set_index(args.policy_set)
+            if args.policy_set is not None
+            else None
+        )
+
         try:
             keyring = load_keyring(args.keyring)
         except VerificationFailure as exc:
@@ -997,6 +1036,7 @@ def main() -> int:
             policy,
             keyring,
             args.schema_dir,
+            policy_set_index=policy_set_index,
         )
     except EvaluationFailure as exc:
         print(
