@@ -72,6 +72,59 @@ def main() -> int:
     ):
         raise AssertionError("state signer normalization failed")
 
+    if state.evaluation_time is not None:
+        raise AssertionError(
+            "legacy state must default evaluation_time to None"
+        )
+
+    temporal_state = EvaluationState.create(
+        matched_signers=[],
+        participants={},
+        weight=0,
+        evaluation_time=1784894400,
+    )
+
+    if temporal_state.evaluation_time != 1784894400:
+        raise AssertionError(
+            "evaluation_time was not preserved"
+        )
+
+    boundary_state = EvaluationState.create(
+        matched_signers=[],
+        participants={},
+        weight=0,
+        evaluation_time=9007199254740991,
+    )
+
+    if boundary_state.evaluation_time != 9007199254740991:
+        raise AssertionError(
+            "maximum safe evaluation_time was not accepted"
+        )
+
+    invalid_evaluation_times = [
+        True,
+        False,
+        -1,
+        9007199254740992,
+        "1784894400",
+    ]
+
+    for invalid_value in invalid_evaluation_times:
+        try:
+            EvaluationState.create(
+                matched_signers=[],
+                participants={},
+                weight=0,
+                evaluation_time=invalid_value,
+            )
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(
+                "invalid evaluation_time was accepted: "
+                f"{invalid_value!r}"
+            )
+
     registry = PrimitiveRegistry([ExamplePrimitive()])
 
     if registry.types() != ("example",):
@@ -113,7 +166,7 @@ def main() -> int:
             "duplicate primitive registration was accepted"
         )
 
-    print("TPE engine core checks: 5/5 passed")
+    print("TPE engine core checks: 9/9 passed")
     return 0
 
 

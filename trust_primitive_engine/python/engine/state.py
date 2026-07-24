@@ -15,6 +15,7 @@ class EvaluationState:
     participants: Mapping[str, Mapping[str, Any]]
     signature_count: int
     weight: int
+    evaluation_time: int | None = None
 
     def __post_init__(self) -> None:
         if tuple(sorted(self.matched_signers)) != self.matched_signers:
@@ -42,6 +43,25 @@ class EvaluationState:
         if self.weight < 0:
             raise ValueError("weight must not be negative")
 
+        if self.evaluation_time is not None:
+            if (
+                isinstance(self.evaluation_time, bool)
+                or not isinstance(self.evaluation_time, int)
+            ):
+                raise ValueError(
+                    "evaluation_time must be an integer or None"
+                )
+
+            if self.evaluation_time < 0:
+                raise ValueError(
+                    "evaluation_time must not be negative"
+                )
+
+            if self.evaluation_time > 9007199254740991:
+                raise ValueError(
+                    "evaluation_time exceeds maximum safe integer"
+                )
+
     @property
     def matched_set(self) -> frozenset[str]:
         return frozenset(self.matched_signers)
@@ -53,6 +73,7 @@ class EvaluationState:
         matched_signers: list[str],
         participants: dict[str, dict[str, Any]],
         weight: int,
+        evaluation_time: int | None = None,
     ) -> "EvaluationState":
         normalized_signers = tuple(sorted(matched_signers))
         immutable_participants = MappingProxyType(
@@ -67,4 +88,5 @@ class EvaluationState:
             participants=immutable_participants,
             signature_count=len(normalized_signers),
             weight=weight,
+            evaluation_time=evaluation_time,
         )
