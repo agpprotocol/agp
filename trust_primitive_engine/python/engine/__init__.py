@@ -5,13 +5,22 @@ from .composition import (
     evaluate_composition,
     project_failure_codes,
 )
-from .dispatcher import evaluate_requirement
+from .dispatcher import (
+    RequirementEvaluationContext,
+    evaluate_requirement,
+)
 from .policy_tree import (
     COMPOSITION_TYPES,
     MAX_REQUIREMENT_DEPTH,
     MAX_REQUIREMENT_NODES,
     UnsupportedPrimitiveError,
     validate_requirement_tree,
+)
+from .policy_evaluation import (
+    PolicyEvaluationContext,
+    PolicyEvaluationResult,
+    evaluate_indexed_policy,
+    evaluate_policy_reference_requirement,
 )
 from .policy_set import (
     PolicyReferenceIdentity,
@@ -21,9 +30,18 @@ from .policy_set import (
 )
 from .registry import PrimitiveRegistry
 from .result import PrimitiveResult
-from .state import EvaluationState
+from .state import (
+    EvaluationState,
+    create_policy_evaluation_state,
+)
 
 __all__ = [
+    "PolicyEvaluationContext",
+    "PolicyEvaluationResult",
+    "RequirementEvaluationContext",
+    "evaluate_indexed_policy",
+    "evaluate_policy_reference_requirement",
+    "create_policy_evaluation_state",
     "PolicyReferenceIdentity",
     "PolicySetEntry",
     "PolicySetIndex",

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from dataclasses import dataclass
 from typing import Any
 
 from .composition import evaluate_composition
@@ -11,10 +13,28 @@ from .result import PrimitiveResult
 from .state import EvaluationState
 
 
+
+PolicyReferenceEvaluator = Callable[
+    [dict[str, Any]],
+    PrimitiveResult,
+]
+
+
+@dataclass(frozen=True)
+class RequirementEvaluationContext:
+    """Structural callbacks available during requirement evaluation."""
+
+    evaluate_policy_reference: (
+        PolicyReferenceEvaluator | None
+    ) = None
+
+
 def evaluate_requirement(
     requirement: dict[str, Any],
     state: EvaluationState,
     registry: PrimitiveRegistry,
+    *,
+    context: RequirementEvaluationContext | None = None,
 ) -> PrimitiveResult:
     """Dispatch one validated requirement by structural category.
 
@@ -30,12 +50,31 @@ def evaluate_requirement(
     requirement_type = requirement["type"]
 
     if requirement_type in COMPOSITION_TYPES:
+        def evaluate_child(
+            child: dict[str, Any],
+            child_state: EvaluationState,
+            child_registry: PrimitiveRegistry,
+        ) -> PrimitiveResult:
+            return evaluate_requirement(
+                child,
+                child_state,
+                child_registry,
+                context=context,
+            )
+
         return evaluate_composition(
             requirement,
             state,
             registry,
-            evaluate_child=evaluate_requirement,
+            evaluate_child=evaluate_child,
         )
+
+    if (
+        requirement_type == "policy_reference"
+        and context is not None
+        and context.evaluate_policy_reference is not None
+    ):
+        return context.evaluate_policy_reference(requirement)
 
     primitive = registry.resolve(requirement_type)
     return primitive.evaluate(requirement, state)

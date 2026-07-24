@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Iterable
+from typing import TYPE_CHECKING, Any, Iterable
+
+
+if TYPE_CHECKING:
+    from .policy_evaluation import PolicyEvaluationResult
 
 
 @dataclass(frozen=True)
@@ -19,6 +23,7 @@ class PrimitiveResult:
     expected: dict[str, Any]
     failure_code: str
     children: tuple["PrimitiveResult", ...] = ()
+    referenced_policy: "PolicyEvaluationResult | None" = None
 
     def __post_init__(self) -> None:
         if tuple(sorted(self.matched_signers)) != self.matched_signers:
@@ -77,6 +82,11 @@ class PrimitiveResult:
                 for child in self.children
             ]
 
+        if self.referenced_policy is not None:
+            result["referenced_policy"] = (
+                self.referenced_policy.to_dict()
+            )
+
         return result
 
     @classmethod
@@ -89,6 +99,7 @@ class PrimitiveResult:
         observed: dict[str, Any],
         expected: dict[str, Any],
         children: Iterable["PrimitiveResult"] = (),
+        referenced_policy: "PolicyEvaluationResult | None" = None,
     ) -> "PrimitiveResult":
         return cls(
             requirement_id=requirement_id,
@@ -99,6 +110,7 @@ class PrimitiveResult:
             expected=expected,
             failure_code="",
             children=tuple(children),
+            referenced_policy=referenced_policy,
         )
 
     @classmethod
@@ -112,6 +124,7 @@ class PrimitiveResult:
         expected: dict[str, Any],
         failure_code: str,
         children: Iterable["PrimitiveResult"] = (),
+        referenced_policy: "PolicyEvaluationResult | None" = None,
     ) -> "PrimitiveResult":
         return cls(
             requirement_id=requirement_id,
@@ -122,4 +135,5 @@ class PrimitiveResult:
             expected=expected,
             failure_code=failure_code,
             children=tuple(children),
+            referenced_policy=referenced_policy,
         )

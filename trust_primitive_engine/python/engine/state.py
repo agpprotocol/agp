@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 
 
 @dataclass(frozen=True)
@@ -90,3 +90,50 @@ class EvaluationState:
             weight=weight,
             evaluation_time=evaluation_time,
         )
+
+
+def create_policy_evaluation_state(
+    *,
+    verified_signers: Iterable[str],
+    participants: Mapping[str, Mapping[str, Any]],
+    eligible_roles: Iterable[str],
+    evaluation_time: int | None = None,
+) -> EvaluationState:
+    """Create the policy-local state for one Trust Policy.
+
+    Verified signer identity, normalized participants, and evaluation
+    time are shared across the complete policy-reference evaluation.
+
+    Signer eligibility, signature count, and weight are recalculated
+    independently for each policy from that policy's eligible_roles.
+    """
+
+    normalized_verified_signers = tuple(
+        sorted(set(verified_signers))
+    )
+    eligible_role_set = frozenset(eligible_roles)
+
+    matched_signers = [
+        signer_id
+        for signer_id in normalized_verified_signers
+        if (
+            signer_id in participants
+            and participants[signer_id]["role"]
+            in eligible_role_set
+        )
+    ]
+
+    weight = sum(
+        int(participants[signer_id]["weight"])
+        for signer_id in matched_signers
+    )
+
+    return EvaluationState.create(
+        matched_signers=matched_signers,
+        participants={
+            signer_id: dict(participant)
+            for signer_id, participant in participants.items()
+        },
+        weight=weight,
+        evaluation_time=evaluation_time,
+    )
