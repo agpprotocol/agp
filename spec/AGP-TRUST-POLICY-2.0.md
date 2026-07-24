@@ -187,11 +187,30 @@ rejected as `INVALID_TRUST_POLICY`.
 
 ## 6. Composition
 
-Phase 1 uses AND composition. A policy is satisfied only if every requirement
-is satisfied.
+The top-level `requirements` array remains an implicit conjunction: every
+top-level requirement must be satisfied for the policy to be satisfied.
 
-When multiple requirements fail, requirement results MUST remain deterministic
-and ordered by `requirement_id`.
+Trust Primitive Engine 2.2 adds explicit recursive composition requirements:
+
+- `all_of`: satisfied only when every child is satisfied;
+- `any_of`: satisfied when at least one child is satisfied;
+- `not`: satisfied only when its single child is unsatisfied.
+
+`all_of` and `any_of` MUST contain at least two child requirements in the
+`requirements` member. `not` MUST contain exactly one child requirement in the
+singular `requirement` member.
+
+Every `requirement_id` MUST be unique across the complete tree. Children of
+`all_of` and `any_of` MUST be ordered lexicographically by `requirement_id`.
+The maximum tree depth is 8 and the maximum tree size is 256 nodes.
+
+All structurally valid children MUST be evaluated in canonical order. Boolean
+composition MUST NOT short-circuit. This preserves complete evidence,
+deterministic replay, and byte-stable results.
+
+Composition results preserve the policy tree through recursive `children`
+arrays. Full normative semantics are defined by
+`trust_primitive_engine/rfcs/TPE-2.2-001-deterministic-policy-composition.md`.
 
 ## 7. Evaluation result
 
@@ -206,9 +225,11 @@ Each requirement yields:
 - `observed`
 - `expected`
 - `failure_code`
+- `children` for composition requirements
 
-Requirement results preserve policy order, which is deterministic because the
-policy requires lexical ordering by `requirement_id`.
+Requirement results preserve the recursive policy tree and canonical policy
+order. Repeated evaluation of identical inputs MUST produce byte-identical
+canonical JSON.
 
 ## 8. Failure codes
 
@@ -227,6 +248,9 @@ policy requires lexical ordering by `requirement_id`.
 - `AT_MOST_N_SIGNERS_EXCEEDED`
 - `AT_LEAST_N_SIGNERS_NOT_REACHED`
 - `EXACTLY_N_SIGNERS_NOT_SATISFIED`
+- `ALL_OF_NOT_SATISFIED`
+- `ANY_OF_NOT_SATISFIED`
+- `NOT_NOT_SATISFIED`
 
 Validation and binding errors remain fatal evaluation errors rather than
 unsatisfied requirements.

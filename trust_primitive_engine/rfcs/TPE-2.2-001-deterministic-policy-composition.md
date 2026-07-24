@@ -1,12 +1,34 @@
 # TPE-2.2-001: Deterministic Policy Composition
 
-- Status: Draft
+- Status: Implemented
 - Category: Standards Track
 - Target: Trust Primitive Engine 2.2
 - Depends on:
   - Trust Policy 2
   - Deterministic Evaluation State
   - TPE-2.1-001 Deterministic Temporal Evaluation
+
+## Implementation status
+
+This specification is implemented by the reference Python Trust Primitive
+Engine for `agp.trust-policy/2`.
+
+The implementation includes:
+
+- recursive validation for `all_of`, `any_of`, and `not`;
+- deterministic complete-tree evaluation without short-circuiting;
+- recursive `PrimitiveResult.children`;
+- global `requirement_id` uniqueness;
+- canonical child ordering;
+- maximum depth 8;
+- maximum node count 256;
+- recursive JSON Schema support;
+- schema/runtime parity coverage;
+- a versioned golden compatibility corpus;
+- property-based recursive-tree hardening.
+
+The reference validation suite passes 353 of 353 checks, including 8 property
+groups and 2,000 generated examples.
 
 ## 1. Abstract
 
