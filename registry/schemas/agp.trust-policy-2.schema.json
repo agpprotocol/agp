@@ -42,56 +42,7 @@
       "type": "array",
       "minItems": 1,
       "items": {
-        "oneOf": [
-          {
-            "$ref": "#/$defs/requiredSigner"
-          },
-          {
-            "$ref": "#/$defs/signerThreshold"
-          },
-          {
-            "$ref": "#/$defs/globalSignatureThreshold"
-          },
-          {
-            "$ref": "#/$defs/globalWeightThreshold"
-          },
-          {
-            "$ref": "#/$defs/roleThreshold"
-          },
-          {
-            "$ref": "#/$defs/roleWeightThreshold"
-          },
-          {
-            "$ref": "#/$defs/prohibitedSigner"
-          },
-          {
-            "$ref": "#/$defs/separationOfDuties"
-          },
-          {
-            "$ref": "#/$defs/mutualExclusion"
-          },
-          {
-            "$ref": "#/$defs/anyOfSigners"
-          },
-          {
-            "$ref": "#/$defs/allOfSigners"
-          },
-          {
-            "$ref": "#/$defs/exactlyOneOfSigners"
-          },
-          {
-            "$ref": "#/$defs/atMostNSigners"
-          },
-          {
-            "$ref": "#/$defs/atLeastNSigners"
-          },
-          {
-            "$ref": "#/$defs/exactlyNSigners"
-          },
-          {
-            "$ref": "#/$defs/timeWindow"
-          }
-        ]
+        "$ref": "#/$defs/requirement"
       }
     }
   },
@@ -527,6 +478,135 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        }
+      }
+    },
+    "requirement": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/requiredSigner"
+        },
+        {
+          "$ref": "#/$defs/signerThreshold"
+        },
+        {
+          "$ref": "#/$defs/globalSignatureThreshold"
+        },
+        {
+          "$ref": "#/$defs/globalWeightThreshold"
+        },
+        {
+          "$ref": "#/$defs/roleThreshold"
+        },
+        {
+          "$ref": "#/$defs/roleWeightThreshold"
+        },
+        {
+          "$ref": "#/$defs/prohibitedSigner"
+        },
+        {
+          "$ref": "#/$defs/separationOfDuties"
+        },
+        {
+          "$ref": "#/$defs/mutualExclusion"
+        },
+        {
+          "$ref": "#/$defs/anyOfSigners"
+        },
+        {
+          "$ref": "#/$defs/allOfSigners"
+        },
+        {
+          "$ref": "#/$defs/exactlyOneOfSigners"
+        },
+        {
+          "$ref": "#/$defs/atMostNSigners"
+        },
+        {
+          "$ref": "#/$defs/atLeastNSigners"
+        },
+        {
+          "$ref": "#/$defs/exactlyNSigners"
+        },
+        {
+          "$ref": "#/$defs/timeWindow"
+        },
+        {
+          "$ref": "#/$defs/allOf"
+        },
+        {
+          "$ref": "#/$defs/anyOf"
+        },
+        {
+          "$ref": "#/$defs/not"
+        }
+      ]
+    },
+    "allOf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "requirements"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "all_of"
+        },
+        "requirements": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/requirement"
+          }
+        }
+      }
+    },
+    "anyOf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "requirements"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "any_of"
+        },
+        "requirements": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/requirement"
+          }
+        }
+      }
+    },
+    "not": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "requirement"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "not"
+        },
+        "requirement": {
+          "$ref": "#/$defs/requirement"
         }
       }
     }
