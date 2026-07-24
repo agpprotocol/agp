@@ -70,6 +70,56 @@ SUITES = [
         ROOT / "trust_primitive_engine/tools/test_fuzz_regression_seeds.py",
         6,
     ),
+    (
+        "policy-set indexing",
+        ROOT / "trust_primitive_engine/tools/test_policy_set_indexing.py",
+        8,
+    ),
+    (
+        "policy-reference validation",
+        ROOT / "trust_primitive_engine/tools/test_policy_reference_validation.py",
+        15,
+    ),
+    (
+        "policy-reference resolution",
+        ROOT / "trust_primitive_engine/tools/test_policy_reference_resolution.py",
+        8,
+    ),
+    (
+        "policy-reference graph validation",
+        ROOT / "trust_primitive_engine/tools/test_policy_reference_graph.py",
+        11,
+    ),
+    (
+        "structural dispatcher",
+        ROOT / "trust_primitive_engine/tools/test_structural_dispatcher.py",
+        6,
+    ),
+    (
+        "recursive policy evaluation",
+        ROOT / "trust_primitive_engine/tools/test_recursive_policy_evaluation.py",
+        9,
+    ),
+    (
+        "recursive policy failure projection",
+        ROOT / "trust_primitive_engine/tools/test_recursive_policy_failure_projection.py",
+        9,
+    ),
+    (
+        "verified policy-set evaluation",
+        ROOT / "trust_primitive_engine/tools/test_verified_policy_set_evaluation.py",
+        6,
+    ),
+    (
+        "policy-set CLI",
+        ROOT / "trust_primitive_engine/tools/test_policy_set_cli.py",
+        5,
+    ),
+    (
+        "policy-reference conformance corpus",
+        ROOT / "trust_primitive_engine/tools/test_policy_reference_conformance_corpus.py",
+        8,
+    ),
 ]
 
 
@@ -97,7 +147,7 @@ def main() -> int:
         total += checks
 
     print("=" * 88)
-    print(f"AGP TPE 2.0 complete validation: {total}/{total} passed")
+    print(f"AGP TPE 2.3 complete validation: {total}/{total} passed")
     return 0
 
 
