@@ -32,6 +32,13 @@ SUITES = [
         "test_primitive_schema_runtime_matrix.py",
         136,
     ),
+    (
+        "property hardening",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_property_hardening.py",
+        4,
+    ),
 ]
 
 
