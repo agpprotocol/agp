@@ -45,6 +45,11 @@ SUITES = [
         ROOT / "trust_primitive_engine/tools/test_mutation_observability.py",
         6,
     ),
+    (
+        "byte stability corpus",
+        ROOT / "trust_primitive_engine/tools/test_byte_stability_corpus.py",
+        6,
+    ),
 ]
 
 

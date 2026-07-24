@@ -1,0 +1,1 @@
+{"eligible_roles":["approver","reviewer"],"object_type":"agp.trust-policy/2","policy_id":"policy:golden:signer-threshold","requirements":[{"minimum_signatures":2,"requirement_id":"requirement:signer-threshold","signer_ids":["authority:alpha","authority:beta","authority:gamma"],"type":"signer_threshold"}],"version":2}

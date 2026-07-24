@@ -1,0 +1,59 @@
+{
+  "encoding": "UTF-8",
+  "entries": [
+    {
+      "normalized_fixture": "valid_required_signer.normalized.json",
+      "normalized_sha256": "ac3f7ae37d9a606d41dffa92674caf6b535ccffaab4b993aa19d18ac6feb9852",
+      "normalized_size_bytes": 244,
+      "source_fixture": "valid_required_signer.json",
+      "source_sha256": "80e005be9cb03d020b1c821fa49be4f92a9dd8fc3d54da60d001a9561e77fa47"
+    },
+    {
+      "normalized_fixture": "valid_signer_threshold.normalized.json",
+      "normalized_sha256": "96e69a306f71cf6bf91f9b3ce849e54299290b7c7256800cf8cf82f49b6b1e54",
+      "normalized_size_bytes": 319,
+      "source_fixture": "valid_signer_threshold.json",
+      "source_sha256": "0f804ec66a15593b37dbc753e6ff3668ba51cd5d7a39c707be5a4b93cbc04133"
+    },
+    {
+      "normalized_fixture": "valid_global_thresholds.normalized.json",
+      "normalized_sha256": "0e75fdf9e856d3b3967639a595b1123d6a4a242a6ac34e6ac602600ff6d6b507",
+      "normalized_size_bytes": 351,
+      "source_fixture": "valid_global_thresholds.json",
+      "source_sha256": "054ec77ff2193745341e129f4b965e43e4867a01b9dc4bdda2566645f2523fd0"
+    },
+    {
+      "normalized_fixture": "valid_role_thresholds.normalized.json",
+      "normalized_sha256": "a1539f045d83bd549becabe836cffb442e1961da1ddd5057b5c58e46e4be50bb",
+      "normalized_size_bytes": 378,
+      "source_fixture": "valid_role_thresholds.json",
+      "source_sha256": "327a936413cd1538df2d0a435afff1f9e1e38b7668af9aa4813f85251b11442a"
+    },
+    {
+      "normalized_fixture": "valid_constraints.normalized.json",
+      "normalized_sha256": "ed9e4c47be1bcd4328dc35604fd678c0fa9630f2593d4b346e240b2e123025ca",
+      "normalized_size_bytes": 597,
+      "source_fixture": "valid_constraints.json",
+      "source_sha256": "34a009875fb8e671e5b80b36bb833e2bcdb386ad18e0b5c7ad360b3dffafbfa3"
+    },
+    {
+      "normalized_fixture": "valid_cardinality.normalized.json",
+      "normalized_sha256": "11067ecf0fec3d9d9e05f86cbb8610ade7fa6267268760a5e14eeaf1a3ee4a9c",
+      "normalized_size_bytes": 847,
+      "source_fixture": "valid_cardinality.json",
+      "source_sha256": "5374c501321e8a130c5d3b03845495d6968c68b2a1fc69a8adb229756452a550"
+    }
+  ],
+  "format": "agp-tpe-v2-byte-stability",
+  "format_version": 1,
+  "policy_version": 2,
+  "serialization": {
+    "ensure_ascii": false,
+    "separators": [
+      ",",
+      ":"
+    ],
+    "sort_keys": true,
+    "trailing_newline": true
+  }
+}

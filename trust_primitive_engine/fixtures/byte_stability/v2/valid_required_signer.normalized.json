@@ -1,0 +1,1 @@
+{"eligible_roles":["approver"],"object_type":"agp.trust-policy/2","policy_id":"policy:golden:required-signer","requirements":[{"requirement_id":"requirement:required-signer","signer_id":"authority:alpha","type":"required_signer"}],"version":2}
