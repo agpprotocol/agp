@@ -21,6 +21,11 @@ SUITES = [
         20,
     ),
     (
+        "composition evaluation",
+        ROOT / "trust_primitive_engine/tools/test_composition_evaluation.py",
+        17,
+    ),
+    (
         "conformance",
         ROOT / "trust_primitive_engine/tools/run_conformance.py",
         75,

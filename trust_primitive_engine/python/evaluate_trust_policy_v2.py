@@ -35,6 +35,8 @@ from engine import (
     EvaluationState,
     PrimitiveRegistry,
     UnsupportedPrimitiveError,
+    evaluate_requirement,
+    project_failure_codes,
     validate_requirement_tree,
 )
 from primitives.exactly_n_signers import ExactlyNSignersPrimitive
@@ -471,34 +473,30 @@ def evaluate_verified_object(
         evaluation_time=evaluation_time,
     )
 
-    requirement_results: list[dict[str, Any]] = []
-
-    for requirement in policy["requirements"]:
-        primitive_type = requirement["type"]
-
-        try:
-            primitive = PRIMITIVE_REGISTRY.resolve(
-                primitive_type
-            )
-        except KeyError as exc:
-            raise EvaluationFailure(
-                "UNSUPPORTED_TRUST_PRIMITIVE",
-                f"primitive is not registered: {primitive_type!r}",
-            ) from exc
-
-        requirement_results.append(
-            primitive.evaluate(
+    try:
+        result_objects = tuple(
+            evaluate_requirement(
                 requirement,
                 engine_state,
-            ).to_dict()
+                PRIMITIVE_REGISTRY,
+            )
+            for requirement in policy["requirements"]
         )
+    except KeyError as exc:
+        raise EvaluationFailure(
+            "UNSUPPORTED_TRUST_PRIMITIVE",
+            str(exc),
+        ) from exc
 
-    failures = [
-        item["failure_code"]
-        for item in requirement_results
-        if item["failure_code"] is not None
+    requirement_results = [
+        result.to_dict()
+        for result in result_objects
     ]
-    satisfied = not failures
+    failures = project_failure_codes(result_objects)
+    satisfied = all(
+        result.satisfied
+        for result in result_objects
+    )
 
     return {
         "object_type": EVALUATION_OBJECT_TYPE,
