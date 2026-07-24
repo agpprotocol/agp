@@ -161,7 +161,7 @@ A policy reference is a structural requirement with this exact shape:
   "type": "policy_reference",
   "policy_id": "policy:security-baseline",
   "policy_version": 3,
-  "policy_digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+  "policy_digest": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
 }
 ```
 
@@ -193,11 +193,10 @@ A JSON boolean MUST be rejected.
 
 ### 8.3 `policy_digest`
 
-`policy_digest` MUST have the form:
+`policy_digest` MUST be exactly 64 lowercase hexadecimal characters.
 
-```text
-sha256:<64 lowercase hexadecimal digits>
-```
+It is the lowercase hexadecimal encoding of the SHA-256 digest over the
+canonical policy bytes. No algorithm prefix is included in the value.
 
 No other digest algorithm is defined by this specification.
 
@@ -237,7 +236,7 @@ For every referenced policy:
 
 ```text
 computed_digest =
-    "sha256:" + SHA256(AGP-C14N-0.7(referenced_policy))
+    lowercase_hex(SHA256(AGP-C14N-0.7(referenced_policy)))
 ```
 
 The computed digest MUST equal the `policy_digest` in the reference node.
@@ -453,7 +452,7 @@ Logical result shape:
   "observed": {
     "policy_id": "policy:security-baseline",
     "policy_version": 3,
-    "policy_digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "policy_digest": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
     "policy_status": "satisfied"
   },
   "expected": {
@@ -463,7 +462,7 @@ Logical result shape:
   "referenced_policy": {
     "policy_id": "policy:security-baseline",
     "policy_version": 3,
-    "policy_digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "policy_digest": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
     "status": "satisfied",
     "requirement_results": []
   }
@@ -615,6 +614,10 @@ identically.
 An older implementation that does not support `policy_reference` will reject it
 as an unsupported requirement type.
 
+Reference digests use the same 64-character lowercase hexadecimal SHA-256
+encoding already used by Decision Context policy binding and Trust Policy
+evaluation output. Implementations MUST NOT add an algorithm prefix.
+
 ## 28. Required conformance coverage
 
 ### 28.1 Valid resolution
@@ -629,6 +632,11 @@ as an unsupported requirement type.
 - referenced policy with its own composition tree.
 
 ### 28.2 Binding
+
+- valid 64-character lowercase hexadecimal policy digest;
+- rejection of an otherwise valid digest prefixed with `sha256:`;
+- rejection of uppercase hexadecimal;
+- rejection of incorrect digest length;
 
 - identifier mismatch;
 - version mismatch;
