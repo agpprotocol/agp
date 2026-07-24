@@ -1,0 +1,51 @@
+{
+  "object_type": "agp.signed-decision-context/2",
+  "context_digest": "context-digest:tpe-2.3-golden",
+  "context": {
+    "object_type": "agp.decision-context/2",
+    "context_id": "context:tpe-2.3-golden",
+    "evaluation_time": 1700000000,
+    "policy": {
+      "id": "policy:golden:direct-unsatisfied",
+      "version": 1,
+      "digest": "52013a155ce3f05f955f37813d15608e5d269e5802b9c01f81efa0c5944f8e20"
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 2
+      },
+      {
+        "id": "authority:beta",
+        "role": "reviewer",
+        "weight": 3
+      },
+      {
+        "id": "authority:gamma",
+        "role": "voter",
+        "weight": 5
+      }
+    ]
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    },
+    {
+      "signature_id": "signature:beta",
+      "statement": {
+        "signer_id": "authority:beta"
+      }
+    },
+    {
+      "signature_id": "signature:gamma",
+      "statement": {
+        "signer_id": "authority:gamma"
+      }
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:nested-root",
+  "version": 1,
+  "eligible_roles": [
+    "voter"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:nested-middle-reference",
+      "type": "policy_reference",
+      "policy_id": "policy:golden:nested-middle",
+      "policy_version": 1,
+      "policy_digest": "289ed722fe2e380fcb827a33adf35f237600b5ad3fb4f871dde459022ac22d23"
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:reference-all-of",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:outer-all",
+      "type": "all_of",
+      "requirements": [
+        {
+          "requirement_id": "requirement:alpha",
+          "type": "required_signer",
+          "signer_id": "authority:alpha"
+        },
+        {
+          "requirement_id": "requirement:reviewer-reference",
+          "type": "policy_reference",
+          "policy_id": "policy:golden:reviewer-satisfied",
+          "policy_version": 1,
+          "policy_digest": "989cbfb3cd20115d75a8ce1152d246b006cd5796609170616e1522cf150a8aea"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "object_type": "agp.trust-policy-evaluation/2",
+  "status": "satisfied",
+  "policy_id": "policy:golden:direct-satisfied",
+  "policy_version": 1,
+  "policy_digest": "22a1ef246d88c5eaad5a3d4acd2eba2eb3bea026f96911edea500a2de76ad92b",
+  "context_id": "context:tpe-2.3-golden",
+  "context_digest": "context-digest:tpe-2.3-golden",
+  "verified_signature_ids": [
+    "signature:alpha",
+    "signature:beta",
+    "signature:gamma"
+  ],
+  "verified_signers": [
+    "authority:alpha",
+    "authority:beta",
+    "authority:gamma"
+  ],
+  "matched_signers": [
+    "authority:alpha"
+  ],
+  "unauthorized_signers": [],
+  "ineligible_role_signers": [
+    "authority:beta",
+    "authority:gamma"
+  ],
+  "signature_count": 1,
+  "weight": 2,
+  "requirement_results": [
+    {
+      "requirement_id": "requirement:reviewer-reference",
+      "type": "policy_reference",
+      "status": "satisfied",
+      "matched_signers": [
+        "authority:beta"
+      ],
+      "observed": {
+        "policy_id": "policy:golden:reviewer-satisfied",
+        "policy_version": 1,
+        "policy_digest": "989cbfb3cd20115d75a8ce1152d246b006cd5796609170616e1522cf150a8aea",
+        "policy_status": "satisfied"
+      },
+      "expected": {
+        "policy_status": "satisfied"
+      },
+      "failure_code": null,
+      "referenced_policy": {
+        "policy_id": "policy:golden:reviewer-satisfied",
+        "policy_version": 1,
+        "policy_digest": "989cbfb3cd20115d75a8ce1152d246b006cd5796609170616e1522cf150a8aea",
+        "status": "satisfied",
+        "requirement_results": [
+          {
+            "requirement_id": "requirement:beta",
+            "type": "required_signer",
+            "status": "satisfied",
+            "matched_signers": [
+              "authority:beta"
+            ],
+            "observed": {
+              "present": true
+            },
+            "expected": {
+              "signer_id": "authority:beta"
+            },
+            "failure_code": null
+          }
+        ],
+        "failure_codes": []
+      }
+    }
+  ],
+  "failure_codes": []
+}

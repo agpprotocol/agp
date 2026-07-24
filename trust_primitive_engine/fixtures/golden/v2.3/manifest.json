@@ -1,0 +1,45 @@
+{
+  "corpus": "agp.tpe-policy-reference-conformance/2.3",
+  "cases": [
+    {
+      "name": "direct-satisfied",
+      "directory": "direct-satisfied",
+      "expected_status": "satisfied"
+    },
+    {
+      "name": "direct-unsatisfied",
+      "directory": "direct-unsatisfied",
+      "expected_status": "unsatisfied"
+    },
+    {
+      "name": "nested-satisfied",
+      "directory": "nested-satisfied",
+      "expected_status": "satisfied"
+    },
+    {
+      "name": "shared-unsatisfied",
+      "directory": "shared-unsatisfied",
+      "expected_status": "unsatisfied"
+    },
+    {
+      "name": "eligible-roles-independent",
+      "directory": "eligible-roles-independent",
+      "expected_status": "satisfied"
+    },
+    {
+      "name": "reference-inside-all-of",
+      "directory": "reference-inside-all-of",
+      "expected_status": "satisfied"
+    },
+    {
+      "name": "reference-inside-any-of",
+      "directory": "reference-inside-any-of",
+      "expected_status": "satisfied"
+    },
+    {
+      "name": "reference-inside-not",
+      "directory": "reference-inside-not",
+      "expected_status": "satisfied"
+    }
+  ]
+}

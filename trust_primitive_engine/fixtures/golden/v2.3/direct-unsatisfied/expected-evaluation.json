@@ -1,0 +1,75 @@
+{
+  "object_type": "agp.trust-policy-evaluation/2",
+  "status": "unsatisfied",
+  "policy_id": "policy:golden:direct-unsatisfied",
+  "policy_version": 1,
+  "policy_digest": "52013a155ce3f05f955f37813d15608e5d269e5802b9c01f81efa0c5944f8e20",
+  "context_id": "context:tpe-2.3-golden",
+  "context_digest": "context-digest:tpe-2.3-golden",
+  "verified_signature_ids": [
+    "signature:alpha",
+    "signature:beta",
+    "signature:gamma"
+  ],
+  "verified_signers": [
+    "authority:alpha",
+    "authority:beta",
+    "authority:gamma"
+  ],
+  "matched_signers": [
+    "authority:alpha"
+  ],
+  "unauthorized_signers": [],
+  "ineligible_role_signers": [
+    "authority:beta",
+    "authority:gamma"
+  ],
+  "signature_count": 1,
+  "weight": 2,
+  "requirement_results": [
+    {
+      "requirement_id": "requirement:reviewer-reference",
+      "type": "policy_reference",
+      "status": "unsatisfied",
+      "matched_signers": [],
+      "observed": {
+        "policy_id": "policy:golden:reviewer-failed",
+        "policy_version": 1,
+        "policy_digest": "09e2f9aa437a1e32c4d037baf1e08aaa575e412bd58a3b83e276dfa649aa9832",
+        "policy_status": "unsatisfied"
+      },
+      "expected": {
+        "policy_status": "satisfied"
+      },
+      "failure_code": "POLICY_REFERENCE_NOT_SATISFIED",
+      "referenced_policy": {
+        "policy_id": "policy:golden:reviewer-failed",
+        "policy_version": 1,
+        "policy_digest": "09e2f9aa437a1e32c4d037baf1e08aaa575e412bd58a3b83e276dfa649aa9832",
+        "status": "unsatisfied",
+        "requirement_results": [
+          {
+            "requirement_id": "requirement:alpha-required",
+            "type": "required_signer",
+            "status": "unsatisfied",
+            "matched_signers": [],
+            "observed": {
+              "present": false
+            },
+            "expected": {
+              "signer_id": "authority:alpha"
+            },
+            "failure_code": "REQUIRED_SIGNER_MISSING"
+          }
+        ],
+        "failure_codes": [
+          "REQUIRED_SIGNER_MISSING"
+        ]
+      }
+    }
+  ],
+  "failure_codes": [
+    "POLICY_REFERENCE_NOT_SATISFIED",
+    "REQUIRED_SIGNER_MISSING"
+  ]
+}

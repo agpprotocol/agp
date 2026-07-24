@@ -1,0 +1,134 @@
+{
+  "object_type": "agp.trust-policy-evaluation/2",
+  "status": "unsatisfied",
+  "policy_id": "policy:golden:shared-unsatisfied",
+  "policy_version": 1,
+  "policy_digest": "9b20e0dcb02a4c608f0356e700e0c8f0742353df181ad2a7b0d2906e25c954e2",
+  "context_id": "context:tpe-2.3-golden",
+  "context_digest": "context-digest:tpe-2.3-golden",
+  "verified_signature_ids": [
+    "signature:alpha",
+    "signature:beta",
+    "signature:gamma"
+  ],
+  "verified_signers": [
+    "authority:alpha",
+    "authority:beta",
+    "authority:gamma"
+  ],
+  "matched_signers": [
+    "authority:alpha"
+  ],
+  "unauthorized_signers": [],
+  "ineligible_role_signers": [
+    "authority:beta",
+    "authority:gamma"
+  ],
+  "signature_count": 1,
+  "weight": 2,
+  "requirement_results": [
+    {
+      "requirement_id": "requirement:shared-all",
+      "type": "all_of",
+      "status": "unsatisfied",
+      "matched_signers": [],
+      "observed": {
+        "satisfied_children": 0,
+        "total_children": 2
+      },
+      "expected": {
+        "required_satisfied_children": 2
+      },
+      "failure_code": "ALL_OF_NOT_SATISFIED",
+      "children": [
+        {
+          "requirement_id": "requirement:left-reference",
+          "type": "policy_reference",
+          "status": "unsatisfied",
+          "matched_signers": [],
+          "observed": {
+            "policy_id": "policy:golden:reviewer-failed",
+            "policy_version": 1,
+            "policy_digest": "09e2f9aa437a1e32c4d037baf1e08aaa575e412bd58a3b83e276dfa649aa9832",
+            "policy_status": "unsatisfied"
+          },
+          "expected": {
+            "policy_status": "satisfied"
+          },
+          "failure_code": "POLICY_REFERENCE_NOT_SATISFIED",
+          "referenced_policy": {
+            "policy_id": "policy:golden:reviewer-failed",
+            "policy_version": 1,
+            "policy_digest": "09e2f9aa437a1e32c4d037baf1e08aaa575e412bd58a3b83e276dfa649aa9832",
+            "status": "unsatisfied",
+            "requirement_results": [
+              {
+                "requirement_id": "requirement:alpha-required",
+                "type": "required_signer",
+                "status": "unsatisfied",
+                "matched_signers": [],
+                "observed": {
+                  "present": false
+                },
+                "expected": {
+                  "signer_id": "authority:alpha"
+                },
+                "failure_code": "REQUIRED_SIGNER_MISSING"
+              }
+            ],
+            "failure_codes": [
+              "REQUIRED_SIGNER_MISSING"
+            ]
+          }
+        },
+        {
+          "requirement_id": "requirement:right-reference",
+          "type": "policy_reference",
+          "status": "unsatisfied",
+          "matched_signers": [],
+          "observed": {
+            "policy_id": "policy:golden:reviewer-failed",
+            "policy_version": 1,
+            "policy_digest": "09e2f9aa437a1e32c4d037baf1e08aaa575e412bd58a3b83e276dfa649aa9832",
+            "policy_status": "unsatisfied"
+          },
+          "expected": {
+            "policy_status": "satisfied"
+          },
+          "failure_code": "POLICY_REFERENCE_NOT_SATISFIED",
+          "referenced_policy": {
+            "policy_id": "policy:golden:reviewer-failed",
+            "policy_version": 1,
+            "policy_digest": "09e2f9aa437a1e32c4d037baf1e08aaa575e412bd58a3b83e276dfa649aa9832",
+            "status": "unsatisfied",
+            "requirement_results": [
+              {
+                "requirement_id": "requirement:alpha-required",
+                "type": "required_signer",
+                "status": "unsatisfied",
+                "matched_signers": [],
+                "observed": {
+                  "present": false
+                },
+                "expected": {
+                  "signer_id": "authority:alpha"
+                },
+                "failure_code": "REQUIRED_SIGNER_MISSING"
+              }
+            ],
+            "failure_codes": [
+              "REQUIRED_SIGNER_MISSING"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "failure_codes": [
+    "POLICY_REFERENCE_NOT_SATISFIED",
+    "REQUIRED_SIGNER_MISSING",
+    "POLICY_REFERENCE_NOT_SATISFIED",
+    "REQUIRED_SIGNER_MISSING",
+    "ALL_OF_NOT_SATISFIED"
+  ]
+}
