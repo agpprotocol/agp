@@ -50,6 +50,11 @@ SUITES = [
         ROOT / "trust_primitive_engine/tools/test_byte_stability_corpus.py",
         6,
     ),
+    (
+        "fuzz regression seeds",
+        ROOT / "trust_primitive_engine/tools/test_fuzz_regression_seeds.py",
+        6,
+    ),
 ]
 
 
