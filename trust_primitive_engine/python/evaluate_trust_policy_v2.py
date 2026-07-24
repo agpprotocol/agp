@@ -79,6 +79,16 @@ POLICY_MEMBERS = {
     "requirements",
 }
 
+POLICY_REFERENCE_TYPE = "policy_reference"
+
+POLICY_REFERENCE_MEMBERS = {
+    "requirement_id",
+    "type",
+    "policy_id",
+    "policy_version",
+    "policy_digest",
+}
+
 COMMON_REQUIREMENT_MEMBERS = {
     "requirement_id",
     "type",
@@ -245,6 +255,56 @@ def validate_exact_members(
         )
 
 
+def validate_policy_reference(
+    value: dict[str, Any],
+) -> dict[str, Any]:
+    validate_exact_members(
+        value,
+        POLICY_REFERENCE_MEMBERS,
+        POLICY_REFERENCE_TYPE,
+    )
+
+    if value["type"] != POLICY_REFERENCE_TYPE:
+        raise EvaluationFailure(
+            "INVALID_TRUST_POLICY",
+            f"type must be {POLICY_REFERENCE_TYPE}",
+        )
+
+    digest = value["policy_digest"]
+
+    if (
+        not isinstance(digest, str)
+        or len(digest) != 64
+        or any(
+            character not in "0123456789abcdef"
+            for character in digest
+        )
+    ):
+        raise EvaluationFailure(
+            "INVALID_TRUST_POLICY",
+            "policy_digest must be exactly 64 lowercase "
+            "hexadecimal characters",
+        )
+
+    return {
+        "requirement_id": validate_identifier(
+            value["requirement_id"],
+            "requirement_id",
+        ),
+        "type": POLICY_REFERENCE_TYPE,
+        "policy_id": validate_identifier(
+            value["policy_id"],
+            "policy_id",
+        ),
+        "policy_version": validate_safe_integer(
+            value["policy_version"],
+            "policy_version",
+            minimum=1,
+        ),
+        "policy_digest": digest,
+    }
+
+
 def validate_requirement(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
         raise EvaluationFailure(
@@ -259,6 +319,9 @@ def validate_requirement(value: Any) -> dict[str, Any]:
             "INVALID_TRUST_POLICY",
             "primitive type must be a string",
         )
+
+    if primitive_type == POLICY_REFERENCE_TYPE:
+        return validate_policy_reference(value)
 
     if primitive_type not in SUPPORTED_PRIMITIVES:
         raise UnsupportedPrimitiveError(
