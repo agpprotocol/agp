@@ -21,7 +21,7 @@ EVALUATOR_PATH = (
 )
 MAX_SAFE_INTEGER = 9_007_199_254_740_991
 EXAMPLES_PER_PROPERTY = 250
-PROPERTY_COUNT = 4
+PROPERTY_COUNT = 8
 TOTAL_GENERATED_EXAMPLES = EXAMPLES_PER_PROPERTY * PROPERTY_COUNT
 
 
@@ -225,6 +225,200 @@ def valid_policy(draw: st.DrawFn) -> dict[str, Any]:
     }
 
 
+leaf_shape = st.just(("leaf",))
+composition_shape = st.recursive(
+    leaf_shape,
+    lambda children: st.one_of(
+        st.tuples(st.just("not"), children),
+        st.tuples(
+            st.sampled_from(["all_of", "any_of"]),
+            st.lists(children, min_size=2, max_size=3),
+        ),
+    ),
+    max_leaves=12,
+)
+
+
+def materialize_shape(
+    shape: Any,
+    *,
+    counter: list[int],
+) -> dict[str, Any]:
+    index = counter[0]
+    counter[0] += 1
+    requirement_id = f"requirement:tree-{index:03d}"
+    kind = shape[0]
+
+    if kind == "leaf":
+        return {
+            "requirement_id": requirement_id,
+            "type": "required_signer",
+            "signer_id": f"authority:tree-{index:03d}",
+        }
+
+    if kind == "not":
+        return {
+            "requirement_id": requirement_id,
+            "type": "not",
+            "requirement": materialize_shape(shape[1], counter=counter),
+        }
+
+    children = [
+        materialize_shape(child, counter=counter)
+        for child in shape[1]
+    ]
+    children.sort(key=lambda item: item["requirement_id"])
+    return {
+        "requirement_id": requirement_id,
+        "type": kind,
+        "requirements": children,
+    }
+
+
+@st.composite
+def valid_composition_policy(draw: st.DrawFn) -> dict[str, Any]:
+    requirement = materialize_shape(
+        draw(composition_shape),
+        counter=[0],
+    )
+    return {
+        "object_type": "agp.trust-policy/2",
+        "policy_id": draw(identifier),
+        "version": 2,
+        "eligible_roles": ["approver", "reviewer"],
+        "requirements": [requirement],
+    }
+
+
+@st.composite
+def malformed_composition_policy(draw: st.DrawFn) -> dict[str, Any]:
+    policy = deepcopy(draw(valid_composition_policy()))
+    mutation = draw(st.sampled_from([
+        "unknown_member",
+        "missing_child",
+        "bad_not_child_type",
+        "bad_all_of_arity",
+    ]))
+    root = policy["requirements"][0]
+
+    if mutation == "unknown_member":
+        root["unexpected"] = draw(st.integers())
+    elif mutation == "missing_child":
+        root.clear()
+        root.update({
+            "requirement_id": "requirement:malformed",
+            "type": "not",
+        })
+    elif mutation == "bad_not_child_type":
+        root.clear()
+        root.update({
+            "requirement_id": "requirement:malformed",
+            "type": "not",
+            "requirement": [],
+        })
+    else:
+        root.clear()
+        root.update({
+            "requirement_id": "requirement:malformed",
+            "type": "all_of",
+            "requirements": [{
+                "requirement_id": "requirement:malformed-child",
+                "type": "required_signer",
+                "signer_id": "authority:malformed",
+            }],
+        })
+
+    return policy
+
+
+@st.composite
+def runtime_stricter_composition_policy(
+    draw: st.DrawFn,
+) -> dict[str, Any]:
+    policy = deepcopy(draw(valid_composition_policy()))
+    mutation = draw(st.sampled_from([
+        "unsorted_children",
+        "duplicate_cross_branch",
+        "depth_limit",
+        "node_limit",
+    ]))
+
+    if mutation == "unsorted_children":
+        policy["requirements"] = [{
+            "requirement_id": "requirement:unordered",
+            "type": "all_of",
+            "requirements": [
+                {
+                    "requirement_id": "requirement:z-child",
+                    "type": "required_signer",
+                    "signer_id": "authority:z",
+                },
+                {
+                    "requirement_id": "requirement:a-child",
+                    "type": "required_signer",
+                    "signer_id": "authority:a",
+                },
+            ],
+        }]
+        return policy
+
+    if mutation == "duplicate_cross_branch":
+        policy["requirements"] = [{
+            "requirement_id": "requirement:duplicate-root",
+            "type": "all_of",
+            "requirements": [
+                {
+                    "requirement_id": "requirement:branch-a",
+                    "type": "not",
+                    "requirement": {
+                        "requirement_id": "requirement:duplicate-leaf",
+                        "type": "required_signer",
+                        "signer_id": "authority:a",
+                    },
+                },
+                {
+                    "requirement_id": "requirement:branch-b",
+                    "type": "not",
+                    "requirement": {
+                        "requirement_id": "requirement:duplicate-leaf",
+                        "type": "required_signer",
+                        "signer_id": "authority:b",
+                    },
+                },
+            ],
+        }]
+        return policy
+
+    if mutation == "depth_limit":
+        node = {
+            "requirement_id": "requirement:depth-09-leaf",
+            "type": "required_signer",
+            "signer_id": "authority:depth",
+        }
+        for index in range(8, -1, -1):
+            node = {
+                "requirement_id": f"requirement:depth-{index:02d}",
+                "type": "not",
+                "requirement": node,
+            }
+        policy["requirements"] = [node]
+        return policy
+
+    policy["requirements"] = [{
+        "requirement_id": "requirement:node-root",
+        "type": "all_of",
+        "requirements": [
+            {
+                "requirement_id": f"requirement:node-{index:03d}",
+                "type": "required_signer",
+                "signer_id": f"authority:node-{index:03d}",
+            }
+            for index in range(256)
+        ],
+    }]
+    return policy
+
+
 @st.composite
 def malformed_policy(draw: st.DrawFn) -> dict[str, Any]:
     policy = deepcopy(draw(valid_policy()))
@@ -396,6 +590,63 @@ def property_runtime_only_constraints_are_enforced(
     )
 
 
+@COMMON_SETTINGS
+@given(valid_composition_policy())
+def property_valid_composition_trees_are_accepted(
+    policy: dict[str, Any],
+) -> None:
+    assert schema_accepts(policy)
+    runtime_validate(deepcopy(policy))
+
+
+@COMMON_SETTINGS
+@given(malformed_composition_policy())
+def property_malformed_composition_trees_are_rejected(
+    policy: dict[str, Any],
+) -> None:
+    assert not schema_accepts(policy)
+    try:
+        runtime_validate(policy)
+    except Exception:
+        return
+    raise AssertionError(
+        "runtime accepted a schema-invalid composition tree"
+    )
+
+
+@COMMON_SETTINGS
+@given(valid_composition_policy())
+def property_composition_validation_is_deterministic(
+    policy: dict[str, Any],
+) -> None:
+    original = deepcopy(policy)
+    first_input = deepcopy(policy)
+    second_input = deepcopy(policy)
+
+    runtime_validate(first_input)
+    runtime_validate(second_input)
+
+    assert first_input == original
+    assert second_input == original
+    assert first_input == second_input
+
+
+@COMMON_SETTINGS
+@given(runtime_stricter_composition_policy())
+def property_composition_runtime_only_constraints_are_enforced(
+    policy: dict[str, Any],
+) -> None:
+    assert schema_accepts(policy)
+    try:
+        runtime_validate(policy)
+    except Exception as exc:
+        assert getattr(exc, "code", None) == "INVALID_TRUST_POLICY"
+        return
+    raise AssertionError(
+        "runtime accepted a non-canonical composition tree"
+    )
+
+
 def run_property(name: str, fn: Any) -> None:
     try:
         fn()
@@ -424,6 +675,23 @@ def main() -> int:
         (
             "runtime_only_constraints_enforced",
             property_runtime_only_constraints_are_enforced,
+        ),
+
+        (
+            "valid_composition_trees_accepted",
+            property_valid_composition_trees_are_accepted,
+        ),
+        (
+            "malformed_composition_trees_rejected",
+            property_malformed_composition_trees_are_rejected,
+        ),
+        (
+            "composition_validation_deterministic",
+            property_composition_validation_is_deterministic,
+        ),
+        (
+            "composition_runtime_only_constraints_enforced",
+            property_composition_runtime_only_constraints_are_enforced,
         ),
     ]
 

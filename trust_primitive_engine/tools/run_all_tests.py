@@ -48,7 +48,7 @@ SUITES = [
     (
         "property hardening",
         ROOT / "trust_primitive_engine/tools/test_property_hardening.py",
-        4,
+        8,
     ),
     (
         "golden compatibility corpus",
