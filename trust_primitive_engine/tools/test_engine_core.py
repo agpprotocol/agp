@@ -157,6 +157,154 @@ def main() -> int:
             f"unexpected primitive result: {result.to_dict()!r}"
         )
 
+    if result.children != ():
+        raise AssertionError(
+            "leaf result must default children to an empty tuple"
+        )
+
+    if "children" in result.to_dict():
+        raise AssertionError(
+            "leaf serialization must not contain children"
+        )
+
+    unsatisfied_child = PrimitiveResult.unsatisfied_result(
+        requirement_id="requirement:child-b",
+        primitive_type="example",
+        matched_signers=[],
+        observed={"matched": False},
+        expected={"matched": True},
+        failure_code="EXAMPLE_NOT_SATISFIED",
+    )
+
+    satisfied_child = PrimitiveResult.satisfied_result(
+        requirement_id="requirement:child-a",
+        primitive_type="example",
+        matched_signers=["authority:legal"],
+        observed={"matched": True},
+        expected={"matched": True},
+    )
+
+    supplied_children = [
+        satisfied_child,
+        unsatisfied_child,
+    ]
+
+    parent = PrimitiveResult.unsatisfied_result(
+        requirement_id="requirement:parent",
+        primitive_type="all_of",
+        matched_signers=["authority:legal"],
+        observed={
+            "satisfied_children": 1,
+            "total_children": 2,
+        },
+        expected={
+            "required_satisfied_children": 2,
+        },
+        failure_code="ALL_OF_NOT_SATISFIED",
+        children=supplied_children,
+    )
+
+    supplied_children.clear()
+
+    if parent.children != (
+        satisfied_child,
+        unsatisfied_child,
+    ):
+        raise AssertionError(
+            "children were not normalized to an immutable tuple"
+        )
+
+    expected_parent = {
+        "requirement_id": "requirement:parent",
+        "type": "all_of",
+        "status": "unsatisfied",
+        "matched_signers": ["authority:legal"],
+        "observed": {
+            "satisfied_children": 1,
+            "total_children": 2,
+        },
+        "expected": {
+            "required_satisfied_children": 2,
+        },
+        "failure_code": "ALL_OF_NOT_SATISFIED",
+        "children": [
+            {
+                "requirement_id": "requirement:child-a",
+                "type": "example",
+                "status": "satisfied",
+                "matched_signers": ["authority:legal"],
+                "observed": {"matched": True},
+                "expected": {"matched": True},
+                "failure_code": None,
+            },
+            {
+                "requirement_id": "requirement:child-b",
+                "type": "example",
+                "status": "unsatisfied",
+                "matched_signers": [],
+                "observed": {"matched": False},
+                "expected": {"matched": True},
+                "failure_code": "EXAMPLE_NOT_SATISFIED",
+            },
+        ],
+    }
+
+    if parent.to_dict() != expected_parent:
+        raise AssertionError(
+            f"unexpected recursive result: {parent.to_dict()!r}"
+        )
+
+    exported_parent = parent.to_dict()
+    exported_parent["children"][0]["observed"]["matched"] = False
+    exported_parent["observed"]["satisfied_children"] = 999
+
+    if parent.to_dict() != expected_parent:
+        raise AssertionError(
+            "mutating serialized output changed the result"
+        )
+
+    try:
+        PrimitiveResult.satisfied_result(
+            requirement_id="requirement:invalid-child",
+            primitive_type="all_of",
+            matched_signers=[],
+            observed={},
+            expected={},
+            children=[object()],
+        )
+    except TypeError:
+        pass
+    else:
+        raise AssertionError(
+            "non-PrimitiveResult child was accepted"
+        )
+
+    try:
+        parent.children = ()
+    except Exception:
+        pass
+    else:
+        raise AssertionError(
+            "frozen PrimitiveResult allowed children mutation"
+        )
+
+    nested_parent = PrimitiveResult.satisfied_result(
+        requirement_id="requirement:nested-parent",
+        primitive_type="not",
+        matched_signers=[],
+        observed={"child_status": "unsatisfied"},
+        expected={"child_status": "unsatisfied"},
+        children=(unsatisfied_child,),
+    )
+
+    if (
+        nested_parent.to_dict()["children"][0]["failure_code"]
+        != "EXAMPLE_NOT_SATISFIED"
+    ):
+        raise AssertionError(
+            "nested child evidence was not preserved"
+        )
+
     try:
         registry.register(ExamplePrimitive())
     except ValueError:
@@ -166,7 +314,7 @@ def main() -> int:
             "duplicate primitive registration was accepted"
         )
 
-    print("TPE engine core checks: 9/9 passed")
+    print("TPE engine core checks: 16/16 passed")
     return 0
 
 

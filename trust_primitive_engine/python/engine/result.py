@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Iterable
 
 
 @dataclass(frozen=True)
@@ -17,12 +18,29 @@ class PrimitiveResult:
     observed: dict[str, Any]
     expected: dict[str, Any]
     failure_code: str
+    children: tuple["PrimitiveResult", ...] = ()
 
     def __post_init__(self) -> None:
         if tuple(sorted(self.matched_signers)) != self.matched_signers:
             raise ValueError(
                 "matched_signers must be lexicographically sorted"
             )
+
+        normalized_children = tuple(self.children)
+
+        if not all(
+            isinstance(child, PrimitiveResult)
+            for child in normalized_children
+        ):
+            raise TypeError(
+                "children must contain only PrimitiveResult values"
+            )
+
+        object.__setattr__(
+            self,
+            "children",
+            normalized_children,
+        )
 
         if self.satisfied and self.failure_code:
             raise ValueError(
@@ -35,7 +53,7 @@ class PrimitiveResult:
             )
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        result = {
             "requirement_id": self.requirement_id,
             "type": self.primitive_type,
             "status": (
@@ -44,14 +62,22 @@ class PrimitiveResult:
                 else "unsatisfied"
             ),
             "matched_signers": list(self.matched_signers),
-            "observed": self.observed,
-            "expected": self.expected,
+            "observed": deepcopy(self.observed),
+            "expected": deepcopy(self.expected),
             "failure_code": (
                 None
                 if self.satisfied
                 else self.failure_code
             ),
         }
+
+        if self.children:
+            result["children"] = [
+                child.to_dict()
+                for child in self.children
+            ]
+
+        return result
 
     @classmethod
     def satisfied_result(
@@ -62,6 +88,7 @@ class PrimitiveResult:
         matched_signers: list[str],
         observed: dict[str, Any],
         expected: dict[str, Any],
+        children: Iterable["PrimitiveResult"] = (),
     ) -> "PrimitiveResult":
         return cls(
             requirement_id=requirement_id,
@@ -71,6 +98,7 @@ class PrimitiveResult:
             observed=observed,
             expected=expected,
             failure_code="",
+            children=tuple(children),
         )
 
     @classmethod
@@ -83,6 +111,7 @@ class PrimitiveResult:
         observed: dict[str, Any],
         expected: dict[str, Any],
         failure_code: str,
+        children: Iterable["PrimitiveResult"] = (),
     ) -> "PrimitiveResult":
         return cls(
             requirement_id=requirement_id,
@@ -92,4 +121,5 @@ class PrimitiveResult:
             observed=observed,
             expected=expected,
             failure_code=failure_code,
+            children=tuple(children),
         )

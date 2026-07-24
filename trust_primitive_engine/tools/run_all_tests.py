@@ -13,7 +13,7 @@ SUITES = [
     (
         "engine core",
         ROOT / "trust_primitive_engine/tools/test_engine_core.py",
-        5,
+        16,
     ),
     (
         "conformance",
