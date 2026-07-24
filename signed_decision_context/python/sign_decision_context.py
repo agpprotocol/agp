@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create or append to an AGP Signed Decision Context 1.0."""
+"""Create or append to an AGP Signed Decision Context 1 or 2."""
 
 from __future__ import annotations
 
@@ -53,6 +53,17 @@ from validate_signed_decision_context import (
 
 
 SUPPORTED_ALGORITHM = "ed25519"
+
+CONTEXT_VERSIONS = {
+    "agp.decision-context/1": {
+        "statement_type": "agp.signature-statement/1",
+        "signed_context_type": "agp.signed-decision-context/1",
+    },
+    "agp.decision-context/2": {
+        "statement_type": "agp.signature-statement/2",
+        "signed_context_type": "agp.signed-decision-context/2",
+    },
+}
 
 
 class SigningFailure(Exception):
@@ -212,6 +223,24 @@ def load_signed_context(
     return value
 
 
+def context_version_config(
+    context: dict[str, Any],
+) -> dict[str, str]:
+    object_type = context.get("object_type")
+    config = CONTEXT_VERSIONS.get(object_type)
+
+    if config is None:
+        raise SigningFailure(
+            "INVALID_OBJECT_TYPE",
+            (
+                "context object_type must be "
+                "agp.decision-context/1 or agp.decision-context/2"
+            ),
+        )
+
+    return config
+
+
 def context_digest(context: dict[str, Any]) -> str:
     try:
         encoded = canonical_bytes(context)
@@ -233,12 +262,13 @@ def create_signature_entry(
     signature_id: str,
     signed_at: str,
 ) -> tuple[dict[str, Any], str]:
+    config = context_version_config(context)
     digest = context_digest(context)
 
     statement = {
-        "object_type": "agp.signature-statement/1",
+        "object_type": config["statement_type"],
         "purpose": "decision-context-attestation",
-        "context_object_type": "agp.decision-context/1",
+        "context_object_type": context["object_type"],
         "context_digest": {
             "algorithm": "sha-256",
             "value": digest,
@@ -288,8 +318,10 @@ def create_signed_decision_context(
         signed_at=signed_at,
     )
 
+    config = context_version_config(context)
+
     result = {
-        "object_type": "agp.signed-decision-context/1",
+        "object_type": config["signed_context_type"],
         "context": context,
         "context_digest": {
             "algorithm": "sha-256",
@@ -410,7 +442,7 @@ def write_output(path: Path, value: dict[str, Any]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Create or append to an AGP Signed Decision Context 1.0 "
+            "Create or append to an AGP Signed Decision Context 1 or 2 "
             "using an Ed25519 private key."
         )
     )
