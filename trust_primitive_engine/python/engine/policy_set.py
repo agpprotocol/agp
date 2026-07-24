@@ -111,7 +111,6 @@ def build_policy_set_index(
                 "policy_set contains duplicate policy_id/version: "
                 f"{identity.policy_id!r} version {identity.policy_version}"
             )
-            raise ValueError("policy_set contains duplicate canonical policy objects")
 
         entry = PolicySetEntry(identity=identity, policy=_freeze_json(normalized))
         entries.append(entry)
