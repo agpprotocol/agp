@@ -33,10 +33,12 @@ from verify_signed_decision_context import (
 
 from engine import (
     EvaluationState,
+    PolicyEvaluationContext,
     PolicyReferenceIdentity,
     PolicySetIndex,
     PrimitiveRegistry,
     UnsupportedPrimitiveError,
+    evaluate_policy_document,
     evaluate_requirement,
     project_failure_codes,
     validate_requirement_tree,
@@ -760,6 +762,8 @@ def evaluate_verified_object(
     signed_context: dict[str, Any],
     policy: dict[str, Any],
     verified_signature_ids: list[str],
+    *,
+    policy_set_index: PolicySetIndex | None = None,
 ) -> dict[str, Any]:
     context = signed_context["context"]
     context_policy = context["policy"]
@@ -839,30 +843,74 @@ def evaluate_verified_object(
         evaluation_time=evaluation_time,
     )
 
-    try:
-        result_objects = tuple(
-            evaluate_requirement(
-                requirement,
-                engine_state,
-                PRIMITIVE_REGISTRY,
-            )
-            for requirement in policy["requirements"]
+    has_policy_references = any(
+        requirement["type"] == POLICY_REFERENCE_TYPE
+        for requirement in iter_requirement_nodes(
+            policy["requirements"]
         )
-    except KeyError as exc:
-        raise EvaluationFailure(
-            "UNSUPPORTED_TRUST_PRIMITIVE",
-            str(exc),
-        ) from exc
-
-    requirement_results = [
-        result.to_dict()
-        for result in result_objects
-    ]
-    failures = project_failure_codes(result_objects)
-    satisfied = all(
-        result.satisfied
-        for result in result_objects
     )
+
+    if has_policy_references:
+        if policy_set_index is None:
+            raise EvaluationFailure(
+                "POLICY_REFERENCE_SET_REQUIRED",
+                "policy contains policy_reference requirements "
+                "but no PolicySetIndex was provided",
+            )
+
+        validate_policy_reference_graph(
+            policy,
+            policy_set_index,
+        )
+
+        recursive_context = PolicyEvaluationContext(
+            verified_signers=tuple(verified_signers),
+            participants=participants,
+            evaluation_time=evaluation_time,
+            policy_set=policy_set_index,
+            registry=PRIMITIVE_REGISTRY,
+        )
+
+        recursive_result = evaluate_policy_document(
+            policy,
+            policy_id=policy["policy_id"],
+            policy_version=policy["version"],
+            policy_digest=digest,
+            context=recursive_context,
+        )
+
+        result_objects = recursive_result.requirement_results
+        requirement_results = [
+            result.to_dict()
+            for result in result_objects
+        ]
+        failures = list(recursive_result.failure_codes)
+        satisfied = recursive_result.satisfied
+    else:
+        try:
+            result_objects = tuple(
+                evaluate_requirement(
+                    requirement,
+                    engine_state,
+                    PRIMITIVE_REGISTRY,
+                )
+                for requirement in policy["requirements"]
+            )
+        except KeyError as exc:
+            raise EvaluationFailure(
+                "UNSUPPORTED_TRUST_PRIMITIVE",
+                str(exc),
+            ) from exc
+
+        requirement_results = [
+            result.to_dict()
+            for result in result_objects
+        ]
+        failures = project_failure_codes(result_objects)
+        satisfied = all(
+            result.satisfied
+            for result in result_objects
+        )
 
     return {
         "object_type": EVALUATION_OBJECT_TYPE,
@@ -889,6 +937,8 @@ def evaluate(
     policy: dict[str, Any],
     keyring: list[dict[str, Any]],
     schema_dir: Path,
+    *,
+    policy_set_index: PolicySetIndex | None = None,
 ) -> dict[str, Any]:
     verified_policy = validate_policy(policy)
 
@@ -907,6 +957,7 @@ def evaluate(
         signed_context,
         verified_policy,
         verification["verified_signature_ids"],
+        policy_set_index=policy_set_index,
     )
 
 

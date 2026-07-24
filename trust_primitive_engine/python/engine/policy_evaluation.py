@@ -324,18 +324,24 @@ def evaluate_policy_reference_requirement(
     )
 
 
-def evaluate_indexed_policy(
-    entry: PolicySetEntry,
+def evaluate_policy_document(
+    policy: dict[str, Any],
+    *,
+    policy_id: str,
+    policy_version: int,
+    policy_digest: str,
     context: PolicyEvaluationContext,
 ) -> PolicyEvaluationResult:
-    """Evaluate one indexed policy recursively.
+    """Evaluate one normalized policy recursively.
 
     The complete reachable graph must be validated before this function
     is called. Resolution defects remain fatal and are never converted
     into unsatisfied requirement results.
-    """
 
-    policy = entry.to_policy()
+    The policy may be the external root policy or an indexed referenced
+    policy. Its identity is supplied explicitly so evaluation does not
+    require inserting the root into the referenced policy set.
+    """
 
     state = create_policy_evaluation_state(
         verified_signers=context.verified_signers,
@@ -373,9 +379,9 @@ def evaluate_indexed_policy(
     )
 
     return PolicyEvaluationResult(
-        policy_id=entry.identity.policy_id,
-        policy_version=entry.identity.policy_version,
-        policy_digest=entry.identity.policy_digest,
+        policy_id=policy_id,
+        policy_version=policy_version,
+        policy_digest=policy_digest,
         satisfied=satisfied,
         requirement_results=requirement_results,
         matched_signers=(
@@ -384,4 +390,19 @@ def evaluate_indexed_policy(
             )
         ),
         failure_codes=failure_codes,
+    )
+
+
+def evaluate_indexed_policy(
+    entry: PolicySetEntry,
+    context: PolicyEvaluationContext,
+) -> PolicyEvaluationResult:
+    """Evaluate one immutable policy-set entry recursively."""
+
+    return evaluate_policy_document(
+        entry.to_policy(),
+        policy_id=entry.identity.policy_id,
+        policy_version=entry.identity.policy_version,
+        policy_digest=entry.identity.policy_digest,
+        context=context,
     )

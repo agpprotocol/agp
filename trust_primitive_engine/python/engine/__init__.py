@@ -20,6 +20,7 @@ from .policy_evaluation import (
     PolicyEvaluationContext,
     PolicyEvaluationResult,
     evaluate_indexed_policy,
+    evaluate_policy_document,
     evaluate_policy_reference_requirement,
     project_recursive_failure_codes,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "PolicyEvaluationResult",
     "RequirementEvaluationContext",
     "evaluate_indexed_policy",
+    "evaluate_policy_document",
     "evaluate_policy_reference_requirement",
     "project_recursive_failure_codes",
     "create_policy_evaluation_state",
