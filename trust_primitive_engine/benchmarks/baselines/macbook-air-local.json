@@ -1,0 +1,180 @@
+{
+  "cases": [
+    {
+      "metrics": {
+        "iterations": 2000,
+        "max_ns": 8042,
+        "mean_ns": 2831.823,
+        "median_ns": 2792.0,
+        "min_ns": 2666,
+        "operations_per_second": 353129.4152212197,
+        "p95_ns": 2917.0,
+        "p99_ns": 3375.0,
+        "total_ns": 5663646
+      },
+      "name": "validate:valid_required_signer",
+      "peak_tracemalloc_bytes": 1630,
+      "result_type": "dict"
+    },
+    {
+      "metrics": {
+        "iterations": 2000,
+        "max_ns": 6708,
+        "mean_ns": 3943.1265,
+        "median_ns": 3917.0,
+        "min_ns": 3791,
+        "operations_per_second": 253605.8632661164,
+        "p95_ns": 4083.0,
+        "p99_ns": 4708.0,
+        "total_ns": 7886253
+      },
+      "name": "validate:valid_signer_threshold",
+      "peak_tracemalloc_bytes": 1854,
+      "result_type": "dict"
+    },
+    {
+      "metrics": {
+        "iterations": 2000,
+        "max_ns": 6000,
+        "mean_ns": 3738.301,
+        "median_ns": 3708.0,
+        "min_ns": 3542,
+        "operations_per_second": 267501.19907412486,
+        "p95_ns": 4083.0,
+        "p99_ns": 4458.0,
+        "total_ns": 7476602
+      },
+      "name": "validate:valid_global_thresholds",
+      "peak_tracemalloc_bytes": 1814,
+      "result_type": "dict"
+    },
+    {
+      "metrics": {
+        "iterations": 2000,
+        "max_ns": 6292,
+        "mean_ns": 3968.091,
+        "median_ns": 3917.0,
+        "min_ns": 3791,
+        "operations_per_second": 252010.34956103578,
+        "p95_ns": 4541.0,
+        "p99_ns": 4791.0,
+        "total_ns": 7936182
+      },
+      "name": "validate:valid_role_thresholds",
+      "peak_tracemalloc_bytes": 1814,
+      "result_type": "dict"
+    },
+    {
+      "metrics": {
+        "iterations": 2000,
+        "max_ns": 44250,
+        "mean_ns": 8575.373,
+        "median_ns": 8459.0,
+        "min_ns": 8208,
+        "operations_per_second": 116613.00330609524,
+        "p95_ns": 9000.0,
+        "p99_ns": 10125.0,
+        "total_ns": 17150746
+      },
+      "name": "validate:valid_constraints",
+      "peak_tracemalloc_bytes": 2454,
+      "result_type": "dict"
+    },
+    {
+      "metrics": {
+        "iterations": 2000,
+        "max_ns": 61917,
+        "mean_ns": 12293.0025,
+        "median_ns": 12208.0,
+        "min_ns": 11875,
+        "operations_per_second": 81347.09156693004,
+        "p95_ns": 12500.0,
+        "p99_ns": 14458.0,
+        "total_ns": 24586005
+      },
+      "name": "validate:valid_cardinality",
+      "peak_tracemalloc_bytes": 3006,
+      "result_type": "dict"
+    },
+    {
+      "metrics": {
+        "iterations": 2000,
+        "max_ns": 7500,
+        "mean_ns": 3782.956,
+        "median_ns": 3750.0,
+        "min_ns": 3542,
+        "operations_per_second": 264343.5451007096,
+        "p95_ns": 4292.0,
+        "p99_ns": 4542.0,
+        "total_ns": 7565912
+      },
+      "name": "validate:scaled:0001-requirements",
+      "peak_tracemalloc_bytes": 1846,
+      "result_type": "dict"
+    },
+    {
+      "metrics": {
+        "iterations": 2000,
+        "max_ns": 24708,
+        "mean_ns": 18074.8895,
+        "median_ns": 17958.0,
+        "min_ns": 17625,
+        "operations_per_second": 55325.37280518368,
+        "p95_ns": 18708.0,
+        "p99_ns": 21250.0,
+        "total_ns": 36149779
+      },
+      "name": "validate:scaled:0010-requirements",
+      "peak_tracemalloc_bytes": 4190,
+      "result_type": "dict"
+    },
+    {
+      "metrics": {
+        "iterations": 200,
+        "max_ns": 179792,
+        "mean_ns": 160183.765,
+        "median_ns": 159417.0,
+        "min_ns": 158167,
+        "operations_per_second": 6242.829914754469,
+        "p95_ns": 165167.0,
+        "p99_ns": 174250.0,
+        "total_ns": 32036753
+      },
+      "name": "validate:scaled:0100-requirements",
+      "peak_tracemalloc_bytes": 36256,
+      "result_type": "dict"
+    },
+    {
+      "metrics": {
+        "iterations": 200,
+        "max_ns": 1615000,
+        "mean_ns": 1577901.405,
+        "median_ns": 1576520.5,
+        "min_ns": 1559542,
+        "operations_per_second": 633.7531589941134,
+        "p95_ns": 1595875.0,
+        "p99_ns": 1602792.0,
+        "total_ns": 315580281
+      },
+      "name": "validate:scaled:1000-requirements",
+      "peak_tracemalloc_bytes": 297076,
+      "result_type": "dict"
+    }
+  ],
+  "configuration": {
+    "iterations": 2000,
+    "large_iterations": 200,
+    "warmup": 200
+  },
+  "format": "agp-tpe-v2-benchmark",
+  "format_version": 1,
+  "metadata": {
+    "cpu_count": 8,
+    "executable": "/Users/demianalegoldberg/Downloads/agp_vs_workflow_benchmark_v0.1/.venv/bin/python",
+    "machine": "arm64",
+    "platform": "macOS-15.6.1-arm64-arm-64bit-Mach-O",
+    "processor": "arm",
+    "python": "3.13.12",
+    "python_implementation": "CPython"
+  }
+}
