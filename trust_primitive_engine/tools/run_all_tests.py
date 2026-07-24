@@ -25,6 +25,13 @@ SUITES = [
         ROOT / "trust_primitive_engine/tools/test_schema_runtime_parity.py",
         12,
     ),
+    (
+        "primitive validation matrix",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_primitive_schema_runtime_matrix.py",
+        136,
+    ),
 ]
 
 
@@ -32,9 +39,9 @@ def main() -> int:
     total = 0
 
     for name, script, checks in SUITES:
-        print("=" * 88)
-        print(f"RUN  {name}")
-        print("=" * 88)
+        print("=" * 88, flush=True)
+        print(f"RUN  {name}", flush=True)
+        print("=" * 88, flush=True)
 
         completed = subprocess.run(
             [sys.executable, str(script)],
