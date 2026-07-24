@@ -31,7 +31,12 @@ from verify_signed_decision_context import (
 )
 
 
-from engine import EvaluationState, PrimitiveRegistry
+from engine import (
+    EvaluationState,
+    PrimitiveRegistry,
+    UnsupportedPrimitiveError,
+    validate_requirement_tree,
+)
 from primitives.exactly_n_signers import ExactlyNSignersPrimitive
 from primitives.at_least_n_signers import AtLeastNSignersPrimitive
 from primitives.at_most_n_signers import AtMostNSignersPrimitive
@@ -254,9 +259,8 @@ def validate_requirement(value: Any) -> dict[str, Any]:
         )
 
     if primitive_type not in SUPPORTED_PRIMITIVES:
-        raise EvaluationFailure(
-            "UNSUPPORTED_TRUST_PRIMITIVE",
-            f"unsupported primitive type: {primitive_type!r}",
+        raise UnsupportedPrimitiveError(
+            f"unsupported primitive type: {primitive_type!r}"
         )
 
     try:
@@ -319,34 +323,22 @@ def validate_policy(value: Any) -> dict[str, Any]:
             "eligible_roles must not contain duplicates",
         )
 
-    raw_requirements = value["requirements"]
-    if not isinstance(raw_requirements, list) or not raw_requirements:
+    try:
+        requirements = validate_requirement_tree(
+            value["requirements"],
+            validate_leaf=validate_requirement,
+            validate_identifier=validate_identifier,
+        )
+    except UnsupportedPrimitiveError as exc:
+        raise EvaluationFailure(
+            "UNSUPPORTED_TRUST_PRIMITIVE",
+            str(exc),
+        ) from exc
+    except ValueError as exc:
         raise EvaluationFailure(
             "INVALID_TRUST_POLICY",
-            "requirements must be a non-empty array",
-        )
-
-    requirements = [
-        validate_requirement(requirement)
-        for requirement in raw_requirements
-    ]
-
-    requirement_ids = [
-        requirement["requirement_id"]
-        for requirement in requirements
-    ]
-
-    if requirement_ids != sorted(requirement_ids):
-        raise EvaluationFailure(
-            "INVALID_TRUST_POLICY",
-            "requirements must be sorted by requirement_id",
-        )
-
-    if len(requirement_ids) != len(set(requirement_ids)):
-        raise EvaluationFailure(
-            "INVALID_TRUST_POLICY",
-            "requirement_id values must be unique",
-        )
+            str(exc),
+        ) from exc
 
     return {
         "object_type": POLICY_OBJECT_TYPE,

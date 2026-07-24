@@ -16,6 +16,11 @@ SUITES = [
         16,
     ),
     (
+        "policy-tree validation",
+        ROOT / "trust_primitive_engine/tools/test_policy_tree_validation.py",
+        20,
+    ),
+    (
         "conformance",
         ROOT / "trust_primitive_engine/tools/run_conformance.py",
         75,
