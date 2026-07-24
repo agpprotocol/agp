@@ -55,6 +55,7 @@ from primitives.separation_of_duties import (
     SeparationOfDutiesPrimitive,
 )
 from primitives.signer_threshold import SignerThresholdPrimitive
+from primitives.time_window import TimeWindowPrimitive
 
 
 POLICY_OBJECT_TYPE = "agp.trust-policy/2"
@@ -100,6 +101,7 @@ SUPPORTED_PRIMITIVES = {
     "role_threshold",
     "role_weight_threshold",
     "separation_of_duties",
+    "time_window",
 }
 
 
@@ -120,6 +122,7 @@ PRIMITIVE_REGISTRY = PrimitiveRegistry(
         RoleWeightThresholdPrimitive(),
         SeparationOfDutiesPrimitive(),
         SignerThresholdPrimitive(),
+        TimeWindowPrimitive(),
     ]
 )
 
@@ -463,10 +466,17 @@ def evaluate_verified_object(
         for signer_id in matched_signers
     )
 
+    evaluation_time = (
+        context.get("evaluation_time")
+        if context.get("object_type") == "agp.decision-context/2"
+        else None
+    )
+
     engine_state = EvaluationState.create(
         matched_signers=matched_signers,
         participants=participants,
         weight=total_weight,
+        evaluation_time=evaluation_time,
     )
 
     requirement_results: list[dict[str, Any]] = []

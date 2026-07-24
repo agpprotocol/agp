@@ -87,6 +87,9 @@
           },
           {
             "$ref": "#/$defs/exactlyNSigners"
+          },
+          {
+            "$ref": "#/$defs/timeWindow"
           }
         ]
       }
@@ -496,6 +499,34 @@
         "exact_matches": {
           "type": "integer",
           "minimum": 1
+        }
+      }
+    },
+    "timeWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "not_before",
+        "not_after"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "time_window"
+        },
+        "not_before": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "not_after": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
         }
       }
     }

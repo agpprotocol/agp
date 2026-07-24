@@ -298,6 +298,16 @@ CASES = [
         },
         "exact_matches",
     ),
+    PrimitiveCase(
+        "time_window",
+        {
+            "requirement_id": "requirement:time-window",
+            "type": "time_window",
+            "not_before": 100,
+            "not_after": 200,
+        },
+        "not_before",
+    ),
 ]
 
 
@@ -683,7 +693,7 @@ def main() -> int:
             )
             checks += 1
 
-    expected_checks = 136
+    expected_checks = 140
     if checks != expected_checks:
         raise TestFailure(
             f"internal matrix count mismatch: {checks} != {expected_checks}"

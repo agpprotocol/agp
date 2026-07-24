@@ -21,6 +21,11 @@ SUITES = [
         75,
     ),
     (
+        "time window conformance",
+        ROOT / "trust_primitive_engine/tools/run_time_window_conformance.py",
+        11,
+    ),
+    (
         "schema/runtime parity",
         ROOT / "trust_primitive_engine/tools/test_schema_runtime_parity.py",
         12,
@@ -28,7 +33,7 @@ SUITES = [
     (
         "primitive validation matrix",
         ROOT / "trust_primitive_engine/tools/test_primitive_schema_runtime_matrix.py",
-        136,
+        140,
     ),
     (
         "property hardening",

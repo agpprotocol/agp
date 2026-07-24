@@ -6,6 +6,8 @@ from .all_of_signers import AllOfSignersPrimitive
 from .any_of_signers import AnyOfSignersPrimitive
 """Built-in Trust Primitive Engine plugins."""
 
+from .time_window import TimeWindowPrimitive
+
 from .global_signature_threshold import (
     GlobalSignatureThresholdPrimitive,
 )
@@ -36,4 +38,5 @@ __all__ = [
     "RoleWeightThresholdPrimitive",
     "SeparationOfDutiesPrimitive",
     "SignerThresholdPrimitive",
+    "TimeWindowPrimitive",
 ]
