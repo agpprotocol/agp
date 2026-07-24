@@ -1,6 +1,6 @@
 {
   "corpus": "agp.trust-policy/2 golden compatibility corpus",
-  "corpus_version": 1,
+  "corpus_version": 2,
   "cases": [
     {
       "file": "valid_required_signer.json",
@@ -69,6 +69,46 @@
     },
     {
       "file": "runtime_invalid_at_most_non_restrictive.json",
+      "schema": "accept",
+      "runtime": "reject"
+    },
+    {
+      "file": "valid_composition_all_of.json",
+      "schema": "accept",
+      "runtime": "accept"
+    },
+    {
+      "file": "valid_composition_any_of_not.json",
+      "schema": "accept",
+      "runtime": "accept"
+    },
+    {
+      "file": "valid_composition_nested.json",
+      "schema": "accept",
+      "runtime": "accept"
+    },
+    {
+      "file": "invalid_composition_all_of_arity.json",
+      "schema": "reject",
+      "runtime": "reject"
+    },
+    {
+      "file": "invalid_composition_not_child_type.json",
+      "schema": "reject",
+      "runtime": "reject"
+    },
+    {
+      "file": "runtime_invalid_composition_unsorted_children.json",
+      "schema": "accept",
+      "runtime": "reject"
+    },
+    {
+      "file": "runtime_invalid_composition_duplicate_cross_branch.json",
+      "schema": "accept",
+      "runtime": "reject"
+    },
+    {
+      "file": "runtime_invalid_composition_depth_limit.json",
       "schema": "accept",
       "runtime": "reject"
     }

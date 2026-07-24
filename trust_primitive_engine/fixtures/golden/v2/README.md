@@ -1,4 +1,4 @@
-# AGP Trust Policy 2.0 Golden Compatibility Corpus
+# AGP Trust Policy 2.x Golden Compatibility Corpus
 
 This directory freezes representative compatibility expectations for version 2.
 
@@ -7,6 +7,7 @@ Categories:
 - schema accept / runtime accept
 - schema reject / runtime reject
 - schema accept / runtime reject for canonical or relational constraints
+- recursive composition coverage for `all_of`, `any_of`, and `not`
 
 Rules:
 

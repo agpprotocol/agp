@@ -53,7 +53,7 @@ SUITES = [
     (
         "golden compatibility corpus",
         ROOT / "trust_primitive_engine/tools/test_golden_policy_corpus.py",
-        14,
+        22,
     ),
     (
         "mutation observability",

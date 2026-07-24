@@ -1,0 +1,35 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:runtime-invalid-composition-duplicate",
+  "version": 2,
+  "eligible_roles": [
+    "approver",
+    "reviewer"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:duplicate-root",
+      "type": "all_of",
+      "requirements": [
+        {
+          "requirement_id": "requirement:branch-a",
+          "type": "not",
+          "requirement": {
+            "requirement_id": "requirement:duplicate-leaf",
+            "type": "required_signer",
+            "signer_id": "authority:a"
+          }
+        },
+        {
+          "requirement_id": "requirement:branch-b",
+          "type": "not",
+          "requirement": {
+            "requirement_id": "requirement:duplicate-leaf",
+            "type": "required_signer",
+            "signer_id": "authority:b"
+          }
+        }
+      ]
+    }
+  ]
+}

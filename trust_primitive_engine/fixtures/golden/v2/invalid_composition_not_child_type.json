@@ -1,0 +1,16 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:invalid-composition-not-child",
+  "version": 2,
+  "eligible_roles": [
+    "approver",
+    "reviewer"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:not-array",
+      "type": "not",
+      "requirement": []
+    }
+  ]
+}
