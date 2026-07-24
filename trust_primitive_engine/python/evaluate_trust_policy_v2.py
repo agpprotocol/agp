@@ -33,6 +33,7 @@ from verify_signed_decision_context import (
 
 from engine import (
     EvaluationState,
+    PolicySetIndex,
     PrimitiveRegistry,
     UnsupportedPrimitiveError,
     evaluate_requirement,
@@ -303,6 +304,68 @@ def validate_policy_reference(
         ),
         "policy_digest": digest,
     }
+
+
+def resolve_policy_reference(
+    requirement: dict[str, Any],
+    policy_set_index: PolicySetIndex,
+) -> dict[str, Any]:
+    """Resolve one validated policy_reference deterministically."""
+
+    if requirement.get("type") != POLICY_REFERENCE_TYPE:
+        raise EvaluationFailure(
+            "INVALID_TRUST_POLICY",
+            "requirement must be a validated policy_reference",
+        )
+
+    policy_id = requirement["policy_id"]
+    policy_version = requirement["policy_version"]
+    expected_digest = requirement["policy_digest"]
+
+    entry = policy_set_index.resolve(
+        policy_id,
+        policy_version,
+    )
+
+    if entry is None:
+        raise EvaluationFailure(
+            "POLICY_REFERENCE_NOT_FOUND",
+            (
+                f"policy_id={policy_id} "
+                f"policy_version={policy_version}"
+            ),
+        )
+
+    identity = entry.identity
+
+    if identity.policy_id != policy_id:
+        raise EvaluationFailure(
+            "POLICY_REFERENCE_ID_MISMATCH",
+            (
+                f"reference={policy_id} "
+                f"resolved={identity.policy_id}"
+            ),
+        )
+
+    if identity.policy_version != policy_version:
+        raise EvaluationFailure(
+            "POLICY_REFERENCE_VERSION_MISMATCH",
+            (
+                f"reference={policy_version} "
+                f"resolved={identity.policy_version}"
+            ),
+        )
+
+    if identity.policy_digest != expected_digest:
+        raise EvaluationFailure(
+            "POLICY_REFERENCE_DIGEST_MISMATCH",
+            (
+                f"reference={expected_digest} "
+                f"computed={identity.policy_digest}"
+            ),
+        )
+
+    return entry.to_policy()
 
 
 def validate_requirement(value: Any) -> dict[str, Any]:
