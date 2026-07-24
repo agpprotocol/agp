@@ -12,11 +12,21 @@ from .policy_tree import (
     UnsupportedPrimitiveError,
     validate_requirement_tree,
 )
+from .policy_set import (
+    PolicyReferenceIdentity,
+    PolicySetEntry,
+    PolicySetIndex,
+    build_policy_set_index,
+)
 from .registry import PrimitiveRegistry
 from .result import PrimitiveResult
 from .state import EvaluationState
 
 __all__ = [
+    "PolicyReferenceIdentity",
+    "PolicySetEntry",
+    "PolicySetIndex",
+    "build_policy_set_index",
     "project_failure_codes",
     "evaluate_requirement",
     "validate_requirement_tree",
