@@ -27,17 +27,18 @@ SUITES = [
     ),
     (
         "primitive validation matrix",
-        ROOT
-        / "trust_primitive_engine/tools/"
-        "test_primitive_schema_runtime_matrix.py",
+        ROOT / "trust_primitive_engine/tools/test_primitive_schema_runtime_matrix.py",
         136,
     ),
     (
         "property hardening",
-        ROOT
-        / "trust_primitive_engine/tools/"
-        "test_property_hardening.py",
+        ROOT / "trust_primitive_engine/tools/test_property_hardening.py",
         4,
+    ),
+    (
+        "golden compatibility corpus",
+        ROOT / "trust_primitive_engine/tools/test_golden_policy_corpus.py",
+        14,
     ),
 ]
 
@@ -58,8 +59,7 @@ def main() -> int:
 
         if completed.returncode != 0:
             print(
-                f"FAIL  {name} exited with "
-                f"code {completed.returncode}",
+                f"FAIL  {name} exited with code {completed.returncode}",
                 file=sys.stderr,
             )
             return completed.returncode

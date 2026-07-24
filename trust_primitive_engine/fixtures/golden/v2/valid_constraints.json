@@ -1,0 +1,40 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:constraints",
+  "version": 2,
+  "eligible_roles": [
+    "approver",
+    "reviewer"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:any-of",
+      "type": "any_of_signers",
+      "signer_ids": [
+        "authority:alpha",
+        "authority:beta"
+      ]
+    },
+    {
+      "requirement_id": "requirement:mutual-exclusion",
+      "type": "mutual_exclusion",
+      "signer_ids": [
+        "authority:delta",
+        "authority:gamma"
+      ]
+    },
+    {
+      "requirement_id": "requirement:prohibited",
+      "type": "prohibited_signer",
+      "signer_id": "authority:blocked"
+    },
+    {
+      "requirement_id": "requirement:separation",
+      "type": "separation_of_duties",
+      "roles": [
+        "approver",
+        "reviewer"
+      ]
+    }
+  ]
+}

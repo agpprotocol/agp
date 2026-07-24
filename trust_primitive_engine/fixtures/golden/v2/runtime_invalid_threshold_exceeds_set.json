@@ -1,0 +1,19 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:threshold-exceeds",
+  "version": 2,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:threshold",
+      "type": "signer_threshold",
+      "signer_ids": [
+        "authority:alpha",
+        "authority:beta"
+      ],
+      "minimum_signatures": 3
+    }
+  ]
+}

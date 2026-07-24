@@ -1,0 +1,20 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:global-thresholds",
+  "version": 2,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:global-signatures",
+      "type": "global_signature_threshold",
+      "minimum_signatures": 2
+    },
+    {
+      "requirement_id": "requirement:global-weight",
+      "type": "global_weight_threshold",
+      "minimum_weight": 3
+    }
+  ]
+}

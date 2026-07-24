@@ -1,0 +1,19 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:mutual-arity",
+  "version": 2,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:mutual",
+      "type": "mutual_exclusion",
+      "signer_ids": [
+        "authority:alpha",
+        "authority:beta",
+        "authority:gamma"
+      ]
+    }
+  ]
+}

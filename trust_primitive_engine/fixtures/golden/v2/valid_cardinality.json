@@ -1,0 +1,56 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:cardinality",
+  "version": 2,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:all-of",
+      "type": "all_of_signers",
+      "signer_ids": [
+        "authority:alpha",
+        "authority:beta"
+      ]
+    },
+    {
+      "requirement_id": "requirement:at-least",
+      "type": "at_least_n_signers",
+      "signer_ids": [
+        "authority:alpha",
+        "authority:beta",
+        "authority:gamma"
+      ],
+      "minimum_matches": 2
+    },
+    {
+      "requirement_id": "requirement:at-most",
+      "type": "at_most_n_signers",
+      "signer_ids": [
+        "authority:alpha",
+        "authority:beta",
+        "authority:gamma"
+      ],
+      "maximum_matches": 2
+    },
+    {
+      "requirement_id": "requirement:exactly-n",
+      "type": "exactly_n_signers",
+      "signer_ids": [
+        "authority:alpha",
+        "authority:beta",
+        "authority:gamma"
+      ],
+      "exact_matches": 2
+    },
+    {
+      "requirement_id": "requirement:exactly-one",
+      "type": "exactly_one_of_signers",
+      "signer_ids": [
+        "authority:alpha",
+        "authority:beta"
+      ]
+    }
+  ]
+}

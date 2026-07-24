@@ -1,0 +1,76 @@
+{
+  "corpus": "agp.trust-policy/2 golden compatibility corpus",
+  "corpus_version": 1,
+  "cases": [
+    {
+      "file": "valid_required_signer.json",
+      "schema": "accept",
+      "runtime": "accept"
+    },
+    {
+      "file": "valid_signer_threshold.json",
+      "schema": "accept",
+      "runtime": "accept"
+    },
+    {
+      "file": "valid_global_thresholds.json",
+      "schema": "accept",
+      "runtime": "accept"
+    },
+    {
+      "file": "valid_role_thresholds.json",
+      "schema": "accept",
+      "runtime": "accept"
+    },
+    {
+      "file": "valid_constraints.json",
+      "schema": "accept",
+      "runtime": "accept"
+    },
+    {
+      "file": "valid_cardinality.json",
+      "schema": "accept",
+      "runtime": "accept"
+    },
+    {
+      "file": "invalid_missing_policy_id.json",
+      "schema": "reject",
+      "runtime": "reject"
+    },
+    {
+      "file": "invalid_unknown_root_member.json",
+      "schema": "reject",
+      "runtime": "reject"
+    },
+    {
+      "file": "invalid_boolean_threshold.json",
+      "schema": "reject",
+      "runtime": "reject"
+    },
+    {
+      "file": "invalid_mutual_exclusion_arity.json",
+      "schema": "reject",
+      "runtime": "reject"
+    },
+    {
+      "file": "runtime_invalid_unsorted_roles.json",
+      "schema": "accept",
+      "runtime": "reject"
+    },
+    {
+      "file": "runtime_invalid_unsorted_requirements.json",
+      "schema": "accept",
+      "runtime": "reject"
+    },
+    {
+      "file": "runtime_invalid_threshold_exceeds_set.json",
+      "schema": "accept",
+      "runtime": "reject"
+    },
+    {
+      "file": "runtime_invalid_at_most_non_restrictive.json",
+      "schema": "accept",
+      "runtime": "reject"
+    }
+  ]
+}

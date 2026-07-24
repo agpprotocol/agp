@@ -1,0 +1,15 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:boolean-threshold",
+  "version": 2,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:global",
+      "type": "global_signature_threshold",
+      "minimum_signatures": true
+    }
+  ]
+}

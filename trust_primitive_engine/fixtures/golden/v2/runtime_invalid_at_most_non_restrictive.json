@@ -1,0 +1,19 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:at-most-non-restrictive",
+  "version": 2,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:at-most",
+      "type": "at_most_n_signers",
+      "signer_ids": [
+        "authority:alpha",
+        "authority:beta"
+      ],
+      "maximum_matches": 2
+    }
+  ]
+}

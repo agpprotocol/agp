@@ -1,0 +1,23 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:role-thresholds",
+  "version": 2,
+  "eligible_roles": [
+    "approver",
+    "reviewer"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:role-signatures",
+      "type": "role_threshold",
+      "role": "approver",
+      "minimum_signatures": 2
+    },
+    {
+      "requirement_id": "requirement:role-weight",
+      "type": "role_weight_threshold",
+      "role": "reviewer",
+      "minimum_weight": 3
+    }
+  ]
+}
