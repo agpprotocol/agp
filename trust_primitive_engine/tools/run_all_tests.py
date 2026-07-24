@@ -38,7 +38,7 @@ SUITES = [
     (
         "schema/runtime parity",
         ROOT / "trust_primitive_engine/tools/test_schema_runtime_parity.py",
-        12,
+        26,
     ),
     (
         "primitive validation matrix",

@@ -137,6 +137,57 @@ def mutate(
     return value
 
 
+
+def required_signer(
+    requirement_id: str,
+    signer_id: str,
+) -> dict[str, Any]:
+    return {
+        "requirement_id": requirement_id,
+        "type": "required_signer",
+        "signer_id": signer_id,
+    }
+
+
+def composition_policy(
+    requirement: dict[str, Any],
+) -> dict[str, Any]:
+    policy = base_policy()
+    policy["requirements"] = [requirement]
+    return policy
+
+
+def nested_not(depth: int) -> dict[str, Any]:
+    node = required_signer(
+        f"requirement:depth-{depth:02d}-leaf",
+        "authority:legal",
+    )
+    for index in range(depth - 1, -1, -1):
+        node = {
+            "requirement_id": f"requirement:depth-{index:02d}",
+            "type": "not",
+            "requirement": node,
+        }
+    return node
+
+
+def all_of_with_node_count(node_count: int) -> dict[str, Any]:
+    if node_count < 3:
+        raise ValueError("all_of tree requires at least 3 nodes")
+
+    children = [
+        required_signer(
+            f"requirement:node-{index:03d}",
+            f"authority:node-{index:03d}",
+        )
+        for index in range(node_count - 1)
+    ]
+    return {
+        "requirement_id": "requirement:node-root",
+        "type": "all_of",
+        "requirements": children,
+    }
+
 def main() -> int:
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
@@ -298,6 +349,245 @@ def main() -> int:
         validator=validator,
         evaluator=evaluator,
         value=mutate(unsorted_signer_ids),
+    )
+    checks += 1
+
+
+    expect_shared(
+        name="composition_all_of_valid",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:all",
+            "type": "all_of",
+            "requirements": [
+                required_signer("requirement:all-legal", "authority:legal"),
+                required_signer("requirement:all-security", "authority:security"),
+            ],
+        }),
+        expected=True,
+    )
+    checks += 1
+
+    expect_shared(
+        name="composition_any_of_valid",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:any",
+            "type": "any_of",
+            "requirements": [
+                required_signer("requirement:any-legal", "authority:legal"),
+                required_signer("requirement:any-security", "authority:security"),
+            ],
+        }),
+        expected=True,
+    )
+    checks += 1
+
+    expect_shared(
+        name="composition_not_valid",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:not",
+            "type": "not",
+            "requirement": required_signer(
+                "requirement:not-legal",
+                "authority:legal",
+            ),
+        }),
+        expected=True,
+    )
+    checks += 1
+
+    expect_shared(
+        name="composition_nested_tree_valid",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:nested-all",
+            "type": "all_of",
+            "requirements": [
+                {
+                    "requirement_id": "requirement:nested-any",
+                    "type": "any_of",
+                    "requirements": [
+                        required_signer(
+                            "requirement:nested-legal",
+                            "authority:legal",
+                        ),
+                        required_signer(
+                            "requirement:nested-security",
+                            "authority:security",
+                        ),
+                    ],
+                },
+                {
+                    "requirement_id": "requirement:nested-not",
+                    "type": "not",
+                    "requirement": required_signer(
+                        "requirement:nested-blocked",
+                        "authority:blocked",
+                    ),
+                },
+            ],
+        }),
+        expected=True,
+    )
+    checks += 1
+
+    expect_shared(
+        name="composition_unknown_member_rejected",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:extra",
+            "type": "all_of",
+            "requirements": [
+                required_signer("requirement:extra-a", "authority:a"),
+                required_signer("requirement:extra-b", "authority:b"),
+            ],
+            "unexpected": True,
+        }),
+        expected=False,
+    )
+    checks += 1
+
+    expect_shared(
+        name="composition_missing_member_rejected",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:missing",
+            "type": "all_of",
+        }),
+        expected=False,
+    )
+    checks += 1
+
+    expect_shared(
+        name="composition_all_of_arity_rejected",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:all-one",
+            "type": "all_of",
+            "requirements": [
+                required_signer(
+                    "requirement:all-one-child",
+                    "authority:legal",
+                ),
+            ],
+        }),
+        expected=False,
+    )
+    checks += 1
+
+    expect_shared(
+        name="composition_any_of_arity_rejected",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:any-one",
+            "type": "any_of",
+            "requirements": [
+                required_signer(
+                    "requirement:any-one-child",
+                    "authority:legal",
+                ),
+            ],
+        }),
+        expected=False,
+    )
+    checks += 1
+
+    expect_shared(
+        name="composition_not_child_type_rejected",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:not-array",
+            "type": "not",
+            "requirement": [],
+        }),
+        expected=False,
+    )
+    checks += 1
+
+    expect_shared(
+        name="composition_unknown_nested_leaf_rejected",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:unknown-parent",
+            "type": "not",
+            "requirement": {
+                "requirement_id": "requirement:unknown-leaf",
+                "type": "unknown_primitive",
+            },
+        }),
+        expected=False,
+    )
+    checks += 1
+
+    expect_runtime_stricter(
+        name="composition_child_order_runtime_only",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:unordered",
+            "type": "all_of",
+            "requirements": [
+                required_signer("requirement:z-child", "authority:z"),
+                required_signer("requirement:a-child", "authority:a"),
+            ],
+        }),
+    )
+    checks += 1
+
+    expect_runtime_stricter(
+        name="composition_duplicate_id_runtime_only",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy({
+            "requirement_id": "requirement:duplicate-root",
+            "type": "all_of",
+            "requirements": [
+                {
+                    "requirement_id": "requirement:branch-a",
+                    "type": "not",
+                    "requirement": required_signer(
+                        "requirement:duplicate-leaf",
+                        "authority:a",
+                    ),
+                },
+                {
+                    "requirement_id": "requirement:branch-b",
+                    "type": "not",
+                    "requirement": required_signer(
+                        "requirement:duplicate-leaf",
+                        "authority:b",
+                    ),
+                },
+            ],
+        }),
+    )
+    checks += 1
+
+    expect_runtime_stricter(
+        name="composition_depth_limit_runtime_only",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy(nested_not(9)),
+    )
+    checks += 1
+
+    expect_runtime_stricter(
+        name="composition_node_limit_runtime_only",
+        validator=validator,
+        evaluator=evaluator,
+        value=composition_policy(all_of_with_node_count(257)),
     )
     checks += 1
 
