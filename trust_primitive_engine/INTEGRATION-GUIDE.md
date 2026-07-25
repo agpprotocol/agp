@@ -446,7 +446,38 @@ A production caller should:
 8. apply the organization's business action only after mapping the result to an
    explicit local decision rule.
 
-## 19. Stability boundary
+## 19. Public Python API
+
+Add the TPE Python directory to the interpreter path or package it within the
+integrating application, then import the stable facade:
+
+```python
+from trust_primitive_engine import (
+    TrustPolicyEvaluationError,
+    evaluate_trust_policy,
+)
+
+try:
+    result = evaluate_trust_policy(
+        signed_context=signed_context,
+        policy=root_policy,
+        keyring=keyring,
+        policy_set=policy_set,
+    )
+except TrustPolicyEvaluationError as exc:
+    print(exc.code, exc.detail)
+else:
+    print(result["status"])
+```
+
+The public API accepts Python mappings and sequences. It returns ordinary
+`satisfied` and `unsatisfied` evaluation objects and raises
+`TrustPolicyEvaluationError` only for fatal errors.
+
+Callers should import only from `trust_primitive_engine`, not from internal
+`engine`, `primitives`, or `evaluate_trust_policy_v2` modules.
+
+## 20. Stability boundary
 
 TPE 2.3 uses:
 
