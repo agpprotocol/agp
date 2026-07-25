@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tpe24-external-example"
+version = "1.0.0"
+description = "Isolated external integration example for agp-tpe 2.4"
+requires-python = ">=3.12"
+dependencies = [
+  "agp-tpe==2.4.0"
+]
+
+[project.scripts]
+tpe24-external-example = "tpe24_external_example.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tpe24_external_example"]

@@ -645,6 +645,24 @@ Expected final line:
 TPE 2.4 context/evidence golden corpus: 10/10 passed
 ```
 
+### External package integration
+
+```bash
+python \
+  trust_primitive_engine/tools/test_external_package_integration.py
+```
+
+This builds and installs `agp-tpe` together with a separate consumer package
+in a clean virtual environment, executes outside the repository with
+`PYTHONPATH` removed, verifies import from `site-packages`, and checks the
+deterministic result SHA-256.
+
+Expected final line:
+
+```text
+TPE 2.4 external package integration: 1/1 passed
+```
+
 ## 19. Recommended integration workflow
 
 A production caller should:

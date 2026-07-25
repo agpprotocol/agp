@@ -1,0 +1,22 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:example:tpe24:production-change",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:operations-approval",
+      "type": "required_signer",
+      "signer_id": "authority:operations"
+    },
+    {
+      "requirement_id": "requirement:tpe24-context-evidence-policy",
+      "type": "policy_reference",
+      "policy_id": "policy:example:tpe24:context-evidence",
+      "policy_version": 1,
+      "policy_digest": "3d68461f67e1908a2ed1c18744b9744ed7a6ade2631d9e3920d6a56b50082051"
+    }
+  ]
+}
