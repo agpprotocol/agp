@@ -79,6 +79,18 @@ jobs:
             "POLICY_REFERENCE_EXAMPLE_PASS" \
             /tmp/tpe-policy-reference-example.log
 
+      - name: Run policy-reference failure examples
+        run: |
+          set -o pipefail
+          bash trust_primitive_engine/examples/policy-reference-failures/run_examples.sh \
+            | tee /tmp/tpe-policy-reference-failures.log
+
+      - name: Verify policy-reference failure examples
+        run: |
+          grep -Fqx \
+            "POLICY_REFERENCE_FAILURE_EXAMPLES_PASS" \
+            /tmp/tpe-policy-reference-failures.log
+
       - name: Check whitespace errors
         run: |
           git diff --check
