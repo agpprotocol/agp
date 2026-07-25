@@ -26,6 +26,11 @@ SUITES = [
         36,
     ),
     (
+        "evidence_present primitive",
+        ROOT / "trust_primitive_engine/tools/test_evidence_present_primitive.py",
+        32,
+    ),
+    (
         "policy-tree validation",
         ROOT / "trust_primitive_engine/tools/test_policy_tree_validation.py",
         20,

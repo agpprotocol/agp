@@ -525,6 +525,24 @@
         }
       }
     },
+    "evidencePresent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "type", "evidence_id"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/identifier"},
+        "type": {"const": "evidence_present"},
+        "evidence_id": {"$ref": "#/$defs/identifier"},
+        "digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "media_type": {
+          "type": "string",
+          "pattern": "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$"
+        }
+      }
+    },
     "timeWindow": {
       "type": "object",
       "additionalProperties": false,
@@ -611,6 +629,9 @@
         },
         {
           "$ref": "#/$defs/contextIntegerAtMost"
+        },
+        {
+          "$ref": "#/$defs/evidencePresent"
         },
         {
           "$ref": "#/$defs/timeWindow"
