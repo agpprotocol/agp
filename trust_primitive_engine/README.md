@@ -411,3 +411,4 @@ serialization, deterministic replay, and SHA-256 result digest.
 - `rfcs/TPE-2.2-001-deterministic-policy-composition.md`
 - `rfcs/TPE-2.3-001-deterministic-policy-references.md`
 - `rfcs/TPE-2.4-001-deterministic-context-requirements.md`
+- `rfcs/TPE-2.5-001-deterministic-contextual-predicates.md`
