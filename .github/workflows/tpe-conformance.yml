@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - chore/tpe-ci
     paths:
       - "trust_primitive_engine/**"
       - "signed_decision_context/**"
@@ -67,6 +66,18 @@ jobs:
       - name: Verify expected validation total
         run: |
           grep -Fqx             "AGP TPE 2.3 complete validation: 438/438 passed"             /tmp/tpe-validation.log
+
+      - name: Run executable policy-reference example
+        run: |
+          set -o pipefail
+          bash trust_primitive_engine/examples/policy-references/run_example.sh \
+            | tee /tmp/tpe-policy-reference-example.log
+
+      - name: Verify policy-reference example
+        run: |
+          grep -Fqx \
+            "POLICY_REFERENCE_EXAMPLE_PASS" \
+            /tmp/tpe-policy-reference-example.log
 
       - name: Check whitespace errors
         run: |
