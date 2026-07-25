@@ -103,7 +103,64 @@ The workflow baseline in the benchmark detected 0/8 because it treated
 coordinator state as authoritative. This is a limited experimental benchmark,
 not a claim that all workflow engines are insecure.
 
-## Quick start
+## Trust Primitive Engine quick start
+
+The AGP Trust Primitive Engine 2.3 is published on PyPI as `agp-tpe`.
+
+Requirements:
+
+- Python 3.12+
+
+Install it without cloning this repository:
+
+```bash
+python -m pip install agp-tpe
+```
+
+Verify the installed distribution and packaged schemas:
+
+```bash
+python - <<'PY'
+from importlib.metadata import version
+from trust_primitive_engine import DEFAULT_SCHEMA_DIR
+
+print("agp-tpe", version("agp-tpe"))
+print("schemas:", DEFAULT_SCHEMA_DIR)
+assert DEFAULT_SCHEMA_DIR.is_dir()
+PY
+```
+
+Use the stable public facade:
+
+```python
+from trust_primitive_engine import (
+    TrustPolicyEvaluationError,
+    evaluate_trust_policy,
+)
+
+try:
+    result = evaluate_trust_policy(
+        signed_context=signed_context,
+        policy=policy,
+        keyring=keyring,
+        policy_set=policy_set,
+    )
+except TrustPolicyEvaluationError as exc:
+    print(exc.code, exc.detail)
+else:
+    print(result["status"])
+```
+
+A real evaluation requires an AGP signed Decision Context, a Trust Policy,
+and the corresponding verification keyring. See the
+[Trust Primitive Engine integration guide](trust_primitive_engine/INTEGRATION-GUIDE.md)
+for the complete input contract, policy references, failure handling, and
+command-line examples.
+
+> TPE 2.3 remains experimental and has not received an independent security
+> audit.
+
+## Repository benchmark quick start
 
 Requirements:
 
