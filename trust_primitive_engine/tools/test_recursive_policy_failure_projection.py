@@ -446,7 +446,71 @@ def main() -> int:
     )
     passed += 1
 
-    expected = 9
+    context_failed = policy_result(
+        "policy:tpe24-context-failed",
+        [
+            failed_leaf(
+                "requirement:environment",
+                "CONTEXT_VALUE_NOT_EQUAL",
+            )
+        ],
+    )
+    assert_projection(
+        "tpe24_context_failure_through_reference",
+        (
+            reference_result(
+                "requirement:context-reference",
+                context_failed,
+            ),
+        ),
+        (
+            "POLICY_REFERENCE_NOT_SATISFIED",
+            "CONTEXT_VALUE_NOT_EQUAL",
+        ),
+    )
+    passed += 1
+
+    evidence_failed = policy_result(
+        "policy:tpe24-evidence-failed",
+        [
+            failed_leaf(
+                "requirement:evidence",
+                "EVIDENCE_MANIFEST_REQUIREMENT_NOT_SATISFIED",
+            )
+        ],
+    )
+    suppressed_any = any_of(
+        "requirement:tpe24-any",
+        [
+            satisfied_leaf("requirement:success"),
+            reference_result(
+                "requirement:evidence-reference",
+                evidence_failed,
+            ),
+        ],
+    )
+    assert_projection(
+        "tpe24_any_of_suppresses_evidence_failure",
+        (suppressed_any,),
+        (),
+    )
+    passed += 1
+
+    suppressed_not = not_result(
+        "requirement:tpe24-not",
+        reference_result(
+            "requirement:context-reference",
+            context_failed,
+        ),
+    )
+    assert_projection(
+        "tpe24_not_suppresses_context_failure",
+        (suppressed_not,),
+        (),
+    )
+    passed += 1
+
+    expected = 12
 
     if passed != expected:
         raise TestFailure(
@@ -455,7 +519,7 @@ def main() -> int:
         )
 
     print(
-        "TPE 2.3 recursive failure projection: "
+        "TPE 2.4 recursive failure projection: "
         f"{passed}/{expected} passed"
     )
     return 0

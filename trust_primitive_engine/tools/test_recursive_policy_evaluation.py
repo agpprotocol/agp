@@ -26,6 +26,11 @@ from engine import (
     build_policy_set_index,
     evaluate_indexed_policy,
 )
+from primitives.context_values import (
+    ContextIntegerAtLeastPrimitive,
+    ContextValueEqualsPrimitive,
+)
+from primitives.evidence_present import EvidencePresentPrimitive
 
 
 class TestFailure(Exception):
@@ -131,6 +136,8 @@ def evaluate(
     target: dict[str, Any],
     policies: list[dict[str, Any]],
     calls: list[str],
+    *,
+    decision_context: dict[str, Any] | None = None,
 ):
     index = build_policy_set_index(
         policies,
@@ -166,8 +173,12 @@ def evaluate(
         evaluation_time=1234567890,
         policy_set=index,
         registry=PrimitiveRegistry([
+            ContextIntegerAtLeastPrimitive(),
+            ContextValueEqualsPrimitive(),
+            EvidencePresentPrimitive(),
             StateSignerPrimitive(calls),
         ]),
+        decision_context=decision_context,
     )
 
     return evaluate_indexed_policy(entry, context)
@@ -461,7 +472,151 @@ def main() -> int:
     print("PASS  deterministic_replay")
     passed += 1
 
-    expected = 9
+    tpe24_context = {
+        "object_type": "agp.decision-context/2",
+        "proposal": {
+            "payload": {
+                "environment": "production",
+                "coverage": 9000,
+            }
+        },
+        "evidence": [
+            {
+                "id": "evidence.security-report",
+                "digest": "a" * 64,
+                "media_type": "application/json",
+            }
+        ],
+    }
+
+    context_target = policy(
+        "policy:tpe24-context-target",
+        roles=["reviewer"],
+        requirements=[
+            {
+                "requirement_id": "requirement:environment",
+                "type": "context_value_equals",
+                "path": "/proposal/payload/environment",
+                "value": "production",
+            }
+        ],
+    )
+    context_root = policy(
+        "policy:tpe24-context-root",
+        roles=["approver"],
+        requirements=[
+            reference(context_target, "requirement:context-reference")
+        ],
+    )
+    result = evaluate(
+        context_root,
+        [context_root, context_target],
+        calls,
+        decision_context=tpe24_context,
+    )
+    if not result.satisfied:
+        raise TestFailure("tpe24 direct context reference failed")
+    inner = (
+        result.requirement_results[0]
+        .referenced_policy
+        .requirement_results[0]
+    )
+    if inner.primitive_type != "context_value_equals":
+        raise TestFailure("tpe24 direct context primitive missing")
+    print("PASS  tpe24_direct_context_reference")
+    passed += 1
+
+    nested_leaf_policy = policy(
+        "policy:tpe24-nested-leaf",
+        roles=["reviewer"],
+        requirements=[
+            {
+                "requirement_id": "requirement:coverage",
+                "type": "context_integer_at_least",
+                "path": "/proposal/payload/coverage",
+                "minimum": 9000,
+            }
+        ],
+    )
+    nested_middle_policy = policy(
+        "policy:tpe24-nested-middle",
+        roles=["approver"],
+        requirements=[
+            reference(nested_leaf_policy, "requirement:nested-leaf")
+        ],
+    )
+    nested_root_policy = policy(
+        "policy:tpe24-nested-root",
+        roles=["reviewer"],
+        requirements=[
+            reference(nested_middle_policy, "requirement:nested-middle")
+        ],
+    )
+    result = evaluate(
+        nested_root_policy,
+        [nested_root_policy, nested_middle_policy, nested_leaf_policy],
+        calls,
+        decision_context=tpe24_context,
+    )
+    if not result.satisfied:
+        raise TestFailure("tpe24 nested context reference failed")
+    print("PASS  tpe24_nested_context_reference")
+    passed += 1
+
+    evidence_target = policy(
+        "policy:tpe24-evidence-target",
+        roles=["reviewer"],
+        requirements=[
+            {
+                "requirement_id": "requirement:evidence-all",
+                "type": "all_of",
+                "requirements": [
+                    {
+                        "requirement_id": "requirement:evidence-present",
+                        "type": "evidence_present",
+                        "evidence_id": "evidence.security-report",
+                    },
+                    {
+                        "requirement_id": "requirement:evidence-bound",
+                        "type": "evidence_present",
+                        "evidence_id": "evidence.security-report",
+                        "digest": "a" * 64,
+                        "media_type": "application/json",
+                    },
+                ],
+            }
+        ],
+    )
+    evidence_root = policy(
+        "policy:tpe24-evidence-root",
+        roles=["approver"],
+        requirements=[
+            reference(evidence_target, "requirement:evidence-reference")
+        ],
+    )
+    first = evaluate(
+        evidence_root,
+        [evidence_root, evidence_target],
+        calls,
+        decision_context=tpe24_context,
+    )
+    second = evaluate(
+        evidence_root,
+        [evidence_root, evidence_target],
+        calls,
+        decision_context=tpe24_context,
+    )
+    if not first.satisfied:
+        raise TestFailure("tpe24 referenced evidence composition failed")
+    print("PASS  tpe24_referenced_evidence_composition")
+    passed += 1
+
+    if first.to_dict() != second.to_dict():
+        raise TestFailure("tpe24 referenced replay changed")
+    print("PASS  tpe24_referenced_replay")
+    passed += 1
+
+    expected = 13
 
     if passed != expected:
         raise TestFailure(
@@ -470,7 +625,7 @@ def main() -> int:
         )
 
     print(
-        "TPE 2.3 recursive policy evaluation: "
+        "TPE 2.4 recursive policy evaluation: "
         f"{passed}/{expected} passed"
     )
     return 0
