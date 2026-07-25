@@ -135,6 +135,26 @@ add(
     "INVALID_JSON",
 )
 
+mutate(
+    "duplicate_evidence",
+    lambda x: x["evidence"].append(
+        copy.deepcopy(x["evidence"][0])
+    ),
+    "DUPLICATE_IDENTIFIER",
+)
+mutate(
+    "unsorted_evidence",
+    lambda x: x["evidence"].insert(
+        0,
+        {
+            "id": "evidence.z-report",
+            "digest": DIGEST_A,
+            "media_type": "application/json",
+        },
+    ),
+    "UNSORTED_COLLECTION",
+)
+
 passed = 0
 for name, raw, expected_accepted, expected_error in cases:
     result = module.validate_bytes(raw)

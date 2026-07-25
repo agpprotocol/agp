@@ -475,7 +475,9 @@ def main() -> int:
         )
         passed += 1
 
-    duplicate_state = state(
+    # Defensive-only behavior: verified Decision Context validation rejects
+    # duplicate evidence identifiers before EvaluationState is constructed.
+    unvalidated_duplicate_state = state(
         evidence=[
             {
                 "id": "evidence.security-report",
@@ -490,8 +492,8 @@ def main() -> int:
         ]
     )
     expect_result(
-        "duplicate_identifier_not_exactly_one",
-        evaluate(duplicate_state, req()),
+        "defensive_unvalidated_duplicate_state",
+        evaluate(unvalidated_duplicate_state, req()),
         satisfied=False,
         status="absent",
         present=False,

@@ -162,6 +162,26 @@ add(
     "INVALID_JSON",
 )
 
+mutated(
+    "duplicate_evidence",
+    lambda x: x["evidence"].append(
+        copy.deepcopy(x["evidence"][0])
+    ),
+    "DUPLICATE_IDENTIFIER",
+)
+mutated(
+    "unsorted_evidence",
+    lambda x: x["evidence"].insert(
+        0,
+        {
+            "id": "evidence.z-report",
+            "digest": DIGEST_A,
+            "media_type": "application/json",
+        },
+    ),
+    "UNSORTED_COLLECTION",
+)
+
 if VECTORS.exists():
     shutil.rmtree(VECTORS)
 VECTORS.mkdir(parents=True)
