@@ -90,6 +90,16 @@
       "name": "nonfinite_number",
       "input": "018_nonfinite_number.input.json",
       "meta": "018_nonfinite_number.meta.json"
+    },
+    {
+      "name": "duplicate_evidence",
+      "input": "019_duplicate_evidence.input.json",
+      "meta": "019_duplicate_evidence.meta.json"
+    },
+    {
+      "name": "unsorted_evidence",
+      "input": "020_unsorted_evidence.input.json",
+      "meta": "020_unsorted_evidence.meta.json"
     }
   ]
 }
