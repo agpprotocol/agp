@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agp-tpe"
+version = "2.3.3"
+description = "AGP Trust Primitive Engine for deterministic Trust Policy 2 evaluation"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [
+  { name = "AGP Protocol" }
+]
+keywords = [
+  "agp",
+  "trust-policy",
+  "policy-engine",
+  "ed25519",
+  "deterministic-evaluation"
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security :: Cryptography"
+]
+dependencies = [
+  "cryptography>=42.0",
+  "jsonschema>=4.26,<5"
+]
+
+[project.urls]
+Homepage = "https://github.com/agpprotocol/agp"
+Repository = "https://github.com/agpprotocol/agp"
+Documentation = "https://github.com/agpprotocol/agp/blob/main/trust_primitive_engine/INTEGRATION-GUIDE.md"
+Issues = "https://github.com/agpprotocol/agp/issues"
+
+[tool.hatch.build.targets.wheel]
+only-include = []
+
+[tool.hatch.build.targets.wheel.force-include]
+"trust_primitive_engine/python/trust_primitive_engine" = "trust_primitive_engine"
+"trust_primitive_engine/python/engine" = "engine"
+"trust_primitive_engine/python/primitives" = "primitives"
+"trust_primitive_engine/python/evaluate_trust_policy_v2.py" = "evaluate_trust_policy_v2.py"
+"canonicalization/python/canonicalize.py" = "canonicalize.py"
+"decision_context/python/validate_decision_context.py" = "validate_decision_context.py"
+"signed_decision_context/python/validate_signed_decision_context.py" = "validate_signed_decision_context.py"
+"signed_decision_context/python/verify_signed_decision_context.py" = "verify_signed_decision_context.py"
+"registry/schemas" = "trust_primitive_engine/schemas"
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/pyproject.toml",
+  "/README.md",
+  "/LICENSE",
+  "/canonicalization/python/canonicalize.py",
+  "/decision_context/python/validate_decision_context.py",
+  "/signed_decision_context/python/validate_signed_decision_context.py",
+  "/signed_decision_context/python/verify_signed_decision_context.py",
+  "/trust_primitive_engine/python",
+  "/registry/schemas"
+]

@@ -35,7 +35,13 @@ from validate_signed_decision_context import ValidationFailure  # noqa: E402
 from verify_signed_decision_context import VerificationFailure  # noqa: E402
 
 
-DEFAULT_SCHEMA_DIR = ROOT / "registry" / "schemas"
+_PACKAGED_SCHEMA_DIR = PACKAGE_DIR / "schemas"
+_REPOSITORY_SCHEMA_DIR = ROOT / "registry" / "schemas"
+DEFAULT_SCHEMA_DIR = (
+    _PACKAGED_SCHEMA_DIR
+    if _PACKAGED_SCHEMA_DIR.is_dir()
+    else _REPOSITORY_SCHEMA_DIR
+)
 
 
 @dataclass(frozen=True, slots=True)

@@ -42,16 +42,6 @@
       "schema": "registry/schemas/agp.signed-decision-context-1.schema.json"
     },
     {
-      "id": "agp.trust-policy/1",
-      "status": "draft",
-      "spec": "spec/AGP-TRUST-POLICY-1.0.md",
-      "description": "Deterministic trust requirements evaluated over cryptographically verified signer identities bound to an AGP Decision Context.",
-      "schema_version": 1,
-      "canonicalization": "agp-c14n/0.7",
-      "digest": "sha-256",
-      "schema": "registry/schemas/agp.trust-policy-1.schema.json"
-    },
-    {
       "id": "agp.signed-envelope/1",
       "status": "reserved",
       "spec": "spec/",
@@ -70,6 +60,16 @@
       "canonicalization": "agp-c14n/0.7",
       "digest": "sha-256",
       "schema": "registry/schemas/reserved.schema.json"
+    },
+    {
+      "id": "agp.trust-policy/1",
+      "status": "active",
+      "spec": "spec/AGP-TRUST-POLICY-1.0.md",
+      "description": "Deterministic trust requirements evaluated over cryptographically verified signer identities bound to an AGP Decision Context.",
+      "schema_version": 1,
+      "canonicalization": "agp-c14n/0.7",
+      "digest": "sha-256",
+      "schema": "registry/schemas/agp.trust-policy-1.schema.json"
     }
   ],
   "canonicalization_algorithms": [

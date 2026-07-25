@@ -82,7 +82,7 @@ mutated(
 )
 mutated(
     "wrong_object_type",
-    lambda x: x.__setitem__("object_type", "agp.decision-context/2"),
+    lambda x: x.__setitem__("object_type", "agp.invalid/1"),
     "INVALID_OBJECT_TYPE",
 )
 mutated(
