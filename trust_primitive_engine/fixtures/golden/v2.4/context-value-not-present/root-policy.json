@@ -1,0 +1,15 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe24:context-value-not-present",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:context-value-not-present",
+      "type": "context_value_present",
+      "path": "/proposal/payload/version"
+    }
+  ]
+}

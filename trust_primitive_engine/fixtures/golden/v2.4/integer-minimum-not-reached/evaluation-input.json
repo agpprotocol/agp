@@ -1,0 +1,47 @@
+{
+  "object_type": "agp.signed-decision-context/2",
+  "context_digest": "context-digest:tpe-2.4:integer-minimum-not-reached",
+  "context": {
+    "object_type": "agp.decision-context/2",
+    "context_id": "context:tpe-2.4:integer-minimum-not-reached",
+    "evaluation_time": 1700000000,
+    "policy": {
+      "id": "policy:golden:tpe24:integer-minimum-not-reached",
+      "version": 1,
+      "digest": "6d3dcd76e5e0597d9f896d36653e46b2687e47ad703f0048a994b35b006d603d"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.4:golden",
+      "payload": {
+        "coverage": 8999
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 2
+      },
+      {
+        "id": "authority:beta",
+        "role": "reviewer",
+        "weight": 3
+      }
+    ],
+    "evidence": []
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    },
+    {
+      "signature_id": "signature:beta",
+      "statement": {
+        "signer_id": "authority:beta"
+      }
+    }
+  ]
+}

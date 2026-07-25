@@ -1,0 +1,47 @@
+{
+  "object_type": "agp.signed-decision-context/2",
+  "context_digest": "context-digest:tpe-2.4:recursive-reference-projection",
+  "context": {
+    "object_type": "agp.decision-context/2",
+    "context_id": "context:tpe-2.4:recursive-reference-projection",
+    "evaluation_time": 1700000000,
+    "policy": {
+      "id": "policy:golden:tpe24:recursive-root",
+      "version": 1,
+      "digest": "a11027aa6b91a6e16bafa05f18fe9d2c76c8d938d4d89399332a3568be980b09"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.4:golden",
+      "payload": {
+        "environment": "staging"
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 2
+      },
+      {
+        "id": "authority:beta",
+        "role": "reviewer",
+        "weight": 3
+      }
+    ],
+    "evidence": []
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    },
+    {
+      "signature_id": "signature:beta",
+      "statement": {
+        "signer_id": "authority:beta"
+      }
+    }
+  ]
+}

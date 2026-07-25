@@ -1,0 +1,112 @@
+{
+  "object_type": "agp.trust-policy-evaluation/2",
+  "status": "satisfied",
+  "policy_id": "policy:golden:tpe24:satisfied-all",
+  "policy_version": 1,
+  "policy_digest": "4a201970422a722727f80d5b3f3898c918ea41ec331cc252b062e4b641511f26",
+  "context_id": "context:tpe-2.4:satisfied-all",
+  "context_digest": "context-digest:tpe-2.4:satisfied-all",
+  "verified_signature_ids": [
+    "signature:alpha",
+    "signature:beta"
+  ],
+  "verified_signers": [
+    "authority:alpha",
+    "authority:beta"
+  ],
+  "matched_signers": [
+    "authority:alpha"
+  ],
+  "unauthorized_signers": [],
+  "ineligible_role_signers": [
+    "authority:beta"
+  ],
+  "signature_count": 1,
+  "weight": 2,
+  "requirement_results": [
+    {
+      "requirement_id": "requirement:01-present",
+      "type": "context_value_present",
+      "status": "satisfied",
+      "matched_signers": [],
+      "observed": {
+        "path": "/proposal/payload/version",
+        "resolution": "found",
+        "value_type": "string",
+        "value": "3.0.0"
+      },
+      "expected": {
+        "resolution": "found"
+      },
+      "failure_code": null
+    },
+    {
+      "requirement_id": "requirement:02-equals",
+      "type": "context_value_equals",
+      "status": "satisfied",
+      "matched_signers": [],
+      "observed": {
+        "path": "/proposal/payload/environment",
+        "resolution": "found",
+        "value_type": "string",
+        "value": "production"
+      },
+      "expected": {
+        "value": "production"
+      },
+      "failure_code": null
+    },
+    {
+      "requirement_id": "requirement:03-minimum",
+      "type": "context_integer_at_least",
+      "status": "satisfied",
+      "matched_signers": [],
+      "observed": {
+        "path": "/proposal/payload/coverage",
+        "resolution": "found",
+        "value_type": "integer",
+        "value": 9500
+      },
+      "expected": {
+        "minimum": 9000
+      },
+      "failure_code": null
+    },
+    {
+      "requirement_id": "requirement:04-maximum",
+      "type": "context_integer_at_most",
+      "status": "satisfied",
+      "matched_signers": [],
+      "observed": {
+        "path": "/proposal/payload/rollout",
+        "resolution": "found",
+        "value_type": "integer",
+        "value": 2000
+      },
+      "expected": {
+        "maximum": 2500
+      },
+      "failure_code": null
+    },
+    {
+      "requirement_id": "requirement:05-evidence",
+      "type": "evidence_present",
+      "status": "satisfied",
+      "matched_signers": [],
+      "observed": {
+        "evidence_id": "evidence.security-report",
+        "match_status": "matched",
+        "present": true,
+        "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "media_type": "application/json"
+      },
+      "expected": {
+        "evidence_id": "evidence.security-report",
+        "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "media_type": "application/json"
+      },
+      "failure_code": null
+    }
+  ],
+  "failure_codes": []
+}

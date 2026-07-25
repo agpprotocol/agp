@@ -1,0 +1,17 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe24:evidence-both-mismatch",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:evidence-both",
+      "type": "evidence_present",
+      "evidence_id": "evidence.security-report",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "media_type": "application/json"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe24:evidence-media-type-mismatch",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:evidence-media-type",
+      "type": "evidence_present",
+      "evidence_id": "evidence.security-report",
+      "media_type": "application/json"
+    }
+  ]
+}

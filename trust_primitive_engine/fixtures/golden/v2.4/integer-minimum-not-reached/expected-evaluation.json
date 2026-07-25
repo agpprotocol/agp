@@ -1,0 +1,47 @@
+{
+  "object_type": "agp.trust-policy-evaluation/2",
+  "status": "unsatisfied",
+  "policy_id": "policy:golden:tpe24:integer-minimum-not-reached",
+  "policy_version": 1,
+  "policy_digest": "6d3dcd76e5e0597d9f896d36653e46b2687e47ad703f0048a994b35b006d603d",
+  "context_id": "context:tpe-2.4:integer-minimum-not-reached",
+  "context_digest": "context-digest:tpe-2.4:integer-minimum-not-reached",
+  "verified_signature_ids": [
+    "signature:alpha",
+    "signature:beta"
+  ],
+  "verified_signers": [
+    "authority:alpha",
+    "authority:beta"
+  ],
+  "matched_signers": [
+    "authority:alpha"
+  ],
+  "unauthorized_signers": [],
+  "ineligible_role_signers": [
+    "authority:beta"
+  ],
+  "signature_count": 1,
+  "weight": 2,
+  "requirement_results": [
+    {
+      "requirement_id": "requirement:integer-minimum",
+      "type": "context_integer_at_least",
+      "status": "unsatisfied",
+      "matched_signers": [],
+      "observed": {
+        "path": "/proposal/payload/coverage",
+        "resolution": "found",
+        "value_type": "integer",
+        "value": 8999
+      },
+      "expected": {
+        "minimum": 9000
+      },
+      "failure_code": "CONTEXT_INTEGER_MINIMUM_NOT_REACHED"
+    }
+  ],
+  "failure_codes": [
+    "CONTEXT_INTEGER_MINIMUM_NOT_REACHED"
+  ]
+}

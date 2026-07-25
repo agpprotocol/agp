@@ -1,0 +1,47 @@
+{
+  "object_type": "agp.signed-decision-context/2",
+  "context_digest": "context-digest:tpe-2.4:integer-maximum-exceeded",
+  "context": {
+    "object_type": "agp.decision-context/2",
+    "context_id": "context:tpe-2.4:integer-maximum-exceeded",
+    "evaluation_time": 1700000000,
+    "policy": {
+      "id": "policy:golden:tpe24:integer-maximum-exceeded",
+      "version": 1,
+      "digest": "ddd1b1b03f32fefac63dac12cb5dbb6e3582f75495e25132f238b1facd17d2d7"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.4:golden",
+      "payload": {
+        "rollout": 2501
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 2
+      },
+      {
+        "id": "authority:beta",
+        "role": "reviewer",
+        "weight": 3
+      }
+    ],
+    "evidence": []
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    },
+    {
+      "signature_id": "signature:beta",
+      "statement": {
+        "signer_id": "authority:beta"
+      }
+    }
+  ]
+}

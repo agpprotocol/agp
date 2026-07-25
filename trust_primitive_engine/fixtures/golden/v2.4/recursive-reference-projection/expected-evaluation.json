@@ -1,0 +1,75 @@
+{
+  "object_type": "agp.trust-policy-evaluation/2",
+  "status": "unsatisfied",
+  "policy_id": "policy:golden:tpe24:recursive-root",
+  "policy_version": 1,
+  "policy_digest": "a11027aa6b91a6e16bafa05f18fe9d2c76c8d938d4d89399332a3568be980b09",
+  "context_id": "context:tpe-2.4:recursive-reference-projection",
+  "context_digest": "context-digest:tpe-2.4:recursive-reference-projection",
+  "verified_signature_ids": [
+    "signature:alpha",
+    "signature:beta"
+  ],
+  "verified_signers": [
+    "authority:alpha",
+    "authority:beta"
+  ],
+  "matched_signers": [
+    "authority:alpha"
+  ],
+  "unauthorized_signers": [],
+  "ineligible_role_signers": [
+    "authority:beta"
+  ],
+  "signature_count": 1,
+  "weight": 2,
+  "requirement_results": [
+    {
+      "requirement_id": "requirement:recursive-reference",
+      "type": "policy_reference",
+      "status": "unsatisfied",
+      "matched_signers": [],
+      "observed": {
+        "policy_id": "policy:golden:tpe24:recursive-leaf",
+        "policy_version": 1,
+        "policy_digest": "b121b32c3aa5628233adabfc19cf2e6398b16cd9fc0614cbe5f6014d4db2fdb5",
+        "policy_status": "unsatisfied"
+      },
+      "expected": {
+        "policy_status": "satisfied"
+      },
+      "failure_code": "POLICY_REFERENCE_NOT_SATISFIED",
+      "referenced_policy": {
+        "policy_id": "policy:golden:tpe24:recursive-leaf",
+        "policy_version": 1,
+        "policy_digest": "b121b32c3aa5628233adabfc19cf2e6398b16cd9fc0614cbe5f6014d4db2fdb5",
+        "status": "unsatisfied",
+        "requirement_results": [
+          {
+            "requirement_id": "requirement:recursive-environment",
+            "type": "context_value_equals",
+            "status": "unsatisfied",
+            "matched_signers": [],
+            "observed": {
+              "path": "/proposal/payload/environment",
+              "resolution": "found",
+              "value_type": "string",
+              "value": "staging"
+            },
+            "expected": {
+              "value": "production"
+            },
+            "failure_code": "CONTEXT_VALUE_NOT_EQUAL"
+          }
+        ],
+        "failure_codes": [
+          "CONTEXT_VALUE_NOT_EQUAL"
+        ]
+      }
+    }
+  ],
+  "failure_codes": [
+    "POLICY_REFERENCE_NOT_SATISFIED",
+    "CONTEXT_VALUE_NOT_EQUAL"
+  ]
+}

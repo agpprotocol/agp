@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.4 development validation: 541/541 passed
+AGP TPE 2.4 development validation: 551/551 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -384,6 +384,22 @@ TPE 2.4 coverage includes:
 - recursive failure projection and suppression;
 - signed public Python API evaluations;
 - clean wheel installation and packaged schemas.
+
+Run the TPE 2.4 context and evidence golden corpus independently:
+
+```bash
+python \
+  trust_primitive_engine/tools/test_tpe24_context_evidence_golden_corpus.py
+```
+
+The fixtures are stored under:
+
+```text
+trust_primitive_engine/fixtures/golden/v2.4
+```
+
+Each case freezes the logical evaluation, compact sorted-key JSON
+serialization, deterministic replay, and SHA-256 result digest.
 
 ## Normative specifications
 

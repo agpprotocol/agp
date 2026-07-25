@@ -628,6 +628,23 @@ Expected final marker:
 TPE_2_4_CONTEXT_EVIDENCE_EXAMPLES_PASS
 ```
 
+### TPE 2.4 golden corpus
+
+```bash
+python \
+  trust_primitive_engine/tools/test_tpe24_context_evidence_golden_corpus.py
+```
+
+The versioned corpus under `fixtures/golden/v2.4` freezes ten end-to-end
+context and evidence evaluations. Each case includes its authoritative result
+and the SHA-256 digest of compact sorted-key UTF-8 JSON serialization.
+
+Expected final line:
+
+```text
+TPE 2.4 context/evidence golden corpus: 10/10 passed
+```
+
 ## 19. Recommended integration workflow
 
 A production caller should:

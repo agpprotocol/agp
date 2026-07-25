@@ -1,0 +1,51 @@
+{
+  "object_type": "agp.signed-decision-context/2",
+  "context_digest": "context-digest:tpe-2.4:evidence-digest-mismatch",
+  "context": {
+    "object_type": "agp.decision-context/2",
+    "context_id": "context:tpe-2.4:evidence-digest-mismatch",
+    "evaluation_time": 1700000000,
+    "policy": {
+      "id": "policy:golden:tpe24:evidence-digest-mismatch",
+      "version": 1,
+      "digest": "7f8b85c0372e793eaef2bfac31cd01ba6de81d17e16eda6de40028b5aa1e4a25"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.4:golden",
+      "payload": {}
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 2
+      },
+      {
+        "id": "authority:beta",
+        "role": "reviewer",
+        "weight": 3
+      }
+    ],
+    "evidence": [
+      {
+        "id": "evidence.security-report",
+        "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "media_type": "application/json"
+      }
+    ]
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    },
+    {
+      "signature_id": "signature:beta",
+      "statement": {
+        "signer_id": "authority:beta"
+      }
+    }
+  ]
+}
