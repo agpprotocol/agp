@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.4 development validation: 552/552 passed
+AGP TPE 2.5 development validation: 584/584 passed
 ```
 
 TPE 2.4 coverage includes:

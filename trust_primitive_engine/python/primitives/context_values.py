@@ -12,6 +12,7 @@ IDENTIFIER_RE = re.compile(r"^[a-z0-9][a-z0-9._:/-]{1,127}[a-z0-9]$")
 MAX_SAFE_INTEGER = 9_007_199_254_740_991
 MAX_EXPECTED_STRING_LENGTH = 4096
 MAX_RESULT_STRING_LENGTH = 4096
+MAX_CONTEXT_SET_SIZE = 64
 
 
 def _validate_exact_members(value: dict[str, Any], expected: set[str], primitive_type: str) -> None:
@@ -94,6 +95,34 @@ def _strict_scalar_equal(observed: Any, expected: Any) -> bool:
     return observed_type is not None and observed_type == expected_type and observed == expected
 
 
+def _validate_scalar_set(value: Any) -> list[Any]:
+    if not isinstance(value, list):
+        raise ValueError("requirements[].values must be an array")
+    if not 1 <= len(value) <= MAX_CONTEXT_SET_SIZE:
+        raise ValueError(
+            "requirements[].values must contain between 1 and 64 entries"
+        )
+
+    normalized = [_validate_scalar(item) for item in value]
+    scalar_types = {_scalar_type(item) for item in normalized}
+    if len(scalar_types) != 1:
+        raise ValueError(
+            "requirements[].values must contain one identical JSON scalar type"
+        )
+
+    value_type = _scalar_type(normalized[0])
+    canonical = [None] if value_type == "null" else sorted(normalized)
+
+    if normalized != canonical:
+        raise ValueError("requirements[].values must be in canonical order")
+
+    for index in range(1, len(normalized)):
+        if _strict_scalar_equal(normalized[index - 1], normalized[index]):
+            raise ValueError("requirements[].values must not contain duplicates")
+
+    return normalized
+
+
 class ContextValuePresentPrimitive(Primitive):
     TYPE = "context_value_present"
     EXPECTED_MEMBERS = {"requirement_id", "type", "path"}
@@ -158,6 +187,106 @@ class ContextValueEqualsPrimitive(Primitive):
         return PrimitiveResult.unsatisfied_result(
             **kwargs,
             failure_code="CONTEXT_VALUE_NOT_EQUAL",
+        )
+
+
+class ContextValueInPrimitive(Primitive):
+    TYPE = "context_value_in"
+    EXPECTED_MEMBERS = {"requirement_id", "type", "path", "values"}
+
+    def validate(self, value: dict[str, Any]) -> dict[str, Any]:
+        _validate_exact_members(value, self.EXPECTED_MEMBERS, self.TYPE)
+        requirement_id = _validate_requirement_id(value["requirement_id"])
+        path = _validate_path(value["path"])
+        values = _validate_scalar_set(value["values"])
+        if value["type"] != self.TYPE:
+            raise ValueError(f"type must be {self.TYPE}")
+        return {
+            "requirement_id": requirement_id,
+            "type": self.TYPE,
+            "path": path,
+            "values": values,
+        }
+
+    def evaluate(
+        self,
+        requirement: dict[str, Any],
+        state: EvaluationState,
+    ) -> PrimitiveResult:
+        path = requirement["path"]
+        expected_values = requirement["values"]
+        resolution = resolve_context_path(state.decision_context, path)
+        kwargs = dict(
+            requirement_id=requirement["requirement_id"],
+            primitive_type=self.TYPE,
+            matched_signers=[],
+            observed=_observation(path, resolution),
+            expected={"values": expected_values},
+        )
+        if resolution.status == "found" and any(
+            _strict_scalar_equal(resolution.value, expected)
+            for expected in expected_values
+        ):
+            return PrimitiveResult.satisfied_result(**kwargs)
+        return PrimitiveResult.unsatisfied_result(
+            **kwargs,
+            failure_code="CONTEXT_VALUE_NOT_IN_SET",
+        )
+
+
+class ContextPathEqualsPrimitive(Primitive):
+    TYPE = "context_path_equals"
+    EXPECTED_MEMBERS = {
+        "requirement_id",
+        "type",
+        "left_path",
+        "right_path",
+    }
+
+    def validate(self, value: dict[str, Any]) -> dict[str, Any]:
+        _validate_exact_members(value, self.EXPECTED_MEMBERS, self.TYPE)
+        requirement_id = _validate_requirement_id(value["requirement_id"])
+        left_path = _validate_path(value["left_path"])
+        right_path = _validate_path(value["right_path"])
+        if left_path == right_path:
+            raise ValueError("context_path_equals paths must be different")
+        if value["type"] != self.TYPE:
+            raise ValueError(f"type must be {self.TYPE}")
+        return {
+            "requirement_id": requirement_id,
+            "type": self.TYPE,
+            "left_path": left_path,
+            "right_path": right_path,
+        }
+
+    def evaluate(
+        self,
+        requirement: dict[str, Any],
+        state: EvaluationState,
+    ) -> PrimitiveResult:
+        left_path = requirement["left_path"]
+        right_path = requirement["right_path"]
+        left = resolve_context_path(state.decision_context, left_path)
+        right = resolve_context_path(state.decision_context, right_path)
+        kwargs = dict(
+            requirement_id=requirement["requirement_id"],
+            primitive_type=self.TYPE,
+            matched_signers=[],
+            observed={
+                "left": _observation(left_path, left),
+                "right": _observation(right_path, right),
+            },
+            expected={"relation": "strict_equal"},
+        )
+        if (
+            left.status == "found"
+            and right.status == "found"
+            and _strict_scalar_equal(left.value, right.value)
+        ):
+            return PrimitiveResult.satisfied_result(**kwargs)
+        return PrimitiveResult.unsatisfied_result(
+            **kwargs,
+            failure_code="CONTEXT_PATH_VALUES_NOT_EQUAL",
         )
 
 

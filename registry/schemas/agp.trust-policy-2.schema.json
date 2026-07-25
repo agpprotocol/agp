@@ -495,6 +495,33 @@
         "value": {"$ref": "#/$defs/contextScalar"}
       }
     },
+    "contextValueIn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "type", "path", "values"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/identifier"},
+        "type": {"const": "context_value_in"},
+        "path": {"$ref": "#/$defs/contextPath"},
+        "values": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 64,
+          "items": {"$ref": "#/$defs/contextScalar"}
+        }
+      }
+    },
+    "contextPathEquals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "type", "left_path", "right_path"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/identifier"},
+        "type": {"const": "context_path_equals"},
+        "left_path": {"$ref": "#/$defs/contextPath"},
+        "right_path": {"$ref": "#/$defs/contextPath"}
+      }
+    },
     "contextIntegerAtLeast": {
       "type": "object",
       "additionalProperties": false,
@@ -623,6 +650,12 @@
         },
         {
           "$ref": "#/$defs/contextValueEquals"
+        },
+        {
+          "$ref": "#/$defs/contextValueIn"
+        },
+        {
+          "$ref": "#/$defs/contextPathEquals"
         },
         {
           "$ref": "#/$defs/contextIntegerAtLeast"
