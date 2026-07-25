@@ -87,6 +87,142 @@ def prepare_signed_context() -> None:
     )
 
 
+def sign_temporary_context(
+    context: dict,
+    *,
+    name: str,
+) -> Path:
+    temporary_context = POSITIVE / f"{name}-context.json"
+    temporary_signed = POSITIVE / f"{name}-signed.json"
+
+    temporary_context.write_text(
+        json.dumps(context, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    run(
+        [
+            sys.executable,
+            str(SIGNER),
+            str(temporary_context),
+            "--private-key",
+            str(POSITIVE / "operations-private-key.json"),
+            "--signer-id",
+            "authority:operations",
+            "--key-id",
+            "key:operations:example",
+            "--signature-id",
+            f"sig:operations:{name}",
+            "--signed-at",
+            "2026-07-24T20:01:00Z",
+            "--output",
+            str(temporary_signed),
+        ]
+    )
+    run(
+        [
+            sys.executable,
+            str(SIGNER),
+            str(temporary_signed),
+            "--append",
+            "--private-key",
+            str(POSITIVE / "security-private-key.json"),
+            "--signer-id",
+            "authority:security",
+            "--key-id",
+            "key:security:example",
+            "--signature-id",
+            f"sig:security:{name}",
+            "--signed-at",
+            "2026-07-24T20:02:00Z",
+            "--output",
+            str(temporary_signed),
+        ]
+    )
+
+    temporary_context.unlink(missing_ok=True)
+    return temporary_signed
+
+
+def tpe24_fixture(
+    *,
+    expected_service: str,
+):
+    import evaluate_trust_policy_v2 as evaluator
+
+    evidence_digest = "a" * 64
+
+    referenced = {
+        "object_type": "agp.trust-policy/2",
+        "policy_id": "policy:example:tpe24-security-review",
+        "version": 1,
+        "eligible_roles": ["reviewer"],
+        "requirements": [
+            {
+                "requirement_id": "requirement:context-service",
+                "type": "context_value_equals",
+                "path": "/proposal/payload/service",
+                "value": expected_service,
+            },
+            {
+                "requirement_id": "requirement:context-version",
+                "type": "context_value_present",
+                "path": "/proposal/payload/version",
+            },
+            {
+                "requirement_id": "requirement:evidence-security",
+                "type": "evidence_present",
+                "evidence_id": "evidence.security-report",
+                "digest": evidence_digest,
+                "media_type": "application/json",
+            },
+        ],
+    }
+    referenced = evaluator.validate_policy(referenced)
+
+    root = {
+        "object_type": "agp.trust-policy/2",
+        "policy_id": "policy:example:tpe24-production-change",
+        "version": 1,
+        "eligible_roles": ["approver"],
+        "requirements": [
+            {
+                "requirement_id": "requirement:operations-approval",
+                "type": "required_signer",
+                "signer_id": "authority:operations",
+            },
+            {
+                "requirement_id": "requirement:tpe24-security-policy",
+                "type": "policy_reference",
+                "policy_id": referenced["policy_id"],
+                "policy_version": referenced["version"],
+                "policy_digest": evaluator.policy_digest(referenced),
+            },
+        ],
+    }
+    root = evaluator.validate_policy(root)
+
+    context = load_json(POSITIVE / "decision-context.json")
+    context["context_id"] = (
+        "ctx:example:tpe24-public-api:"
+        + ("satisfied" if expected_service == "payments-api" else "unsatisfied")
+    )
+    context["policy"] = {
+        "id": root["policy_id"],
+        "version": root["version"],
+        "digest": evaluator.policy_digest(root),
+    }
+    context["evidence"] = [
+        {
+            "id": "evidence.security-report",
+            "digest": evidence_digest,
+            "media_type": "application/json",
+        }
+    ]
+
+    return root, referenced, context
+
+
 def test_satisfied() -> None:
     result = evaluate_trust_policy(
         signed_context=load_json(POSITIVE / "signed-context.json"),
@@ -179,6 +315,79 @@ def test_unsatisfied() -> None:
     print("PASS public API unsatisfied evaluation")
 
 
+def test_tpe24_satisfied() -> None:
+    root, referenced, context = tpe24_fixture(
+        expected_service="payments-api",
+    )
+    signed_path = sign_temporary_context(
+        context,
+        name="public-api-tpe24-satisfied",
+    )
+
+    try:
+        result = evaluate_trust_policy(
+            signed_context=load_json(signed_path),
+            policy=root,
+            keyring=load_json(POSITIVE / "keyring.json"),
+            policy_set=[referenced],
+        )
+    finally:
+        signed_path.unlink(missing_ok=True)
+
+    assert result["status"] == "satisfied", result
+    assert result["failure_codes"] == [], result
+
+    referenced_result = result["requirement_results"][1]
+    inner = referenced_result["referenced_policy"]
+    assert inner["status"] == "satisfied", inner
+    assert [
+        item["type"]
+        for item in inner["requirement_results"]
+    ] == [
+        "context_value_equals",
+        "context_value_present",
+        "evidence_present",
+    ], inner
+
+    print("PASS public API TPE 2.4 satisfied evaluation")
+
+
+def test_tpe24_unsatisfied() -> None:
+    root, referenced, context = tpe24_fixture(
+        expected_service="staging",
+    )
+    signed_path = sign_temporary_context(
+        context,
+        name="public-api-tpe24-unsatisfied",
+    )
+
+    try:
+        result = evaluate_trust_policy(
+            signed_context=load_json(signed_path),
+            policy=root,
+            keyring=load_json(POSITIVE / "keyring.json"),
+            policy_set=[referenced],
+        )
+    finally:
+        signed_path.unlink(missing_ok=True)
+
+    assert result["status"] == "unsatisfied", result
+    assert result["failure_codes"] == [
+        "POLICY_REFERENCE_NOT_SATISFIED",
+        "CONTEXT_VALUE_NOT_EQUAL",
+    ], result
+
+    inner = (
+        result["requirement_results"][1]
+        ["referenced_policy"]
+    )
+    assert inner["failure_codes"] == [
+        "CONTEXT_VALUE_NOT_EQUAL",
+    ], inner
+
+    print("PASS public API TPE 2.4 unsatisfied evaluation")
+
+
 def test_fatal_error() -> None:
     try:
         evaluate_trust_policy(
@@ -199,8 +408,10 @@ def main() -> int:
     prepare_signed_context()
     test_satisfied()
     test_unsatisfied()
+    test_tpe24_satisfied()
+    test_tpe24_unsatisfied()
     test_fatal_error()
-    print("AGP TPE public Python API: 3/3 passed")
+    print("AGP TPE public Python API: 5/5 passed")
     return 0
 
 
