@@ -401,6 +401,10 @@ trust_primitive_engine/fixtures/golden/v2.4
 Each case freezes the logical evaluation, compact sorted-key JSON
 serialization, deterministic replay, and SHA-256 result digest.
 
+## Release conformance
+
+- `TPE-2.4-CONFORMANCE-STATEMENT.md`
+
 ## Normative specifications
 
 - `rfcs/TPE-2.1-001-deterministic-temporal-evaluation.md`

@@ -663,6 +663,15 @@ Expected final line:
 TPE 2.4 external package integration: 1/1 passed
 ```
 
+## TPE 2.4 release conformance
+
+The complete release-level traceability, frozen digests, compatibility scope,
+security boundaries, and reproducible verification procedure are recorded in:
+
+```text
+trust_primitive_engine/TPE-2.4-CONFORMANCE-STATEMENT.md
+```
+
 ## 19. Recommended integration workflow
 
 A production caller should:
