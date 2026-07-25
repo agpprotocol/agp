@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "agp-tpe"
-version = "2.3.3"
+version = "2.3.4"
 description = "AGP Trust Primitive Engine for deterministic Trust Policy 2 evaluation"
 readme = "README.md"
 requires-python = ">=3.12"
