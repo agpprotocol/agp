@@ -612,6 +612,22 @@ PASS  cycle_detected       POLICY_REFERENCE_CYCLE
 POLICY_REFERENCE_FAILURE_EXAMPLES_PASS
 ```
 
+### TPE 2.4 context and evidence examples
+
+```bash
+bash trust_primitive_engine/examples/context-and-evidence/run_examples.sh
+```
+
+The runner covers satisfied context and evidence, a context equality failure,
+absent evidence, digest mismatch, and recursive failure projection through a
+policy reference.
+
+Expected final marker:
+
+```text
+TPE_2_4_CONTEXT_EVIDENCE_EXAMPLES_PASS
+```
+
 ## 19. Recommended integration workflow
 
 A production caller should:

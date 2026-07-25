@@ -1,0 +1,45 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:example:tpe24:context-evidence",
+  "version": 1,
+  "eligible_roles": [
+    "reviewer"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:context-coverage-minimum",
+      "type": "context_integer_at_least",
+      "path": "/proposal/payload/coverage_basis_points",
+      "minimum": 9000
+    },
+    {
+      "requirement_id": "requirement:context-environment",
+      "type": "context_value_equals",
+      "path": "/proposal/payload/environment",
+      "value": "production"
+    },
+    {
+      "requirement_id": "requirement:context-rollout-maximum",
+      "type": "context_integer_at_most",
+      "path": "/proposal/payload/rollout/basis_points",
+      "maximum": 2500
+    },
+    {
+      "requirement_id": "requirement:context-version-present",
+      "type": "context_value_present",
+      "path": "/proposal/payload/version"
+    },
+    {
+      "requirement_id": "requirement:evidence-security-report",
+      "type": "evidence_present",
+      "evidence_id": "evidence.security-report",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "media_type": "application/json"
+    },
+    {
+      "requirement_id": "requirement:security-reviewer",
+      "type": "required_signer",
+      "signer_id": "authority:security"
+    }
+  ]
+}

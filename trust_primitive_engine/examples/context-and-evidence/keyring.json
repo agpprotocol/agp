@@ -1,0 +1,16 @@
+{
+  "keys": [
+    {
+      "signer_id": "authority:operations",
+      "key_id": "key:operations:tpe24-example",
+      "algorithm": "ed25519",
+      "public_key": "ebVWLo_mVPlAeLES6KmLp5AfhTrmlb7X4OORC60ElmQ"
+    },
+    {
+      "signer_id": "authority:security",
+      "key_id": "key:security:tpe24-example",
+      "algorithm": "ed25519",
+      "public_key": "5_FioQvsVZr-oZXk3OhLaVaNXSywlj60RsBoXisX8vA"
+    }
+  ]
+}
