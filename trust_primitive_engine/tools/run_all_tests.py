@@ -136,6 +136,13 @@ SUITES = [
         8,
     ),
     (
+        "TPE 2.4 context/evidence golden corpus",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_tpe24_context_evidence_golden_corpus.py",
+        10,
+    ),
+    (
         "public Python API",
         ROOT / "trust_primitive_engine/tools/test_public_api.py",
         5,

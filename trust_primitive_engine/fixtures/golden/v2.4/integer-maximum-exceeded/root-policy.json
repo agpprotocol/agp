@@ -1,0 +1,16 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe24:integer-maximum-exceeded",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:integer-maximum",
+      "type": "context_integer_at_most",
+      "path": "/proposal/payload/rollout",
+      "maximum": 2500
+    }
+  ]
+}

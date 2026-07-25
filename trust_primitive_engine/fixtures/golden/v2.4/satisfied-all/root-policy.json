@@ -1,0 +1,40 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe24:satisfied-all",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:01-present",
+      "type": "context_value_present",
+      "path": "/proposal/payload/version"
+    },
+    {
+      "requirement_id": "requirement:02-equals",
+      "type": "context_value_equals",
+      "path": "/proposal/payload/environment",
+      "value": "production"
+    },
+    {
+      "requirement_id": "requirement:03-minimum",
+      "type": "context_integer_at_least",
+      "path": "/proposal/payload/coverage",
+      "minimum": 9000
+    },
+    {
+      "requirement_id": "requirement:04-maximum",
+      "type": "context_integer_at_most",
+      "path": "/proposal/payload/rollout",
+      "maximum": 2500
+    },
+    {
+      "requirement_id": "requirement:05-evidence",
+      "type": "evidence_present",
+      "evidence_id": "evidence.security-report",
+      "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "media_type": "application/json"
+    }
+  ]
+}

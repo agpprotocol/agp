@@ -1,0 +1,47 @@
+{
+  "object_type": "agp.trust-policy-evaluation/2",
+  "status": "unsatisfied",
+  "policy_id": "policy:golden:tpe24:integer-maximum-exceeded",
+  "policy_version": 1,
+  "policy_digest": "ddd1b1b03f32fefac63dac12cb5dbb6e3582f75495e25132f238b1facd17d2d7",
+  "context_id": "context:tpe-2.4:integer-maximum-exceeded",
+  "context_digest": "context-digest:tpe-2.4:integer-maximum-exceeded",
+  "verified_signature_ids": [
+    "signature:alpha",
+    "signature:beta"
+  ],
+  "verified_signers": [
+    "authority:alpha",
+    "authority:beta"
+  ],
+  "matched_signers": [
+    "authority:alpha"
+  ],
+  "unauthorized_signers": [],
+  "ineligible_role_signers": [
+    "authority:beta"
+  ],
+  "signature_count": 1,
+  "weight": 2,
+  "requirement_results": [
+    {
+      "requirement_id": "requirement:integer-maximum",
+      "type": "context_integer_at_most",
+      "status": "unsatisfied",
+      "matched_signers": [],
+      "observed": {
+        "path": "/proposal/payload/rollout",
+        "resolution": "found",
+        "value_type": "integer",
+        "value": 2501
+      },
+      "expected": {
+        "maximum": 2500
+      },
+      "failure_code": "CONTEXT_INTEGER_MAXIMUM_EXCEEDED"
+    }
+  ],
+  "failure_codes": [
+    "CONTEXT_INTEGER_MAXIMUM_EXCEEDED"
+  ]
+}

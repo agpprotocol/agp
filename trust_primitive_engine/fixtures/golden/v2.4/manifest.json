@@ -1,0 +1,67 @@
+{
+  "corpus": "agp.tpe-context-evidence-conformance/2.4",
+  "hash_serialization": "json-sort-keys-compact-utf8",
+  "hash_algorithm": "sha-256",
+  "cases": [
+    {
+      "name": "satisfied-all",
+      "directory": "satisfied-all",
+      "expected_status": "satisfied",
+      "expected_sha256": "effb0595f5f77313d0f58277f7e7b931ceb98b74598e4d23041539147e46182a"
+    },
+    {
+      "name": "context-value-not-equal",
+      "directory": "context-value-not-equal",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "eb203bc1c84830f5d3ccb9e19f5c8022bcaee4c400da31e00bc8db43259d6afd"
+    },
+    {
+      "name": "context-value-not-present",
+      "directory": "context-value-not-present",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "71439990fa3c686bd2e3f0ad5e75c96ec3be46666ef28a831a6619aeb63be59a"
+    },
+    {
+      "name": "integer-minimum-not-reached",
+      "directory": "integer-minimum-not-reached",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "6b395d0b7c873d675edc0d4a8c3560738485a146f8943615bd9b4222d13b3766"
+    },
+    {
+      "name": "integer-maximum-exceeded",
+      "directory": "integer-maximum-exceeded",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "1c457c0df83b18b87cc8cf8bc2447a309f8080b2c893379e8bb245a4db468066"
+    },
+    {
+      "name": "evidence-absent",
+      "directory": "evidence-absent",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "13c4c18cdab0e237684c14472d401dfe033ef583ec31f2b18d5d183280f1c0b4"
+    },
+    {
+      "name": "evidence-digest-mismatch",
+      "directory": "evidence-digest-mismatch",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "d770b8b1e0cdde6bdd1d06eae742dbf4d1e10eb9a1195e5a53a969d051f00b52"
+    },
+    {
+      "name": "evidence-media-type-mismatch",
+      "directory": "evidence-media-type-mismatch",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "338ae522bb21236929ca458a05566a51a7c73aec65f1b04b1527eed8e7bb5c43"
+    },
+    {
+      "name": "evidence-both-mismatch",
+      "directory": "evidence-both-mismatch",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "e7b6b53d7dff2f87684e5838d18fa6b4ac56eb42b5f30df87b811a3a7e48521e"
+    },
+    {
+      "name": "recursive-reference-projection",
+      "directory": "recursive-reference-projection",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "c7438aba6f567ac11d82c064bf22c1260c2acc71d1093f529d66ff1846c46a06"
+    }
+  ]
+}

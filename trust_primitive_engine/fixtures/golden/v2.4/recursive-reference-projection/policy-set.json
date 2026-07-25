@@ -1,0 +1,18 @@
+[
+  {
+    "object_type": "agp.trust-policy/2",
+    "policy_id": "policy:golden:tpe24:recursive-leaf",
+    "version": 1,
+    "eligible_roles": [
+      "reviewer"
+    ],
+    "requirements": [
+      {
+        "requirement_id": "requirement:recursive-environment",
+        "type": "context_value_equals",
+        "path": "/proposal/payload/environment",
+        "value": "production"
+      }
+    ]
+  }
+]
