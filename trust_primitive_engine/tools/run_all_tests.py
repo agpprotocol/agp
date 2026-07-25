@@ -16,6 +16,11 @@ SUITES = [
         16,
     ),
     (
+        "context projection and resolution",
+        ROOT / "trust_primitive_engine/tools/test_context_resolution.py",
+        19,
+    ),
+    (
         "policy-tree validation",
         ROOT / "trust_primitive_engine/tools/test_policy_tree_validation.py",
         20,
@@ -157,7 +162,7 @@ def main() -> int:
         total += checks
 
     print("=" * 88)
-    print(f"AGP TPE 2.3 complete validation: {total}/{total} passed")
+    print(f"AGP TPE 2.4 development validation: {total}/{total} passed")
     return 0
 
 

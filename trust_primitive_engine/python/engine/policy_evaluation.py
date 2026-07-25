@@ -24,6 +24,7 @@ class PolicyEvaluationContext:
     evaluation_time: int | None
     policy_set: PolicySetIndex
     registry: PrimitiveRegistry
+    decision_context: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         normalized_signers = tuple(
@@ -348,6 +349,7 @@ def evaluate_policy_document(
         participants=context.participants,
         eligible_roles=policy["eligible_roles"],
         evaluation_time=context.evaluation_time,
+        decision_context=context.decision_context,
     )
 
     requirement_context = RequirementEvaluationContext(

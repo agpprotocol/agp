@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import Any, Iterable, Mapping
 
+from .context_resolution import create_context_projection
+
 
 @dataclass(frozen=True)
 class EvaluationState:
@@ -16,6 +18,7 @@ class EvaluationState:
     signature_count: int
     weight: int
     evaluation_time: int | None = None
+    decision_context: Mapping[str, Any] | None = None
 
     def __post_init__(self) -> None:
         if tuple(sorted(self.matched_signers)) != self.matched_signers:
@@ -74,6 +77,7 @@ class EvaluationState:
         participants: dict[str, dict[str, Any]],
         weight: int,
         evaluation_time: int | None = None,
+        decision_context: Mapping[str, Any] | None = None,
     ) -> "EvaluationState":
         normalized_signers = tuple(sorted(matched_signers))
         immutable_participants = MappingProxyType(
@@ -89,6 +93,9 @@ class EvaluationState:
             signature_count=len(normalized_signers),
             weight=weight,
             evaluation_time=evaluation_time,
+            decision_context=create_context_projection(
+                decision_context
+            ),
         )
 
 
@@ -98,6 +105,7 @@ def create_policy_evaluation_state(
     participants: Mapping[str, Mapping[str, Any]],
     eligible_roles: Iterable[str],
     evaluation_time: int | None = None,
+    decision_context: Mapping[str, Any] | None = None,
 ) -> EvaluationState:
     """Create the policy-local state for one Trust Policy.
 
@@ -136,4 +144,5 @@ def create_policy_evaluation_state(
         },
         weight=weight,
         evaluation_time=evaluation_time,
+        decision_context=decision_context,
     )
