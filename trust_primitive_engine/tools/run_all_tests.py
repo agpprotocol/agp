@@ -148,6 +148,13 @@ SUITES = [
         5,
     ),
     (
+        "external package integration",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_external_package_integration.py",
+        1,
+    ),
+    (
         "package installation",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         1,
