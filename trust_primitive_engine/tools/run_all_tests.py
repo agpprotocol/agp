@@ -21,6 +21,11 @@ SUITES = [
         19,
     ),
     (
+        "context value primitives",
+        ROOT / "trust_primitive_engine/tools/test_context_value_primitives.py",
+        36,
+    ),
+    (
         "policy-tree validation",
         ROOT / "trust_primitive_engine/tools/test_policy_tree_validation.py",
         20,
