@@ -6,6 +6,12 @@ from .all_of_signers import AllOfSignersPrimitive
 from .any_of_signers import AnyOfSignersPrimitive
 """Built-in Trust Primitive Engine plugins."""
 
+from .context_values import (
+    ContextIntegerAtLeastPrimitive,
+    ContextIntegerAtMostPrimitive,
+    ContextValueEqualsPrimitive,
+    ContextValuePresentPrimitive,
+)
 from .time_window import TimeWindowPrimitive
 
 from .global_signature_threshold import (
@@ -23,6 +29,10 @@ from .separation_of_duties import SeparationOfDutiesPrimitive
 from .signer_threshold import SignerThresholdPrimitive
 
 __all__ = [
+    "ContextIntegerAtLeastPrimitive",
+    "ContextIntegerAtMostPrimitive",
+    "ContextValueEqualsPrimitive",
+    "ContextValuePresentPrimitive",
     "ExactlyNSignersPrimitive",
     "AtLeastNSignersPrimitive",
     "AtMostNSignersPrimitive",

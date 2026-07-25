@@ -44,6 +44,12 @@ from engine import (
     project_failure_codes,
     validate_requirement_tree,
 )
+from primitives.context_values import (
+    ContextIntegerAtLeastPrimitive,
+    ContextIntegerAtMostPrimitive,
+    ContextValueEqualsPrimitive,
+    ContextValuePresentPrimitive,
+)
 from primitives.exactly_n_signers import ExactlyNSignersPrimitive
 from primitives.at_least_n_signers import AtLeastNSignersPrimitive
 from primitives.at_most_n_signers import AtMostNSignersPrimitive
@@ -112,6 +118,10 @@ ALLOWED_ROLES = {
 }
 
 SUPPORTED_PRIMITIVES = {
+    "context_integer_at_least",
+    "context_integer_at_most",
+    "context_value_equals",
+    "context_value_present",
     "exactly_n_signers",
     "at_least_n_signers",
     "at_most_n_signers",
@@ -133,6 +143,10 @@ SUPPORTED_PRIMITIVES = {
 
 PRIMITIVE_REGISTRY = PrimitiveRegistry(
     [
+        ContextIntegerAtLeastPrimitive(),
+        ContextIntegerAtMostPrimitive(),
+        ContextValueEqualsPrimitive(),
+        ContextValuePresentPrimitive(),
         ExactlyNSignersPrimitive(),
         AtLeastNSignersPrimitive(),
         AtMostNSignersPrimitive(),

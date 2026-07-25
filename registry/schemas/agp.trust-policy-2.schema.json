@@ -453,6 +453,78 @@
         }
       }
     },
+    "contextPath": {
+      "type": "string",
+      "minLength": 19,
+      "maxLength": 512,
+      "pattern": "^/proposal/payload/(?:[^/~]|~0|~1)+(?:/(?:[^/~]|~0|~1)+){0,15}$"
+    },
+    "contextScalar": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "boolean"},
+        {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "string",
+          "maxLength": 4096
+        }
+      ]
+    },
+    "contextValuePresent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "type", "path"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/identifier"},
+        "type": {"const": "context_value_present"},
+        "path": {"$ref": "#/$defs/contextPath"}
+      }
+    },
+    "contextValueEquals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "type", "path", "value"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/identifier"},
+        "type": {"const": "context_value_equals"},
+        "path": {"$ref": "#/$defs/contextPath"},
+        "value": {"$ref": "#/$defs/contextScalar"}
+      }
+    },
+    "contextIntegerAtLeast": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "type", "path", "minimum"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/identifier"},
+        "type": {"const": "context_integer_at_least"},
+        "path": {"$ref": "#/$defs/contextPath"},
+        "minimum": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      }
+    },
+    "contextIntegerAtMost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "type", "path", "maximum"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/identifier"},
+        "type": {"const": "context_integer_at_most"},
+        "path": {"$ref": "#/$defs/contextPath"},
+        "maximum": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      }
+    },
     "timeWindow": {
       "type": "object",
       "additionalProperties": false,
@@ -527,6 +599,18 @@
         },
         {
           "$ref": "#/$defs/exactlyNSigners"
+        },
+        {
+          "$ref": "#/$defs/contextValuePresent"
+        },
+        {
+          "$ref": "#/$defs/contextValueEquals"
+        },
+        {
+          "$ref": "#/$defs/contextIntegerAtLeast"
+        },
+        {
+          "$ref": "#/$defs/contextIntegerAtMost"
         },
         {
           "$ref": "#/$defs/timeWindow"
