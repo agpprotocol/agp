@@ -1,0 +1,38 @@
+{
+  "object_type": "agp.decision-context/2",
+  "context_id": "ctx:example:tpe24:missing-evidence",
+  "created_at": "2026-07-24T20:00:00Z",
+  "expires_at": null,
+  "evaluation_time": 1784923200,
+  "policy": {
+    "id": "policy:example:tpe24:production-change",
+    "version": 1,
+    "digest": "d2dd845fc11994bedd47efdf3c9db408ae9a67e4cfc194284b5fba3b817c82d0"
+  },
+  "proposal": {
+    "type": "proposal:production-change",
+    "payload": {
+      "coverage_basis_points": 9500,
+      "environment": "production",
+      "rollout": {
+        "basis_points": 2000
+      },
+      "service": "payments-api",
+      "version": "3.0.0"
+    }
+  },
+  "participants": [
+    {
+      "id": "authority:operations",
+      "role": "approver",
+      "weight": 1
+    },
+    {
+      "id": "authority:security",
+      "role": "reviewer",
+      "weight": 1
+    }
+  ],
+  "evidence": [],
+  "constraints": []
+}

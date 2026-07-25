@@ -91,6 +91,18 @@ jobs:
             "POLICY_REFERENCE_FAILURE_EXAMPLES_PASS" \
             /tmp/tpe-policy-reference-failures.log
 
+      - name: Run TPE 2.4 context and evidence examples
+        run: |
+          set -o pipefail
+          bash trust_primitive_engine/examples/context-and-evidence/run_examples.sh \
+            | tee /tmp/tpe-context-evidence-examples.log
+
+      - name: Verify TPE 2.4 context and evidence examples
+        run: |
+          grep -Fqx \
+            "TPE_2_4_CONTEXT_EVIDENCE_EXAMPLES_PASS" \
+            /tmp/tpe-context-evidence-examples.log
+
       - name: Check whitespace errors
         run: |
           git diff --check
