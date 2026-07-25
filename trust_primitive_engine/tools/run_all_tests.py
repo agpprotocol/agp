@@ -125,6 +125,11 @@ SUITES = [
         ROOT / "trust_primitive_engine/tools/test_public_api.py",
         3,
     ),
+    (
+        "package installation",
+        ROOT / "trust_primitive_engine/tools/test_package_install.py",
+        1,
+    ),
 ]
 
 

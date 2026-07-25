@@ -446,7 +446,34 @@ A production caller should:
 8. apply the organization's business action only after mapping the result to an
    explicit local decision rule.
 
-## 19. Public Python API
+## 19. Package installation
+
+Install directly from a repository checkout:
+
+```bash
+python -m pip install .
+```
+
+After installation:
+
+```python
+from trust_primitive_engine import evaluate_trust_policy
+```
+
+The distribution name is `agp-tpe`. The import package is
+`trust_primitive_engine`.
+
+The repository includes a clean-wheel installation test:
+
+```bash
+python trust_primitive_engine/tools/test_package_install.py
+```
+
+This test builds a wheel, installs it into a temporary isolated virtual
+environment, imports the public API, and verifies that packaged schemas are
+available.
+
+## 20. Public Python API
 
 Add the TPE Python directory to the interpreter path or package it within the
 integrating application, then import the stable facade:
@@ -477,7 +504,7 @@ The public API accepts Python mappings and sequences. It returns ordinary
 Callers should import only from `trust_primitive_engine`, not from internal
 `engine`, `primitives`, or `evaluate_trust_policy_v2` modules.
 
-## 20. Stability boundary
+## 21. Stability boundary
 
 TPE 2.3 uses:
 
