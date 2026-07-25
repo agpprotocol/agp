@@ -50,6 +50,7 @@ from primitives.context_values import (
     ContextValueEqualsPrimitive,
     ContextValuePresentPrimitive,
 )
+from primitives.evidence_present import EvidencePresentPrimitive
 from primitives.exactly_n_signers import ExactlyNSignersPrimitive
 from primitives.at_least_n_signers import AtLeastNSignersPrimitive
 from primitives.at_most_n_signers import AtMostNSignersPrimitive
@@ -118,6 +119,7 @@ ALLOWED_ROLES = {
 }
 
 SUPPORTED_PRIMITIVES = {
+    "evidence_present",
     "context_integer_at_least",
     "context_integer_at_most",
     "context_value_equals",
@@ -143,6 +145,7 @@ SUPPORTED_PRIMITIVES = {
 
 PRIMITIVE_REGISTRY = PrimitiveRegistry(
     [
+        EvidencePresentPrimitive(),
         ContextIntegerAtLeastPrimitive(),
         ContextIntegerAtMostPrimitive(),
         ContextValueEqualsPrimitive(),
