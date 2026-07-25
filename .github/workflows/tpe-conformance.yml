@@ -1,0 +1,73 @@
+name: AGP TPE 2.3 Conformance
+
+on:
+  push:
+    branches:
+      - main
+      - chore/tpe-ci
+    paths:
+      - "trust_primitive_engine/**"
+      - "signed_decision_context/**"
+      - "canonicalization/**"
+      - "registry/schemas/agp.trust-policy-2.schema.json"
+      - "requirements-v0.4.txt"
+      - ".github/workflows/tpe-conformance.yml"
+  pull_request:
+    paths:
+      - "trust_primitive_engine/**"
+      - "signed_decision_context/**"
+      - "canonicalization/**"
+      - "registry/schemas/agp.trust-policy-2.schema.json"
+      - "requirements-v0.4.txt"
+      - ".github/workflows/tpe-conformance.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tpe-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHONHASHSEED: "0"
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+jobs:
+  conformance:
+    name: TPE 2.3 complete validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-v0.4.txt
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-v0.4.txt
+
+      - name: Validate Python syntax
+        run: |
+          python -m compileall -q             canonicalization/python             signed_decision_context/python             trust_primitive_engine/python             trust_primitive_engine/tools
+
+      - name: Run complete TPE validation
+        run: |
+          set -o pipefail
+          python trust_primitive_engine/tools/run_all_tests.py             | tee /tmp/tpe-validation.log
+
+      - name: Verify expected validation total
+        run: |
+          grep -Fqx             "AGP TPE 2.3 complete validation: 438/438 passed"             /tmp/tpe-validation.log
+
+      - name: Check whitespace errors
+        run: |
+          git diff --check
