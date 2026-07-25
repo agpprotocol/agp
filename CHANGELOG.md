@@ -1,5 +1,24 @@
 # Changelog
 
+## Trust Primitive Engine 2.4.0
+- Added deterministic projection and immutable resolution of approved Decision
+  Context data under `/proposal/payload/...`.
+- Added the `context_value_present` and `context_value_equals` primitives.
+- Added the `context_integer_at_least` and `context_integer_at_most`
+  primitives with strict integer semantics and safe-integer bounds.
+- Added the `evidence_present` primitive with optional digest and media-type
+  binding and deterministic mismatch classification.
+- Added Decision Context conformance coverage for duplicate and unsorted
+  evidence identifiers.
+- Propagated the same verified Decision Context through direct, nested, shared,
+  and composed policy references.
+- Added deterministic recursive failure projection and suppression coverage for
+  all TPE 2.4 context and evidence requirements.
+- Hardened the stable public Python API with signed end-to-end TPE 2.4
+  satisfied and unsatisfied evaluations.
+- Preserved TPE 2.3 policy-reference behavior and legacy byte-stable outputs.
+- Expanded complete development validation to 541/541 checks.
+
 ## Trust Primitive Engine 2.3.4
 - Published the `agp-tpe` Python distribution for installation from PyPI.
 - Added a public quick start for package installation, schema verification,

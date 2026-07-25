@@ -1,4 +1,4 @@
-"""Public API for AGP Trust Primitive Engine 2.3."""
+"""Public API for AGP Trust Primitive Engine 2.4."""
 
 from .api import (
     DEFAULT_SCHEMA_DIR,
