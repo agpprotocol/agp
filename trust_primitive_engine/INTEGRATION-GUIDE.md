@@ -448,7 +448,13 @@ A production caller should:
 
 ## 19. Package installation
 
-Install directly from a repository checkout:
+Install the published package from PyPI:
+
+```bash
+python -m pip install agp-tpe
+```
+
+To install from a repository checkout instead:
 
 ```bash
 python -m pip install .
@@ -461,7 +467,7 @@ from trust_primitive_engine import evaluate_trust_policy
 ```
 
 The distribution name is `agp-tpe`. The import package is
-`trust_primitive_engine`.
+`trust_primitive_engine`. TPE 2.3 requires Python 3.12 or newer.
 
 The repository includes a clean-wheel installation test:
 
