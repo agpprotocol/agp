@@ -10,6 +10,8 @@ The current implementation supports:
 - deterministic temporal evaluation;
 - recursive Boolean composition;
 - deterministic policy references;
+- deterministic Decision Context projection and resolution;
+- deterministic context-value and evidence requirements;
 - complete recursive result evidence;
 - deterministic policy-level failure projection.
 
@@ -35,6 +37,73 @@ The engine currently includes:
 - `at_most_n_signers`
 - `exactly_n_signers`
 - `time_window`
+- `context_value_present`
+- `context_value_equals`
+- `context_integer_at_least`
+- `context_integer_at_most`
+- `evidence_present`
+
+### Context and evidence requirements
+
+Trust Primitive Engine 2.4 adds deterministic requirements over the verified
+Decision Context.
+
+Context paths are restricted to `/proposal/payload/...` and use JSON Pointer
+escaping. A found JSON `null` value counts as present. Missing paths and
+traversal mismatches are ordinary unsatisfied results.
+
+Example context requirements:
+
+```json
+[
+  {
+    "requirement_id": "requirement:environment-present",
+    "type": "context_value_present",
+    "path": "/proposal/payload/environment"
+  },
+  {
+    "requirement_id": "requirement:production-environment",
+    "type": "context_value_equals",
+    "path": "/proposal/payload/environment",
+    "value": "production"
+  },
+  {
+    "requirement_id": "requirement:minimum-coverage",
+    "type": "context_integer_at_least",
+    "path": "/proposal/payload/test_report/coverage_basis_points",
+    "minimum": 9000
+  },
+  {
+    "requirement_id": "requirement:maximum-rollout",
+    "type": "context_integer_at_most",
+    "path": "/proposal/payload/rollout/basis_points",
+    "maximum": 2500
+  }
+]
+```
+
+Scalar equality is type-strict. Integer comparisons reject Booleans, decimals,
+and values outside the AGP safe-integer range.
+
+Example evidence requirement:
+
+```json
+{
+  "requirement_id": "requirement:approved-security-report",
+  "type": "evidence_present",
+  "evidence_id": "evidence.security-report",
+  "digest": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "media_type": "application/json"
+}
+```
+
+The evidence match status is deterministically classified as `matched`,
+`absent`, `digest_mismatch`, `media_type_mismatch`, or
+`digest_and_media_type_mismatch`.
+
+Context and evidence requirements can appear directly, inside composition
+requirements, and inside referenced policies. Root and referenced policies use
+the same verified Decision Context.
 
 Primitive implementations are registered through `PrimitiveRegistry`.
 
@@ -253,6 +322,9 @@ agp.trust-policy-evaluation/2
 Policies without `policy_reference` retain their existing TPE 2.2 semantics and
 do not require a policy set.
 
+Policies without TPE 2.4 context or evidence requirements preserve their TPE
+2.3 output shape and byte-stable behavior.
+
 The TPE 2.2 golden compatibility corpus remains authoritative for legacy
 behavior.
 
@@ -289,8 +361,33 @@ The corpus covers:
 - references inside `not`;
 - deterministic replay and compact serialization.
 
+Run the complete TPE 2.4 development validation:
+
+```bash
+python trust_primitive_engine/tools/run_all_tests.py
+```
+
+The expected final line is:
+
+```text
+AGP TPE 2.4 development validation: 541/541 passed
+```
+
+TPE 2.4 coverage includes:
+
+- context projection and immutable resolution;
+- all four context-value primitives;
+- evidence presence and optional binding mismatches;
+- Decision Context 1 and 2 equivalence;
+- composition integration;
+- direct, nested, shared, and composed policy references;
+- recursive failure projection and suppression;
+- signed public Python API evaluations;
+- clean wheel installation and packaged schemas.
+
 ## Normative specifications
 
 - `rfcs/TPE-2.1-001-deterministic-temporal-evaluation.md`
 - `rfcs/TPE-2.2-001-deterministic-policy-composition.md`
 - `rfcs/TPE-2.3-001-deterministic-policy-references.md`
+- `rfcs/TPE-2.4-001-deterministic-context-requirements.md`
