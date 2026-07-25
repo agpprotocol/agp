@@ -2,6 +2,16 @@
   "registry_version": "0.8",
   "objects": [
     {
+      "id": "agp.trust-policy/1",
+      "status": "active",
+      "spec": "spec/AGP-TRUST-POLICY-1.0.md",
+      "description": "Deterministic trust requirements evaluated over cryptographically verified signer identities bound to an AGP Decision Context.",
+      "schema_version": 1,
+      "canonicalization": "agp-c14n/0.7",
+      "digest": "sha-256",
+      "schema": "registry/schemas/agp.trust-policy-1.schema.json"
+    },
+    {
       "id": "agp.transparency-record/1",
       "status": "reserved",
       "spec": "spec/",
@@ -24,12 +34,22 @@
     {
       "id": "agp.signed-decision-context/1",
       "status": "reserved",
-      "spec": "spec/",
-      "description": "Reserved identifier for the historical signed decision context object.",
+      "spec": "spec/AGP-SIGNED-DECISION-CONTEXT-1.0.md",
+      "description": "Self-contained Decision Context with one or more independent cryptographic attestations.",
       "schema_version": 1,
       "canonicalization": "agp-c14n/0.7",
       "digest": "sha-256",
-      "schema": "registry/schemas/reserved.schema.json"
+      "schema": "registry/schemas/agp.signed-decision-context-1.schema.json"
+    },
+    {
+      "id": "agp.signature-statement/1",
+      "status": "reserved",
+      "spec": "spec/AGP-SIGNED-DECISION-CONTEXT-1.0.md",
+      "description": "Typed canonical statement signed over a Decision Context digest.",
+      "schema_version": 1,
+      "canonicalization": "agp-c14n/0.7",
+      "digest": "sha-256",
+      "schema": "registry/schemas/agp.signature-statement-1.schema.json"
     },
     {
       "id": "agp.decision-context/1",
