@@ -1,5 +1,17 @@
 # Changelog
 
+## Trust Primitive Engine 2.3.4
+- Published the `agp-tpe` Python distribution for installation from PyPI.
+- Added a public quick start for package installation, schema verification,
+  and the stable `trust_primitive_engine` API.
+- Added Trusted Publishing through GitHub Actions without persistent PyPI
+  credentials.
+- Hardened releases by requiring an exact `tpe-vX.Y.Z` tag and package-version
+  match, checking out the released tag, and refusing versions already present
+  on PyPI.
+- No Trust Policy evaluation semantics, schemas, or conformance expectations
+  changed from TPE 2.3.3.
+
 ## Trust Primitive Engine 2.3
 - Deterministic `policy_reference` requirements bound by policy identifier,
   version, and canonical SHA-256 digest.
