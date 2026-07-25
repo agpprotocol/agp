@@ -138,7 +138,7 @@ SUITES = [
     (
         "public Python API",
         ROOT / "trust_primitive_engine/tools/test_public_api.py",
-        3,
+        5,
     ),
     (
         "package installation",
