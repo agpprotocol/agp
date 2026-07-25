@@ -105,7 +105,7 @@ not a claim that all workflow engines are insecure.
 
 ## Trust Primitive Engine quick start
 
-The AGP Trust Primitive Engine 2.3 is published on PyPI as `agp-tpe`.
+The AGP Trust Primitive Engine 2.4 is published on PyPI as `agp-tpe`.
 
 Requirements:
 
@@ -157,7 +157,7 @@ and the corresponding verification keyring. See the
 for the complete input contract, policy references, failure handling, and
 command-line examples.
 
-> TPE 2.3 remains experimental and has not received an independent security
+> TPE 2.4 remains experimental and has not received an independent security
 > audit.
 
 ## Repository benchmark quick start

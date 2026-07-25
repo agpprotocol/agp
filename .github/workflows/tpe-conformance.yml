@@ -1,4 +1,4 @@
-name: AGP TPE 2.3 Conformance
+name: AGP TPE 2.4 Conformance
 
 on:
   push:
@@ -34,7 +34,7 @@ env:
 
 jobs:
   conformance:
-    name: TPE 2.3 complete validation
+    name: TPE 2.4 complete validation
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
