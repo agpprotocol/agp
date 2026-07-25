@@ -97,6 +97,13 @@ def signed_context_for(
                 "version": normalized["version"],
                 "digest": evaluator.policy_digest(normalized),
             },
+            "proposal": {
+                "type": "proposal:test",
+                "payload": {
+                    "environment": "production",
+                    "coverage": 9000,
+                },
+            },
             "participants": [
                 {
                     "id": "authority:alpha",
@@ -109,6 +116,14 @@ def signed_context_for(
                     "weight": 3,
                 },
             ],
+            "evidence": [
+                {
+                    "id": "evidence.security-report",
+                    "digest": "a" * 64,
+                    "media_type": "application/json",
+                }
+            ],
+            "constraints": [],
         },
         "signatures": [
             {
@@ -387,7 +402,125 @@ def main() -> int:
     print("PASS  deterministic_replay")
     passed += 1
 
-    expected = 6
+    context_referenced = policy(
+        "policy:tpe24-verified-context",
+        roles=["reviewer"],
+        requirements=[
+            {
+                "requirement_id": "requirement:coverage",
+                "type": "context_integer_at_least",
+                "path": "/proposal/payload/coverage",
+                "minimum": 9000,
+            },
+            {
+                "requirement_id": "requirement:environment",
+                "type": "context_value_equals",
+                "path": "/proposal/payload/environment",
+                "value": "production",
+            },
+        ],
+    )
+    context_root = policy(
+        "policy:tpe24-verified-root",
+        roles=["approver"],
+        requirements=[
+            reference(
+                evaluator,
+                context_referenced,
+                "requirement:tpe24-context-policy",
+            )
+        ],
+    )
+    normalized_context_root = evaluator.validate_policy(context_root)
+    context_result = evaluator.evaluate_verified_object(
+        signed_context_for(evaluator, normalized_context_root),
+        normalized_context_root,
+        ["signature:alpha", "signature:beta"],
+        policy_set_index=build_index(evaluator, [context_referenced]),
+    )
+    if context_result["status"] != "satisfied":
+        raise TestFailure("verified tpe24 context reference failed")
+    print("PASS  verified_tpe24_context_reference")
+    passed += 1
+
+    evidence_referenced = policy(
+        "policy:tpe24-verified-evidence",
+        roles=["reviewer"],
+        requirements=[
+            {
+                "requirement_id": "requirement:evidence",
+                "type": "evidence_present",
+                "evidence_id": "evidence.security-report",
+                "digest": "a" * 64,
+                "media_type": "application/json",
+            }
+        ],
+    )
+    evidence_root = policy(
+        "policy:tpe24-verified-evidence-root",
+        roles=["approver"],
+        requirements=[
+            reference(
+                evaluator,
+                evidence_referenced,
+                "requirement:tpe24-evidence-policy",
+            )
+        ],
+    )
+    normalized_evidence_root = evaluator.validate_policy(evidence_root)
+    evidence_result = evaluator.evaluate_verified_object(
+        signed_context_for(evaluator, normalized_evidence_root),
+        normalized_evidence_root,
+        ["signature:alpha", "signature:beta"],
+        policy_set_index=build_index(evaluator, [evidence_referenced]),
+    )
+    if evidence_result["status"] != "satisfied":
+        raise TestFailure("verified tpe24 evidence reference failed")
+    print("PASS  verified_tpe24_evidence_reference")
+    passed += 1
+
+    failing_referenced = policy(
+        "policy:tpe24-verified-failing",
+        roles=["reviewer"],
+        requirements=[
+            {
+                "requirement_id": "requirement:environment",
+                "type": "context_value_equals",
+                "path": "/proposal/payload/environment",
+                "value": "staging",
+            }
+        ],
+    )
+    failing_root = policy(
+        "policy:tpe24-verified-failing-root",
+        roles=["approver"],
+        requirements=[
+            reference(
+                evaluator,
+                failing_referenced,
+                "requirement:tpe24-failing-policy",
+            )
+        ],
+    )
+    normalized_failing_root = evaluator.validate_policy(failing_root)
+    failure_result = evaluator.evaluate_verified_object(
+        signed_context_for(evaluator, normalized_failing_root),
+        normalized_failing_root,
+        ["signature:alpha", "signature:beta"],
+        policy_set_index=build_index(evaluator, [failing_referenced]),
+    )
+    if failure_result["failure_codes"] != [
+        "POLICY_REFERENCE_NOT_SATISFIED",
+        "CONTEXT_VALUE_NOT_EQUAL",
+    ]:
+        raise TestFailure(
+            "verified tpe24 failure projection changed: "
+            f"{failure_result['failure_codes']!r}"
+        )
+    print("PASS  verified_tpe24_failure_projection")
+    passed += 1
+
+    expected = 9
 
     if passed != expected:
         raise TestFailure(
@@ -396,7 +529,7 @@ def main() -> int:
         )
 
     print(
-        "TPE 2.3 verified policy-set integration: "
+        "TPE 2.4 verified policy-set integration: "
         f"{passed}/{expected} passed"
     )
     return 0

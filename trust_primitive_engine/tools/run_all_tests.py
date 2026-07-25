@@ -113,17 +113,17 @@ SUITES = [
     (
         "recursive policy evaluation",
         ROOT / "trust_primitive_engine/tools/test_recursive_policy_evaluation.py",
-        9,
+        13,
     ),
     (
         "recursive policy failure projection",
         ROOT / "trust_primitive_engine/tools/test_recursive_policy_failure_projection.py",
-        9,
+        12,
     ),
     (
         "verified policy-set evaluation",
         ROOT / "trust_primitive_engine/tools/test_verified_policy_set_evaluation.py",
-        6,
+        9,
     ),
     (
         "policy-set CLI",
