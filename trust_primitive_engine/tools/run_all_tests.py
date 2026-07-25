@@ -120,6 +120,11 @@ SUITES = [
         ROOT / "trust_primitive_engine/tools/test_policy_reference_conformance_corpus.py",
         8,
     ),
+    (
+        "public Python API",
+        ROOT / "trust_primitive_engine/tools/test_public_api.py",
+        3,
+    ),
 ]
 
 
