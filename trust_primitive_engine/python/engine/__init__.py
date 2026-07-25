@@ -1,5 +1,12 @@
 """Core types for the AGP Trust Primitive Engine."""
 
+from .context_resolution import (
+    ContextPathError,
+    ContextResolution,
+    create_context_projection,
+    parse_context_path,
+    resolve_context_path,
+)
 from .primitive import Primitive
 from .composition import (
     evaluate_composition,
@@ -38,6 +45,11 @@ from .state import (
 )
 
 __all__ = [
+    "ContextPathError",
+    "ContextResolution",
+    "create_context_projection",
+    "parse_context_path",
+    "resolve_context_path",
     "PolicyEvaluationContext",
     "PolicyEvaluationResult",
     "RequirementEvaluationContext",

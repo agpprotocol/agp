@@ -865,6 +865,7 @@ def evaluate_verified_object(
         participants=participants,
         weight=total_weight,
         evaluation_time=evaluation_time,
+        decision_context=context,
     )
 
     has_policy_references = any(
@@ -891,6 +892,7 @@ def evaluate_verified_object(
             verified_signers=tuple(verified_signers),
             participants=participants,
             evaluation_time=evaluation_time,
+            decision_context=context,
             policy_set=policy_set_index,
             registry=PRIMITIVE_REGISTRY,
         )
