@@ -1,0 +1,5 @@
+{
+  "vector": "dc3_invalid_issuer_id",
+  "accepted": false,
+  "error_code": "INVALID_EVIDENCE"
+}

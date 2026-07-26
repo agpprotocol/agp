@@ -16,11 +16,12 @@ import (
 const safeMax int64 = 9007199254740991
 
 var (
-	identifierRE = regexp.MustCompile(`^[a-z0-9][a-z0-9._:/-]{1,127}[a-z0-9]$`)
-	contextIDRE  = regexp.MustCompile(`^[a-z0-9][a-z0-9._:-]{2,127}$`)
-	digestRE     = regexp.MustCompile(`^[0-9a-f]{64}$`)
-	timestampRE  = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$`)
-	mediaTypeRE  = regexp.MustCompile(`^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$`)
+	identifierRE   = regexp.MustCompile(`^[a-z0-9][a-z0-9._:/-]{1,127}[a-z0-9]$`)
+	contextIDRE    = regexp.MustCompile(`^[a-z0-9][a-z0-9._:-]{2,127}$`)
+	digestRE       = regexp.MustCompile(`^[0-9a-f]{64}$`)
+	timestampRE    = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$`)
+	mediaTypeRE    = regexp.MustCompile(`^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$`)
+	evidenceTypeRE = regexp.MustCompile(`^[a-z0-9][a-z0-9._:/-]{1,123}[a-z0-9]/[1-9][0-9]*$`)
 )
 
 var topLevelV1 = setOf(
@@ -32,6 +33,8 @@ var topLevelV2 = setOf(
 	"object_type", "context_id", "created_at", "expires_at",
 	"evaluation_time", "policy", "proposal", "participants", "evidence", "constraints",
 )
+
+var topLevelV3 = topLevelV2
 
 var roles = setOf("proposer", "voter", "reviewer", "approver", "observer")
 
@@ -235,7 +238,7 @@ func validateObject(value any) error {
 	if !ok {
 		return reject(
 			"INVALID_OBJECT_TYPE",
-			"object_type must be agp.decision-context/1 or agp.decision-context/2",
+			"object_type must be agp.decision-context/1, agp.decision-context/2, or agp.decision-context/3",
 		)
 	}
 
@@ -245,10 +248,12 @@ func validateObject(value any) error {
 		topLevel = topLevelV1
 	case "agp.decision-context/2":
 		topLevel = topLevelV2
+	case "agp.decision-context/3":
+		topLevel = topLevelV3
 	default:
 		return reject(
 			"INVALID_OBJECT_TYPE",
-			"object_type must be agp.decision-context/1 or agp.decision-context/2",
+			"object_type must be agp.decision-context/1, agp.decision-context/2, or agp.decision-context/3",
 		)
 	}
 
@@ -266,7 +271,7 @@ func validateObject(value any) error {
 		}
 	}
 
-	if objectType == "agp.decision-context/2" {
+	if objectType == "agp.decision-context/2" || objectType == "agp.decision-context/3" {
 		if _, err := nonnegativeSafeInteger(obj["evaluation_time"], "evaluation_time"); err != nil {
 			return err
 		}
@@ -358,9 +363,13 @@ func validateObject(value any) error {
 		return reject("INVALID_EVIDENCE", "evidence must be an array")
 	}
 	evidence := make([]map[string]any, 0, len(evidenceRaw))
+	evidenceFields := setOf("id", "digest", "media_type")
+	if objectType == "agp.decision-context/3" {
+		evidenceFields = setOf("id", "digest", "media_type", "evidence_type", "issuer_id")
+	}
 	for index, raw := range evidenceRaw {
 		where := fmt.Sprintf("evidence[%d]", index)
-		entry, err := exactObject(raw, setOf("id", "digest", "media_type"), "INVALID_EVIDENCE", where)
+		entry, err := exactObject(raw, evidenceFields, "INVALID_EVIDENCE", where)
 		if err != nil {
 			return err
 		}
@@ -374,6 +383,15 @@ func validateObject(value any) error {
 		mediaType, ok := entry["media_type"].(string)
 		if !ok || !mediaTypeRE.MatchString(mediaType) {
 			return reject("INVALID_EVIDENCE", where+".media_type is invalid")
+		}
+		if objectType == "agp.decision-context/3" {
+			evidenceType, ok := entry["evidence_type"].(string)
+			if !ok || len(evidenceType) > 128 || !evidenceTypeRE.MatchString(evidenceType) {
+				return reject("INVALID_EVIDENCE", where+".evidence_type is invalid")
+			}
+			if _, err := identifier(entry["issuer_id"], where+".issuer_id"); err != nil {
+				return reject("INVALID_EVIDENCE", err.Error())
+			}
 		}
 		evidence = append(evidence, entry)
 	}
