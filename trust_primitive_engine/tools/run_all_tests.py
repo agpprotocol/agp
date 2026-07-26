@@ -41,6 +41,11 @@ SUITES = [
         34,
     ),
     (
+        "TPE 2.5 formal integration",
+        ROOT / "trust_primitive_engine/tools/test_tpe25_integration.py",
+        12,
+    ),
+    (
         "policy-tree validation",
         ROOT / "trust_primitive_engine/tools/test_policy_tree_validation.py",
         20,
@@ -153,9 +158,16 @@ SUITES = [
         10,
     ),
     (
+        "TPE 2.5 contextual predicates golden corpus",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_tpe25_golden_corpus.py",
+        5,
+    ),
+    (
         "public Python API",
         ROOT / "trust_primitive_engine/tools/test_public_api.py",
-        5,
+        7,
     ),
     (
         "external package integration",

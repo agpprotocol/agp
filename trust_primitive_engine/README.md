@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.5 development validation: 618/618 passed
+AGP TPE 2.5 development validation: 637/637 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -400,6 +400,20 @@ trust_primitive_engine/fixtures/golden/v2.4
 
 Each case freezes the logical evaluation, compact sorted-key JSON
 serialization, deterministic replay, and SHA-256 result digest.
+
+Run the TPE 2.5 golden corpus independently:
+
+```bash
+python trust_primitive_engine/tools/test_tpe25_golden_corpus.py
+```
+
+The fixtures are stored under `trust_primitive_engine/fixtures/golden/v2.5`.
+
+Run the executable TPE 2.5 examples:
+
+```bash
+bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
+```
 
 ## Release conformance
 

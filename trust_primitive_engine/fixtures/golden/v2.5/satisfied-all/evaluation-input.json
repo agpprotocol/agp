@@ -1,0 +1,50 @@
+{
+  "object_type": "agp.signed-decision-context/2",
+  "context_digest": "context-digest:tpe-2.5:satisfied-all",
+  "context": {
+    "object_type": "agp.decision-context/2",
+    "context_id": "context:tpe-2.5:satisfied-all",
+    "evaluation_time": 1700000000,
+    "policy": {
+      "id": "policy:golden:tpe25:satisfied-all",
+      "version": 1,
+      "digest": "2fd62e40875767b4588dad7f06b5b3a528b6db8780b2d1c04bf6176a9746a38e"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.5:golden",
+      "payload": {
+        "environment": "production",
+        "requested_version": "3.0.0",
+        "approved_version": "3.0.0"
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 1
+      }
+    ],
+    "evidence": [
+      {
+        "id": "evidence.architecture",
+        "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "media_type": "application/json"
+      },
+      {
+        "id": "evidence.security",
+        "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "media_type": "application/json"
+      }
+    ],
+    "constraints": []
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    }
+  ]
+}
