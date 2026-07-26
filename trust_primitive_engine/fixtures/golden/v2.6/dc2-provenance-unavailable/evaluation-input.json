@@ -1,0 +1,37 @@
+{
+  "object_type": "agp.signed-decision-context/2",
+  "context_digest": "context-digest:tpe-2.6:dc2-provenance-unavailable",
+  "context": {
+    "object_type": "agp.decision-context/2",
+    "context_id": "context:tpe-2.6:dc2-provenance-unavailable",
+    "policy": {
+      "id": "policy:golden:tpe26:dc2-provenance-unavailable",
+      "version": 1,
+      "digest": "4b65bf485b56c6fa199ac7d0c872127f7ffc7fa33a8b7373b3c1194213ef2c94"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.6:golden",
+      "payload": {
+        "environment": "production"
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 1
+      }
+    ],
+    "evidence": [],
+    "constraints": [],
+    "evaluation_time": 1700000000
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    }
+  ]
+}

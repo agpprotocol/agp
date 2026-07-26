@@ -1,0 +1,40 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe26:satisfied-all",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:01-approved-issuer",
+      "type": "evidence_issuer_in",
+      "issuer_ids": [
+        "authority:lab-a",
+        "authority:lab-b"
+      ],
+      "evidence_types": [
+        "security:assessment/1"
+      ]
+    },
+    {
+      "requirement_id": "requirement:02-approved-type",
+      "type": "evidence_type_in",
+      "evidence_types": [
+        "security:assessment/1"
+      ],
+      "issuer_ids": [
+        "authority:lab-a",
+        "authority:lab-b"
+      ]
+    },
+    {
+      "requirement_id": "requirement:03-distinct-issuers",
+      "type": "evidence_distinct_issuers_at_least",
+      "minimum": 2,
+      "evidence_types": [
+        "security:assessment/1"
+      ]
+    }
+  ]
+}

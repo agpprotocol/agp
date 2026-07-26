@@ -1,0 +1,45 @@
+{
+  "object_type": "agp.signed-decision-context/3",
+  "context_digest": "context-digest:tpe-2.6:distinct-minimum-not-reached",
+  "context": {
+    "object_type": "agp.decision-context/3",
+    "context_id": "context:tpe-2.6:distinct-minimum-not-reached",
+    "policy": {
+      "id": "policy:golden:tpe26:distinct-minimum-not-reached",
+      "version": 1,
+      "digest": "66034eb58746f5776cc5cfede63cb305b872b8087ae7d154af5343622c032044"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.6:golden",
+      "payload": {
+        "environment": "production"
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 1
+      }
+    ],
+    "evidence": [
+      {
+        "id": "evidence.assessment-a",
+        "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "media_type": "application/json",
+        "evidence_type": "security:assessment/1",
+        "issuer_id": "authority:lab-a"
+      }
+    ],
+    "constraints": [],
+    "evaluation_time": 1700000000
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    }
+  ]
+}

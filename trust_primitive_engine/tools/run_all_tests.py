@@ -51,6 +51,11 @@ SUITES = [
         12,
     ),
     (
+        "TPE 2.6 formal integration",
+        ROOT / "trust_primitive_engine/tools/test_tpe26_integration.py",
+        14,
+    ),
+    (
         "policy-tree validation",
         ROOT / "trust_primitive_engine/tools/test_policy_tree_validation.py",
         20,
@@ -170,9 +175,16 @@ SUITES = [
         5,
     ),
     (
+        "TPE 2.6 evidence provenance golden corpus",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_tpe26_golden_corpus.py",
+        7,
+    ),
+    (
         "public Python API",
         ROOT / "trust_primitive_engine/tools/test_public_api.py",
-        7,
+        9,
     ),
     (
         "external package integration",

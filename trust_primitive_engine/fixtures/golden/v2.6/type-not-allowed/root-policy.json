@@ -1,0 +1,21 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe26:type-not-allowed",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:02-approved-type",
+      "type": "evidence_type_in",
+      "evidence_types": [
+        "security:assessment/1"
+      ],
+      "issuer_ids": [
+        "authority:lab-a",
+        "authority:lab-b"
+      ]
+    }
+  ]
+}

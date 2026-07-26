@@ -1,0 +1,50 @@
+{
+  "object_type": "agp.trust-policy-evaluation/2",
+  "status": "unsatisfied",
+  "policy_id": "policy:golden:tpe26:distinct-minimum-not-reached",
+  "policy_version": 1,
+  "policy_digest": "66034eb58746f5776cc5cfede63cb305b872b8087ae7d154af5343622c032044",
+  "context_id": "context:tpe-2.6:distinct-minimum-not-reached",
+  "context_digest": "context-digest:tpe-2.6:distinct-minimum-not-reached",
+  "verified_signature_ids": [
+    "signature:alpha"
+  ],
+  "verified_signers": [
+    "authority:alpha"
+  ],
+  "matched_signers": [
+    "authority:alpha"
+  ],
+  "unauthorized_signers": [],
+  "ineligible_role_signers": [],
+  "signature_count": 1,
+  "weight": 1,
+  "requirement_results": [
+    {
+      "requirement_id": "requirement:03-distinct-issuers",
+      "type": "evidence_distinct_issuers_at_least",
+      "status": "unsatisfied",
+      "matched_signers": [],
+      "observed": {
+        "provenance_status": "available",
+        "count": 1,
+        "issuer_ids": [
+          "authority:lab-a"
+        ],
+        "evidence_ids": [
+          "evidence.assessment-a"
+        ]
+      },
+      "expected": {
+        "minimum": 2,
+        "evidence_types": [
+          "security:assessment/1"
+        ]
+      },
+      "failure_code": "EVIDENCE_DISTINCT_ISSUER_MINIMUM_NOT_REACHED"
+    }
+  ],
+  "failure_codes": [
+    "EVIDENCE_DISTINCT_ISSUER_MINIMUM_NOT_REACHED"
+  ]
+}

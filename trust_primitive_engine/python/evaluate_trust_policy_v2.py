@@ -893,7 +893,10 @@ def evaluate_verified_object(
 
     evaluation_time = (
         context.get("evaluation_time")
-        if context.get("object_type") == "agp.decision-context/2"
+        if context.get("object_type") in {
+            "agp.decision-context/2",
+            "agp.decision-context/3",
+        }
         else None
     )
 
