@@ -1,7 +1,7 @@
-# TPE 2.5 Integration Guide
+# TPE 2.6 Integration Guide
 
 This guide explains how an external system can integrate with the AGP Trust
-Primitive Engine (TPE) 2.5 through its command-line interface and stable public
+Primitive Engine (TPE) 2.6 through its command-line interface and stable public
 Python API.
 
 For normative semantics, see:
@@ -15,7 +15,7 @@ For normative semantics, see:
 
 ## 1. Integration inputs
 
-A complete TPE 2.5 evaluation can require four JSON inputs:
+A complete TPE 2.6 evaluation can require four JSON inputs:
 
 1. a Signed Decision Context;
 2. a root Trust Policy 2 object;
@@ -803,7 +803,7 @@ from trust_primitive_engine import evaluate_trust_policy
 ```
 
 The distribution name is `agp-tpe`. The import package is
-`trust_primitive_engine`. TPE 2.5 requires Python 3.12 or newer.
+`trust_primitive_engine`. TPE 2.6 requires Python 3.12 or newer.
 
 The repository includes a clean-wheel installation test:
 
@@ -848,7 +848,7 @@ Callers should import only from `trust_primitive_engine`, not from internal
 
 ## 23. Stability boundary
 
-TPE 2.5 uses:
+TPE 2.6 uses:
 
 ```text
 agp.trust-policy/2
@@ -865,3 +865,50 @@ Integrators should depend on documented CLI inputs, exit codes, object types,
 and result fields rather than importing internal Python modules directly.
 Internal package organization may evolve independently of the public
 integration contract.
+
+## TPE 2.6 evidence provenance predicates
+
+TPE 2.6 adds deterministic predicates over provenance declarations already
+contained in a verified Decision Context 3 evidence manifest:
+
+- `evidence_issuer_in`
+- `evidence_type_in`
+- `evidence_distinct_issuers_at_least`
+
+Issuer and evidence-type filters bind to the same evidence entry. An approved
+issuer on one entry and an approved evidence type on another entry never form a
+match.
+
+Decision Context 3 exposes provenance as `available`, including when its
+evidence array is empty. Decision Context 1 and Decision Context 2 expose
+provenance as `unavailable`; TPE 2.6 predicates remain valid policy forms but
+evaluate as ordinary unsatisfied requirements.
+
+The `issuer_id` and `evidence_type` fields are context-attested declarations.
+TPE 2.6 does not independently authenticate an external evidence issuer.
+
+The deterministic TPE 2.6 corpus is stored under:
+
+```text
+trust_primitive_engine/fixtures/golden/v2.6/
+```
+
+Run it independently with:
+
+```bash
+python trust_primitive_engine/tools/test_tpe26_golden_corpus.py
+```
+
+Expected result:
+
+```text
+TPE 2.6 evidence provenance golden corpus: 7/7 passed
+```
+
+## TPE 2.6 release conformance
+
+The TPE 2.6 release evidence is recorded in:
+
+```text
+trust_primitive_engine/TPE-2.6-CONFORMANCE-STATEMENT.md
+```

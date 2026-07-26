@@ -1,5 +1,25 @@
 # Changelog
 
+## Trust Primitive Engine 2.6.0
+- Added `evidence_issuer_in` for deterministic evidence-issuer membership with
+  optional same-entry evidence-type filtering.
+- Added `evidence_type_in` for deterministic evidence-type membership with
+  optional same-entry issuer filtering.
+- Added `evidence_distinct_issuers_at_least` for bounded deterministic counting
+  of distinct context-attested evidence issuers.
+- Added Decision Context 3 provenance projection while preserving fail-closed
+  unavailable behavior for Decision Context 1 and 2.
+- Added composition, direct and nested policy-reference integration, recursive
+  failure projection, suppression, deterministic replay, and serialization
+  coverage for all TPE 2.6 predicates.
+- Added signed Decision Context 3 public API coverage for satisfied and
+  unsatisfied evaluations.
+- Added a deterministic seven-case TPE 2.6 golden corpus with compact sorted-key
+  JSON SHA-256 result hashes.
+- Preserved valid TPE 2.0 through TPE 2.5 behavior, existing frozen corpora, and
+  Trust Policy and evaluation object versions.
+- Expanded complete development validation to 682/682 checks.
+
 ## Trust Primitive Engine 2.5.0
 - Added `context_value_in` for deterministic scalar membership checks with
   canonical homogeneous value sets and strict JSON type semantics.
