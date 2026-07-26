@@ -1,0 +1,642 @@
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"os"
+	"sort"
+)
+
+const (
+	typeIssuerIn       = "evidence_issuer_in"
+	typeEvidenceIn     = "evidence_type_in"
+	typeDistinctIssuer = "evidence_distinct_issuers_at_least"
+	typePolicyRef      = "policy_reference"
+)
+
+type policyBinding struct {
+	ID      string `json:"id"`
+	Version int    `json:"version"`
+	Digest  string `json:"digest"`
+}
+
+type participant struct {
+	ID     string `json:"id"`
+	Role   string `json:"role"`
+	Weight int    `json:"weight"`
+}
+
+type evidence struct {
+	ID           string `json:"id"`
+	EvidenceType string `json:"evidence_type"`
+	IssuerID     string `json:"issuer_id"`
+}
+
+type context struct {
+	ObjectType   string        `json:"object_type"`
+	ContextID    string        `json:"context_id"`
+	Policy       policyBinding `json:"policy"`
+	Participants []participant `json:"participants"`
+	Evidence     []evidence    `json:"evidence"`
+}
+
+type signatureStatement struct {
+	SignerID string `json:"signer_id"`
+}
+
+type signature struct {
+	SignatureID string             `json:"signature_id"`
+	Statement   signatureStatement `json:"statement"`
+}
+
+type evaluationInput struct {
+	ObjectType    string      `json:"object_type"`
+	ContextDigest string      `json:"context_digest"`
+	Context       context     `json:"context"`
+	Signatures    []signature `json:"signatures"`
+}
+
+type policy struct {
+	ObjectType    string           `json:"object_type"`
+	PolicyID      string           `json:"policy_id"`
+	Version       int              `json:"version"`
+	EligibleRoles []string         `json:"eligible_roles"`
+	Requirements  []map[string]any `json:"requirements"`
+}
+
+func decodeFile(path string, target any) error {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+	decoder := json.NewDecoder(bytes.NewReader(raw))
+	decoder.UseNumber()
+	if err := decoder.Decode(target); err != nil {
+		return err
+	}
+	if decoder.More() {
+		return errors.New("trailing JSON data")
+	}
+	return nil
+}
+
+func asString(value any, field string) (string, error) {
+	result, ok := value.(string)
+	if !ok {
+		return "", fmt.Errorf("%s must be a string", field)
+	}
+	return result, nil
+}
+
+func asInt(value any, field string) (int, error) {
+	switch typed := value.(type) {
+	case json.Number:
+		result, err := typed.Int64()
+		if err != nil {
+			return 0, fmt.Errorf("%s must be an integer", field)
+		}
+		return int(result), nil
+	case float64:
+		result := int(typed)
+		if float64(result) != typed {
+			return 0, fmt.Errorf("%s must be an integer", field)
+		}
+		return result, nil
+	case int:
+		return typed, nil
+	default:
+		return 0, fmt.Errorf("%s must be an integer", field)
+	}
+}
+
+func asStrings(value any, field string) ([]string, error) {
+	raw, ok := value.([]any)
+	if !ok {
+		if typed, ok := value.([]string); ok {
+			return append([]string(nil), typed...), nil
+		}
+		return nil, fmt.Errorf("%s must be an array", field)
+	}
+	result := make([]string, 0, len(raw))
+	for _, item := range raw {
+		text, ok := item.(string)
+		if !ok {
+			return nil, fmt.Errorf("%s must contain strings", field)
+		}
+		result = append(result, text)
+	}
+	return result, nil
+}
+
+func optionalStrings(requirement map[string]any, field string) ([]string, bool, error) {
+	value, present := requirement[field]
+	if !present {
+		return nil, false, nil
+	}
+	result, err := asStrings(value, field)
+	return result, true, err
+}
+
+func contains(values []string, candidate string) bool {
+	for _, value := range values {
+		if value == candidate {
+			return true
+		}
+	}
+	return false
+}
+
+func uniqueSorted(values []string) []string {
+	set := map[string]struct{}{}
+	for _, value := range values {
+		set[value] = struct{}{}
+	}
+	result := make([]string, 0, len(set))
+	for value := range set {
+		result = append(result, value)
+	}
+	sort.Strings(result)
+	return result
+}
+
+func filteredEvidence(
+	ctx context,
+	issuerIDs []string,
+	filterIssuer bool,
+	evidenceTypes []string,
+	filterType bool,
+) []evidence {
+	unique := map[string]evidence{}
+	for _, entry := range ctx.Evidence {
+		if entry.ID == "" || entry.IssuerID == "" || entry.EvidenceType == "" {
+			continue
+		}
+		if _, exists := unique[entry.ID]; !exists {
+			unique[entry.ID] = entry
+		}
+	}
+
+	ids := make([]string, 0, len(unique))
+	for id := range unique {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+
+	result := make([]evidence, 0, len(ids))
+	for _, id := range ids {
+		entry := unique[id]
+		if filterIssuer && !contains(issuerIDs, entry.IssuerID) {
+			continue
+		}
+		if filterType && !contains(evidenceTypes, entry.EvidenceType) {
+			continue
+		}
+		result = append(result, entry)
+	}
+	return result
+}
+
+func provenanceStatus(ctx context) string {
+	if ctx.ObjectType == "agp.decision-context/3" {
+		return "available"
+	}
+	return "unavailable"
+}
+
+func observedEntries(status string, entries []evidence) map[string]any {
+	evidenceIDs := make([]string, 0, len(entries))
+	issuerIDs := make([]string, 0, len(entries))
+	evidenceTypes := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		evidenceIDs = append(evidenceIDs, entry.ID)
+		issuerIDs = append(issuerIDs, entry.IssuerID)
+		evidenceTypes = append(evidenceTypes, entry.EvidenceType)
+	}
+	return map[string]any{
+		"provenance_status": status,
+		"evidence_ids":      uniqueSorted(evidenceIDs),
+		"issuer_ids":        uniqueSorted(issuerIDs),
+		"evidence_types":    uniqueSorted(evidenceTypes),
+	}
+}
+
+func evaluateIssuerIn(requirement map[string]any, ctx context) (map[string]any, string, error) {
+	requirementID, err := asString(requirement["requirement_id"], "requirement_id")
+	if err != nil {
+		return nil, "", err
+	}
+	issuerIDs, err := asStrings(requirement["issuer_ids"], "issuer_ids")
+	if err != nil {
+		return nil, "", err
+	}
+	evidenceTypes, hasTypes, err := optionalStrings(requirement, "evidence_types")
+	if err != nil {
+		return nil, "", err
+	}
+
+	status := provenanceStatus(ctx)
+	entries := []evidence{}
+	if status == "available" {
+		entries = filteredEvidence(ctx, issuerIDs, true, evidenceTypes, hasTypes)
+	}
+	satisfied := status == "available" && len(entries) > 0
+	failure := ""
+	var failureValue any = nil
+	resultStatus := "satisfied"
+	if !satisfied {
+		resultStatus = "unsatisfied"
+		failure = "EVIDENCE_ISSUER_NOT_ALLOWED"
+		failureValue = failure
+	}
+
+	var expectedTypes any = nil
+	if hasTypes {
+		expectedTypes = evidenceTypes
+	}
+	return map[string]any{
+		"requirement_id":  requirementID,
+		"type":            typeIssuerIn,
+		"status":          resultStatus,
+		"matched_signers": []string{},
+		"observed":        observedEntries(status, entries),
+		"expected": map[string]any{
+			"issuer_ids":     issuerIDs,
+			"evidence_types": expectedTypes,
+		},
+		"failure_code": failureValue,
+	}, failure, nil
+}
+
+func evaluateEvidenceTypeIn(requirement map[string]any, ctx context) (map[string]any, string, error) {
+	requirementID, err := asString(requirement["requirement_id"], "requirement_id")
+	if err != nil {
+		return nil, "", err
+	}
+	evidenceTypes, err := asStrings(requirement["evidence_types"], "evidence_types")
+	if err != nil {
+		return nil, "", err
+	}
+	issuerIDs, hasIssuers, err := optionalStrings(requirement, "issuer_ids")
+	if err != nil {
+		return nil, "", err
+	}
+
+	status := provenanceStatus(ctx)
+	entries := []evidence{}
+	if status == "available" {
+		entries = filteredEvidence(ctx, issuerIDs, hasIssuers, evidenceTypes, true)
+	}
+	satisfied := status == "available" && len(entries) > 0
+	failure := ""
+	var failureValue any = nil
+	resultStatus := "satisfied"
+	if !satisfied {
+		resultStatus = "unsatisfied"
+		failure = "EVIDENCE_TYPE_NOT_ALLOWED"
+		failureValue = failure
+	}
+
+	var expectedIssuers any = nil
+	if hasIssuers {
+		expectedIssuers = issuerIDs
+	}
+	return map[string]any{
+		"requirement_id":  requirementID,
+		"type":            typeEvidenceIn,
+		"status":          resultStatus,
+		"matched_signers": []string{},
+		"observed":        observedEntries(status, entries),
+		"expected": map[string]any{
+			"evidence_types": evidenceTypes,
+			"issuer_ids":     expectedIssuers,
+		},
+		"failure_code": failureValue,
+	}, failure, nil
+}
+
+func evaluateDistinctIssuers(requirement map[string]any, ctx context) (map[string]any, string, error) {
+	requirementID, err := asString(requirement["requirement_id"], "requirement_id")
+	if err != nil {
+		return nil, "", err
+	}
+	minimum, err := asInt(requirement["minimum"], "minimum")
+	if err != nil {
+		return nil, "", err
+	}
+	evidenceTypes, hasTypes, err := optionalStrings(requirement, "evidence_types")
+	if err != nil {
+		return nil, "", err
+	}
+
+	status := provenanceStatus(ctx)
+	entries := []evidence{}
+	if status == "available" {
+		entries = filteredEvidence(ctx, nil, false, evidenceTypes, hasTypes)
+	}
+	issuerIDs := make([]string, 0, len(entries))
+	evidenceIDs := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		issuerIDs = append(issuerIDs, entry.IssuerID)
+		evidenceIDs = append(evidenceIDs, entry.ID)
+	}
+	issuerIDs = uniqueSorted(issuerIDs)
+	evidenceIDs = uniqueSorted(evidenceIDs)
+
+	satisfied := status == "available" && len(issuerIDs) >= minimum
+	failure := ""
+	var failureValue any = nil
+	resultStatus := "satisfied"
+	if !satisfied {
+		resultStatus = "unsatisfied"
+		failure = "EVIDENCE_DISTINCT_ISSUER_MINIMUM_NOT_REACHED"
+		failureValue = failure
+	}
+
+	var expectedTypes any = nil
+	if hasTypes {
+		expectedTypes = evidenceTypes
+	}
+	return map[string]any{
+		"requirement_id":  requirementID,
+		"type":            typeDistinctIssuer,
+		"status":          resultStatus,
+		"matched_signers": []string{},
+		"observed": map[string]any{
+			"provenance_status": status,
+			"count":             len(issuerIDs),
+			"issuer_ids":        issuerIDs,
+			"evidence_ids":      evidenceIDs,
+		},
+		"expected": map[string]any{
+			"minimum":        minimum,
+			"evidence_types": expectedTypes,
+		},
+		"failure_code": failureValue,
+	}, failure, nil
+}
+
+func findPolicy(policySet []policy, id string, version int) (policy, bool) {
+	for _, candidate := range policySet {
+		if candidate.PolicyID == id && candidate.Version == version {
+			return candidate, true
+		}
+	}
+	return policy{}, false
+}
+
+func evaluateRequirements(
+	current policy,
+	policySet []policy,
+	ctx context,
+) ([]any, []string, string, error) {
+	results := make([]any, 0, len(current.Requirements))
+	failures := []string{}
+
+	for _, requirement := range current.Requirements {
+		primitiveType, err := asString(requirement["type"], "type")
+		if err != nil {
+			return nil, nil, "", err
+		}
+
+		var result map[string]any
+		var failure string
+
+		switch primitiveType {
+		case typeIssuerIn:
+			result, failure, err = evaluateIssuerIn(requirement, ctx)
+		case typeEvidenceIn:
+			result, failure, err = evaluateEvidenceTypeIn(requirement, ctx)
+		case typeDistinctIssuer:
+			result, failure, err = evaluateDistinctIssuers(requirement, ctx)
+		case typePolicyRef:
+			requirementID, innerErr := asString(
+				requirement["requirement_id"],
+				"requirement_id",
+			)
+			if innerErr != nil {
+				return nil, nil, "", innerErr
+			}
+			policyID, innerErr := asString(requirement["policy_id"], "policy_id")
+			if innerErr != nil {
+				return nil, nil, "", innerErr
+			}
+			version, innerErr := asInt(
+				requirement["policy_version"],
+				"policy_version",
+			)
+			if innerErr != nil {
+				return nil, nil, "", innerErr
+			}
+			digest, innerErr := asString(
+				requirement["policy_digest"],
+				"policy_digest",
+			)
+			if innerErr != nil {
+				return nil, nil, "", innerErr
+			}
+			referenced, ok := findPolicy(policySet, policyID, version)
+			if !ok {
+				return nil, nil, "", fmt.Errorf(
+					"referenced policy not found: %s/%d",
+					policyID,
+					version,
+				)
+			}
+
+			nestedResults, nestedFailures, nestedStatus, innerErr :=
+				evaluateRequirements(referenced, policySet, ctx)
+			if innerErr != nil {
+				return nil, nil, "", innerErr
+			}
+
+			referenceStatus := "satisfied"
+			var referenceFailure any = nil
+			if nestedStatus != "satisfied" {
+				referenceStatus = "unsatisfied"
+				failure = "POLICY_REFERENCE_NOT_SATISFIED"
+				referenceFailure = failure
+			}
+
+			result = map[string]any{
+				"requirement_id":  requirementID,
+				"type":            typePolicyRef,
+				"status":          referenceStatus,
+				"matched_signers": []string{},
+				"observed": map[string]any{
+					"policy_id":      policyID,
+					"policy_version": version,
+					"policy_digest":  digest,
+					"policy_status":  nestedStatus,
+				},
+				"expected": map[string]any{
+					"policy_status": "satisfied",
+				},
+				"failure_code": referenceFailure,
+				"referenced_policy": map[string]any{
+					"policy_id":           policyID,
+					"policy_version":      version,
+					"policy_digest":       digest,
+					"status":              nestedStatus,
+					"requirement_results": nestedResults,
+					"failure_codes":       nestedFailures,
+				},
+			}
+			if failure != "" {
+				failures = append(failures, failure)
+				failures = append(failures, nestedFailures...)
+			}
+			results = append(results, result)
+			continue
+		default:
+			return nil, nil, "", fmt.Errorf(
+				"unsupported requirement type: %s",
+				primitiveType,
+			)
+		}
+		if err != nil {
+			return nil, nil, "", err
+		}
+		results = append(results, result)
+		if failure != "" {
+			failures = append(failures, failure)
+		}
+	}
+
+	status := "satisfied"
+	if len(failures) > 0 {
+		status = "unsatisfied"
+	}
+	return results, failures, status, nil
+}
+
+func signerProjection(
+	input evaluationInput,
+	root policy,
+) (
+	verifiedSignatureIDs []string,
+	verifiedSigners []string,
+	matchedSigners []string,
+	unauthorized []string,
+	ineligible []string,
+	weight int,
+) {
+	verifiedSignatureIDs = []string{}
+	verifiedSigners = []string{}
+	matchedSigners = []string{}
+	unauthorized = []string{}
+	ineligible = []string{}
+	signers := []string{}
+	for _, item := range input.Signatures {
+		verifiedSignatureIDs = append(
+			verifiedSignatureIDs,
+			item.SignatureID,
+		)
+		signers = append(signers, item.Statement.SignerID)
+	}
+	verifiedSignatureIDs = uniqueSorted(verifiedSignatureIDs)
+	verifiedSigners = uniqueSorted(signers)
+
+	participants := map[string]participant{}
+	for _, item := range input.Context.Participants {
+		participants[item.ID] = item
+	}
+	for _, signer := range verifiedSigners {
+		item, ok := participants[signer]
+		if !ok {
+			unauthorized = append(unauthorized, signer)
+			continue
+		}
+		if !contains(root.EligibleRoles, item.Role) {
+			ineligible = append(ineligible, signer)
+			continue
+		}
+		matchedSigners = append(matchedSigners, signer)
+		weight += item.Weight
+	}
+	sort.Strings(matchedSigners)
+	sort.Strings(unauthorized)
+	sort.Strings(ineligible)
+	return
+}
+
+func reproduce(
+	input evaluationInput,
+	root policy,
+	policySet []policy,
+) (map[string]any, error) {
+	requirementResults, failureCodes, status, err :=
+		evaluateRequirements(root, policySet, input.Context)
+	if err != nil {
+		return nil, err
+	}
+
+	verifiedSignatureIDs,
+		verifiedSigners,
+		matchedSigners,
+		unauthorized,
+		ineligible,
+		weight := signerProjection(input, root)
+
+	return map[string]any{
+		"object_type":             "agp.trust-policy-evaluation/2",
+		"status":                  status,
+		"policy_id":               root.PolicyID,
+		"policy_version":          root.Version,
+		"policy_digest":           input.Context.Policy.Digest,
+		"context_id":              input.Context.ContextID,
+		"context_digest":          input.ContextDigest,
+		"verified_signature_ids":  verifiedSignatureIDs,
+		"verified_signers":        verifiedSigners,
+		"matched_signers":         matchedSigners,
+		"unauthorized_signers":    unauthorized,
+		"ineligible_role_signers": ineligible,
+		"signature_count":         len(verifiedSignatureIDs),
+		"weight":                  weight,
+		"requirement_results":     requirementResults,
+		"failure_codes":           failureCodes,
+	}, nil
+}
+
+func main() {
+	if len(os.Args) != 4 {
+		fmt.Fprintln(
+			os.Stderr,
+			"usage: agp-tpe26-reproduce evaluation-input.json root-policy.json policy-set.json",
+		)
+		os.Exit(2)
+	}
+
+	var input evaluationInput
+	var root policy
+	var policySet []policy
+
+	if err := decodeFile(os.Args[1], &input); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if err := decodeFile(os.Args[2], &root); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if err := decodeFile(os.Args[3], &policySet); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+
+	result, err := reproduce(input, root, policySet)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	encoded, err := json.Marshal(result)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	if _, err := os.Stdout.Write(encoded); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}

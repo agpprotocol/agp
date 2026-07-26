@@ -1,0 +1,35 @@
+# TPE 2.6 Go reproduction profile
+
+This directory contains a deliberately bounded Go reproduction of the frozen
+TPE 2.6 evidence-provenance corpus.
+
+It independently implements:
+
+- `evidence_issuer_in`;
+- `evidence_type_in`;
+- `evidence_distinct_issuers_at_least`;
+- the recursive `policy_reference` projection exercised by the corpus;
+- deterministic TPE 2.6 evaluation-result construction.
+
+The Go program reads only `evaluation-input.json`, `root-policy.json`, and
+`policy-set.json`. It does not read `expected-evaluation.json` while producing
+a result.
+
+Run:
+
+```bash
+python trust_primitive_engine/tools/test_tpe26_go_reproduction.py
+```
+
+Expected marker:
+
+```text
+TPE 2.6 Python/Go frozen-profile reproduction: 7/7 passed
+```
+
+## Scope limitation
+
+This is not yet a complete second implementation of the Trust Primitive
+Engine. It does not implement every Trust Policy 2 primitive, composition
+form, validation rule, signature-verification path, or arbitrary reference
+graph.

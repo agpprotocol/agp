@@ -72,6 +72,21 @@ built from the repository:
 This prevents a stale local environment from being mistaken for the contents
 of the newly built distribution.
 
+## Cross-language frozen-profile boundary
+
+`trust_primitive_engine/tools/test_tpe26_go_reproduction.py` builds a separate
+Go program and requires it to reproduce all seven frozen TPE 2.6 evaluations
+byte-for-byte and hash-for-hash.
+
+The Go program independently implements the three evidence-provenance
+predicates and the policy-reference projection used by the corpus. It derives
+the evaluation envelope from the input context and policy rather than reading
+the expected evaluation.
+
+This establishes cross-language consistency for the frozen TPE 2.6 profile. It
+does not claim a complete second implementation of all Trust Policy 2
+validation and evaluation semantics.
+
 ## Independent reproduction boundary
 
 `trust_primitive_engine/tools/test_tpe26_external_reproduction.py` separately
