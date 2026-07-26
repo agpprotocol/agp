@@ -79,7 +79,7 @@ def main() -> int:
             cwd=EXTERNAL,
         )
 
-        agp_wheels = sorted(dist.glob("agp_tpe-2.4.0-*.whl"))
+        agp_wheels = sorted(dist.glob("agp_tpe-2.5.0-*.whl"))
         example_wheels = sorted(
             dist.glob("tpe24_external_example-1.0.0-*.whl")
         )

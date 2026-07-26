@@ -1,5 +1,24 @@
 # Changelog
 
+## Trust Primitive Engine 2.5.0
+- Added `context_value_in` for deterministic scalar membership checks with
+  canonical homogeneous value sets and strict JSON type semantics.
+- Added `context_path_equals` for deterministic strict comparison between two
+  approved Decision Context paths.
+- Added `evidence_count_at_least` with optional exact media-type filtering,
+  unique evidence-identifier counting, and canonical contributing identifiers.
+- Added formal integration coverage across composition, direct and nested
+  policy references, recursive failure projection, failure suppression,
+  deterministic replay, and result serialization.
+- Expanded the stable public Python API coverage with signed TPE 2.5 satisfied
+  and unsatisfied evaluations.
+- Added a deterministic five-case TPE 2.5 golden corpus with compact sorted-key
+  JSON SHA-256 result hashes.
+- Added executable TPE 2.5 contextual-predicate examples and CI verification.
+- Preserved valid TPE 2.0 through TPE 2.4 policy behavior and existing frozen
+  compatibility corpora.
+- Expanded complete development validation to 637/637 checks.
+
 ## Trust Primitive Engine 2.4.0
 - Added deterministic projection and immutable resolution of approved Decision
   Context data under `/proposal/payload/...`.
