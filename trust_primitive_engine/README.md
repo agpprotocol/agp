@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.6 development validation: 694/694 passed
+AGP TPE 2.6 development validation: 721/721 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -421,6 +421,28 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-NORMATIVE-TRACEABILITY.md`
+
+### TPE 2.6 Python/Go validation parity
+
+A shared 27-vector matrix verifies that Python and Go accept and reject the
+same requirement forms for the three TPE 2.6 evidence-provenance predicates.
+
+The matrix covers valid minimal forms, missing and unknown members, invalid
+identifiers, empty and oversized sets, duplicate and non-canonical sets,
+invalid evidence types, wrong JSON types, and the complete `minimum` boundary.
+
+```bash
+python trust_primitive_engine/tools/test_tpe26_go_validation.py
+```
+
+Expected marker:
+
+```text
+TPE 2.6 Python/Go requirement validation parity: 27/27 passed
+```
+
+The matrix compares runtime acceptance semantics. It does not claim that both
+implementations expose identical human-readable error messages.
 
 ### TPE 2.6 Python/Go frozen-profile reproduction
 

@@ -72,6 +72,19 @@ built from the repository:
 This prevents a stale local environment from being mistaken for the contents
 of the newly built distribution.
 
+## Cross-language requirement-validation boundary
+
+`trust_primitive_engine/tools/test_tpe26_go_validation.py` exercises a shared
+27-vector matrix against the Python primitive validators and the independent
+Go requirement validator.
+
+The matrix covers the exact-member boundary, identifier and evidence-type
+syntax, canonical set ordering, duplicate rejection, cardinality limits, JSON
+type strictness, and the inclusive `minimum` range from 1 through 256.
+
+The conformance claim is acceptance/rejection parity. Human-readable validation
+messages are not standardized by this profile.
+
 ## Cross-language frozen-profile boundary
 
 `trust_primitive_engine/tools/test_tpe26_go_reproduction.py` builds a separate
