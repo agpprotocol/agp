@@ -27,6 +27,17 @@ Expected marker:
 TPE 2.6 Python/Go frozen-profile reproduction: 7/7 passed
 ```
 
+## Requirement validation mode
+
+The same binary exposes a bounded validation mode:
+
+```bash
+agp-tpe26-reproduce --validate-requirement requirement.json
+```
+
+The 27-vector Python/Go parity suite verifies common acceptance and rejection
+semantics for the three TPE 2.6 predicates.
+
 ## Scope limitation
 
 This is not yet a complete second implementation of the Trust Primitive

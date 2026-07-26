@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
+	"regexp"
 	"sort"
 )
 
@@ -14,6 +16,16 @@ const (
 	typeEvidenceIn     = "evidence_type_in"
 	typeDistinctIssuer = "evidence_distinct_issuers_at_least"
 	typePolicyRef      = "policy_reference"
+	maxSetSize         = 64
+)
+
+var (
+	identifierPattern = regexp.MustCompile(
+		`^[a-z0-9][a-z0-9._:/-]{1,127}[a-z0-9]$`,
+	)
+	evidenceTypePattern = regexp.MustCompile(
+		`^[a-z0-9][a-z0-9._:/-]{1,123}[a-z0-9]/[1-9][0-9]*$`,
+	)
 )
 
 type policyBinding struct {
@@ -137,6 +149,184 @@ func optionalStrings(requirement map[string]any, field string) ([]string, bool, 
 	}
 	result, err := asStrings(value, field)
 	return result, true, err
+}
+
+func validateExactMembers(
+	requirement map[string]any,
+	required []string,
+	optional []string,
+) error {
+	allowed := map[string]struct{}{}
+	for _, key := range required {
+		allowed[key] = struct{}{}
+		if _, present := requirement[key]; !present {
+			return fmt.Errorf("missing member: %s", key)
+		}
+	}
+	for _, key := range optional {
+		allowed[key] = struct{}{}
+	}
+	for key := range requirement {
+		if _, present := allowed[key]; !present {
+			return fmt.Errorf("unknown member: %s", key)
+		}
+	}
+	return nil
+}
+
+func validateIdentifier(value any, field string) (string, error) {
+	text, err := asString(value, field)
+	if err != nil {
+		return "", err
+	}
+	if !identifierPattern.MatchString(text) {
+		return "", fmt.Errorf("%s contains an invalid identifier", field)
+	}
+	return text, nil
+}
+
+func validateCanonicalSet(
+	value any,
+	field string,
+	pattern *regexp.Regexp,
+) ([]string, error) {
+	values, err := asStrings(value, field)
+	if err != nil {
+		return nil, err
+	}
+	if len(values) < 1 || len(values) > maxSetSize {
+		return nil, fmt.Errorf(
+			"%s must contain between 1 and %d entries",
+			field,
+			maxSetSize,
+		)
+	}
+	for _, item := range values {
+		if !pattern.MatchString(item) {
+			return nil, fmt.Errorf("%s contains an invalid value", field)
+		}
+	}
+	sorted := append([]string(nil), values...)
+	sort.Strings(sorted)
+	if !reflect.DeepEqual(values, sorted) {
+		return nil, fmt.Errorf("%s must be in canonical order", field)
+	}
+	for index := 1; index < len(values); index++ {
+		if values[index] == values[index-1] {
+			return nil, fmt.Errorf("%s must not contain duplicates", field)
+		}
+	}
+	return values, nil
+}
+
+func validateRequirement(requirement map[string]any) error {
+	primitiveType, err := asString(requirement["type"], "type")
+	if err != nil {
+		return err
+	}
+
+	switch primitiveType {
+	case typeIssuerIn:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "issuer_ids"},
+			[]string{"evidence_types"},
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		if _, err := validateCanonicalSet(
+			requirement["issuer_ids"],
+			"issuer_ids",
+			identifierPattern,
+		); err != nil {
+			return err
+		}
+		if value, present := requirement["evidence_types"]; present {
+			if _, err := validateCanonicalSet(
+				value,
+				"evidence_types",
+				evidenceTypePattern,
+			); err != nil {
+				return err
+			}
+		}
+		return nil
+
+	case typeEvidenceIn:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "evidence_types"},
+			[]string{"issuer_ids"},
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		if _, err := validateCanonicalSet(
+			requirement["evidence_types"],
+			"evidence_types",
+			evidenceTypePattern,
+		); err != nil {
+			return err
+		}
+		if value, present := requirement["issuer_ids"]; present {
+			if _, err := validateCanonicalSet(
+				value,
+				"issuer_ids",
+				identifierPattern,
+			); err != nil {
+				return err
+			}
+		}
+		return nil
+
+	case typeDistinctIssuer:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "minimum"},
+			[]string{"evidence_types"},
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		minimum, err := asInt(requirement["minimum"], "minimum")
+		if err != nil {
+			return err
+		}
+		if minimum < 1 || minimum > 256 {
+			return errors.New(
+				"minimum must be an integer between 1 and 256",
+			)
+		}
+		if value, present := requirement["evidence_types"]; present {
+			if _, err := validateCanonicalSet(
+				value,
+				"evidence_types",
+				evidenceTypePattern,
+			); err != nil {
+				return err
+			}
+		}
+		return nil
+
+	default:
+		return fmt.Errorf("unsupported requirement type: %s", primitiveType)
+	}
 }
 
 func contains(values []string, candidate string) bool {
@@ -399,6 +589,11 @@ func evaluateRequirements(
 		if err != nil {
 			return nil, nil, "", err
 		}
+		if primitiveType != typePolicyRef {
+			if err := validateRequirement(requirement); err != nil {
+				return nil, nil, "", err
+			}
+		}
 
 		var result map[string]any
 		var failure string
@@ -599,7 +794,36 @@ func reproduce(
 	}, nil
 }
 
+func validationReceipt(path string) error {
+	var requirement map[string]any
+	if err := decodeFile(path, &requirement); err != nil {
+		return err
+	}
+	err := validateRequirement(requirement)
+	receipt := map[string]any{
+		"accepted":   err == nil,
+		"error_code": nil,
+	}
+	if err != nil {
+		receipt["error_code"] = "INVALID_REQUIREMENT"
+	}
+	encoded, marshalErr := json.Marshal(receipt)
+	if marshalErr != nil {
+		return marshalErr
+	}
+	_, writeErr := os.Stdout.Write(encoded)
+	return writeErr
+}
+
 func main() {
+	if len(os.Args) == 3 && os.Args[1] == "--validate-requirement" {
+		if err := validationReceipt(os.Args[2]); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	if len(os.Args) != 4 {
 		fmt.Fprintln(
 			os.Stderr,
