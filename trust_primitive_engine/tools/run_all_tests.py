@@ -31,6 +31,11 @@ SUITES = [
         32,
     ),
     (
+        "TPE 2.5 contextual predicates",
+        ROOT / "trust_primitive_engine/tools/test_contextual_predicates.py",
+        32,
+    ),
+    (
         "policy-tree validation",
         ROOT / "trust_primitive_engine/tools/test_policy_tree_validation.py",
         20,
@@ -186,7 +191,7 @@ def main() -> int:
         total += checks
 
     print("=" * 88)
-    print(f"AGP TPE 2.4 development validation: {total}/{total} passed")
+    print(f"AGP TPE 2.5 development validation: {total}/{total} passed")
     return 0
 
 

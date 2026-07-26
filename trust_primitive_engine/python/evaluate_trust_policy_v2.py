@@ -47,7 +47,9 @@ from engine import (
 from primitives.context_values import (
     ContextIntegerAtLeastPrimitive,
     ContextIntegerAtMostPrimitive,
+    ContextPathEqualsPrimitive,
     ContextValueEqualsPrimitive,
+    ContextValueInPrimitive,
     ContextValuePresentPrimitive,
 )
 from primitives.evidence_present import EvidencePresentPrimitive
@@ -122,7 +124,9 @@ SUPPORTED_PRIMITIVES = {
     "evidence_present",
     "context_integer_at_least",
     "context_integer_at_most",
+    "context_path_equals",
     "context_value_equals",
+    "context_value_in",
     "context_value_present",
     "exactly_n_signers",
     "at_least_n_signers",
@@ -148,7 +152,9 @@ PRIMITIVE_REGISTRY = PrimitiveRegistry(
         EvidencePresentPrimitive(),
         ContextIntegerAtLeastPrimitive(),
         ContextIntegerAtMostPrimitive(),
+        ContextPathEqualsPrimitive(),
         ContextValueEqualsPrimitive(),
+        ContextValueInPrimitive(),
         ContextValuePresentPrimitive(),
         ExactlyNSignersPrimitive(),
         AtLeastNSignersPrimitive(),
