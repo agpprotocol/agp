@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.6 development validation: 687/687 passed
+AGP TPE 2.6 development validation: 694/694 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -421,6 +421,29 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-NORMATIVE-TRACEABILITY.md`
+
+### TPE 2.6 Python/Go frozen-profile reproduction
+
+A bounded Go implementation independently reproduces the seven frozen TPE 2.6
+evidence-provenance cases. It reads the evaluation input, root policy, and
+policy set, then emits the complete evaluation object without reading the
+expected result.
+
+The runner requires byte-identical compact JSON, identical SHA-256 evaluation
+digests, identical status, and all seven frozen cases passing.
+
+```bash
+python trust_primitive_engine/tools/test_tpe26_go_reproduction.py
+```
+
+Expected marker:
+
+```text
+TPE 2.6 Python/Go frozen-profile reproduction: 7/7 passed
+```
+
+This is a bounded reproduction profile, not yet a complete Go implementation
+of every Trust Policy 2 primitive and validation rule.
 
 ### Independent TPE 2.6 external reproduction
 

@@ -182,6 +182,13 @@ SUITES = [
         7,
     ),
     (
+        "TPE 2.6 Python/Go frozen-profile reproduction",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_tpe26_go_reproduction.py",
+        7,
+    ),
+    (
         "public Python API",
         ROOT / "trust_primitive_engine/tools/test_public_api.py",
         9,
