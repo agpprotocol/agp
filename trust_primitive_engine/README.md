@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.6 development validation: 682/682 passed
+AGP TPE 2.6 development validation: 684/684 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -420,6 +420,25 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 - `TPE-2.4-CONFORMANCE-STATEMENT.md`
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-CONFORMANCE-STATEMENT.md`
+
+### Independent TPE 2.6 external reproduction
+
+Build and install the TPE wheel and a standalone consumer package in a clean
+temporary environment, then reproduce two frozen signed Decision Context 3
+results outside the repository:
+
+```bash
+python trust_primitive_engine/tools/test_tpe26_external_reproduction.py
+```
+
+Expected final marker:
+
+```text
+TPE 2.6 external reproduction: 2/2 passed
+```
+
+The consumer imports only the stable `trust_primitive_engine` public API and
+verifies both deterministic result hashes from an installed wheel.
 
 ## Normative specifications
 

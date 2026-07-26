@@ -187,6 +187,13 @@ SUITES = [
         9,
     ),
     (
+        "TPE 2.6 external reproduction",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_tpe26_external_reproduction.py",
+        2,
+    ),
+    (
         "external package integration",
         ROOT
         / "trust_primitive_engine/tools/"

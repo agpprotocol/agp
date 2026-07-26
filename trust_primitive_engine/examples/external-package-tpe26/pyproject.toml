@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tpe26-external-reproduction"
+version = "1.0.0"
+description = "Independent external reproduction package for agp-tpe 2.6"
+requires-python = ">=3.12"
+dependencies = [
+  "agp-tpe==2.6.0"
+]
+
+[project.scripts]
+tpe26-external-reproduction = "tpe26_external_reproduction.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tpe26_external_reproduction"]
