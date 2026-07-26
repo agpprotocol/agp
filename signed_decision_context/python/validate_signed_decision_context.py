@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Stage 1 structural validator for Signed Decision Context 1 and 2."""
+"""Stage 1 structural validator for Signed Decision Context 1, 2, and 3."""
 
 from __future__ import annotations
 
@@ -30,6 +30,12 @@ SIGNED_CONTEXT_VERSIONS = {
         "context_schema": "agp.decision-context-2.schema.json",
         "statement_type": "agp.signature-statement/2",
         "statement_schema": "agp.signature-statement-2.schema.json",
+    },
+    "agp.signed-decision-context/3": {
+        "context_type": "agp.decision-context/3",
+        "context_schema": "agp.decision-context-3.schema.json",
+        "statement_type": "agp.signature-statement/3",
+        "statement_schema": "agp.signature-statement-3.schema.json",
     },
 }
 
