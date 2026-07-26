@@ -1,0 +1,39 @@
+{
+  "object_type": "agp.signed-decision-context/2",
+  "context_digest": "context-digest:tpe-2.5:context-value-not-in-set",
+  "context": {
+    "object_type": "agp.decision-context/2",
+    "context_id": "context:tpe-2.5:context-value-not-in-set",
+    "evaluation_time": 1700000000,
+    "policy": {
+      "id": "policy:golden:tpe25:context-value-not-in-set",
+      "version": 1,
+      "digest": "840fb3fff840ef10d152fa2dd5448be7648b5078143d7cb6294318785c9776ed"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.5:golden",
+      "payload": {
+        "environment": "staging",
+        "requested_version": "3.0.0",
+        "approved_version": "3.0.0"
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 1
+      }
+    ],
+    "evidence": [],
+    "constraints": []
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    }
+  ]
+}

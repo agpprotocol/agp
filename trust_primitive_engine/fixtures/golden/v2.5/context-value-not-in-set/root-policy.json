@@ -1,0 +1,19 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe25:context-value-not-in-set",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:01-environment",
+      "type": "context_value_in",
+      "path": "/proposal/payload/environment",
+      "values": [
+        "canary",
+        "production"
+      ]
+    }
+  ]
+}

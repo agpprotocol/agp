@@ -1,0 +1,17 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe25:recursive-root",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:recursive-reference",
+      "type": "policy_reference",
+      "policy_id": "policy:golden:tpe25:recursive-leaf",
+      "policy_version": 1,
+      "policy_digest": "2afb59c4de3ed0a4217bce157087a4d3cf7044ff576ae05e01a2bb6a094f4512"
+    }
+  ]
+}

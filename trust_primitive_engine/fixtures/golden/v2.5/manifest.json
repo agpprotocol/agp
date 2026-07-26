@@ -1,0 +1,37 @@
+{
+  "corpus": "agp.tpe-contextual-predicates-conformance/2.5",
+  "hash_serialization": "json-sort-keys-compact-utf8",
+  "hash_algorithm": "sha-256",
+  "cases": [
+    {
+      "name": "satisfied-all",
+      "directory": "satisfied-all",
+      "expected_status": "satisfied",
+      "expected_sha256": "02b71ac1fdf9a902e1ab569cf1fdea0e7c81f234745eb050e687e23dea305688"
+    },
+    {
+      "name": "context-value-not-in-set",
+      "directory": "context-value-not-in-set",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "62ea976dbb98dbddd0d3dda6e0a93e786883c1eaa3e0e977a16ca0c77398c2f7"
+    },
+    {
+      "name": "context-path-values-not-equal",
+      "directory": "context-path-values-not-equal",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "bc8efe4fabf65051539c1cf45a1e8bd9d29607543b6b1811b55897595c69b5c8"
+    },
+    {
+      "name": "evidence-count-not-reached",
+      "directory": "evidence-count-not-reached",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "dfb80e0590fec1f92ccc8ab6d64315334cd5efa1920f640d19053aec7ec4aa6d"
+    },
+    {
+      "name": "recursive-reference-projection",
+      "directory": "recursive-reference-projection",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "660647a874b1e520816b477d00aef184226a6226022aa0c6adf45de45f9f3652"
+    }
+  ]
+}

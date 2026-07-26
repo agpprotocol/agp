@@ -1,0 +1,31 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe25:satisfied-all",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:01-environment",
+      "type": "context_value_in",
+      "path": "/proposal/payload/environment",
+      "values": [
+        "canary",
+        "production"
+      ]
+    },
+    {
+      "requirement_id": "requirement:02-version-match",
+      "type": "context_path_equals",
+      "left_path": "/proposal/payload/requested_version",
+      "right_path": "/proposal/payload/approved_version"
+    },
+    {
+      "requirement_id": "requirement:03-evidence-count",
+      "type": "evidence_count_at_least",
+      "minimum": 2,
+      "media_type": "application/json"
+    }
+  ]
+}

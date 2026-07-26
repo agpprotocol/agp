@@ -65,7 +65,7 @@ jobs:
 
       - name: Verify expected validation total
         run: |
-          grep -Fqx             "AGP TPE 2.5 development validation: 618/618 passed"             /tmp/tpe-validation.log
+          grep -Fqx             "AGP TPE 2.5 development validation: 637/637 passed"             /tmp/tpe-validation.log
 
       - name: Run executable policy-reference example
         run: |
@@ -102,6 +102,18 @@ jobs:
           grep -Fqx \
             "TPE_2_4_CONTEXT_EVIDENCE_EXAMPLES_PASS" \
             /tmp/tpe-context-evidence-examples.log
+
+      - name: Run TPE 2.5 contextual predicate examples
+        run: |
+          set -o pipefail
+          bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh \
+            | tee /tmp/tpe25-contextual-predicates-examples.log
+
+      - name: Verify TPE 2.5 contextual predicate examples
+        run: |
+          grep -Fqx \
+            "TPE_2_5_CONTEXTUAL_PREDICATES_EXAMPLES_PASS" \
+            /tmp/tpe25-contextual-predicates-examples.log
 
       - name: Check whitespace errors
         run: |

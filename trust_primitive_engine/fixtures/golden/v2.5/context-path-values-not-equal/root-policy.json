@@ -1,0 +1,16 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe25:context-path-values-not-equal",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:02-version-match",
+      "type": "context_path_equals",
+      "left_path": "/proposal/payload/requested_version",
+      "right_path": "/proposal/payload/approved_version"
+    }
+  ]
+}

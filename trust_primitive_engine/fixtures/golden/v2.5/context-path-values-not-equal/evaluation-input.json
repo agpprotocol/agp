@@ -1,0 +1,39 @@
+{
+  "object_type": "agp.signed-decision-context/2",
+  "context_digest": "context-digest:tpe-2.5:context-path-values-not-equal",
+  "context": {
+    "object_type": "agp.decision-context/2",
+    "context_id": "context:tpe-2.5:context-path-values-not-equal",
+    "evaluation_time": 1700000000,
+    "policy": {
+      "id": "policy:golden:tpe25:context-path-values-not-equal",
+      "version": 1,
+      "digest": "b702f46bd96242c0b15c3433548aff11c571f403d1cb0e5d6d1ddbe3f53315ab"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.5:golden",
+      "payload": {
+        "environment": "production",
+        "requested_version": "3.0.0",
+        "approved_version": "3.1.0"
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 1
+      }
+    ],
+    "evidence": [],
+    "constraints": []
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    }
+  ]
+}
