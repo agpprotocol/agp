@@ -17,29 +17,17 @@ BASE = {
     "context_id": "dc:procurement-2026-001",
     "created_at": "2026-07-22T20:00:00Z",
     "expires_at": "2026-07-23T20:00:00Z",
-    "policy": {
-        "id": "agp.policy.procurement/1",
-        "version": 1,
-        "digest": DIGEST_A,
-    },
+    "policy": {"id": "agp.policy.procurement/1", "version": 1, "digest": DIGEST_A},
     "proposal": {
         "type": "agp.proposal.procurement/1",
-        "payload": {
-            "currency": "ARS",
-            "supplier_id": "supplier-17",
-            "total": 2500000,
-        },
+        "payload": {"currency": "ARS", "supplier_id": "supplier-17", "total": 2500000},
     },
     "participants": [
         {"id": "actor.finance", "role": "voter", "weight": 1},
         {"id": "actor.legal", "role": "reviewer", "weight": 1},
     ],
     "evidence": [
-        {
-            "id": "evidence.quote-1",
-            "digest": DIGEST_B,
-            "media_type": "application/pdf",
-        }
+        {"id": "evidence.quote-1", "digest": DIGEST_B, "media_type": "application/pdf"}
     ],
     "constraints": [
         {
@@ -50,133 +38,92 @@ BASE = {
     ],
 }
 
+BASE_V3 = copy.deepcopy(BASE)
+BASE_V3["object_type"] = "agp.decision-context/3"
+BASE_V3["evaluation_time"] = 1784894400
+BASE_V3["evidence"][0].update(
+    {"evidence_type": "agp.evidence.quote/1", "issuer_id": "authority:procurement"}
+)
+
 def encoded(value):
-    return (
-        json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
-        + b"\n"
-    )
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":")).encode("utf-8") + b"\n"
 
 cases = []
 
 def add(name, raw, accepted, error_code=None):
-    cases.append(
-        {
-            "name": name,
-            "raw": raw,
-            "accepted": accepted,
-            "error_code": error_code,
-        }
-    )
+    cases.append({"name": name, "raw": raw, "accepted": accepted, "error_code": error_code})
 
 add("authoritative_context", encoded(BASE), True)
 
-def mutated(name, fn, error_code):
-    value = copy.deepcopy(BASE)
+def mutate_from(base, name, fn, error_code):
+    value = copy.deepcopy(base)
     fn(value)
     add(name, encoded(value), False, error_code)
 
-mutated(
-    "unknown_top_level",
-    lambda x: x.__setitem__("result", "accepted"),
-    "UNKNOWN_TOP_LEVEL_MEMBER",
-)
-mutated(
-    "wrong_object_type",
-    lambda x: x.__setitem__("object_type", "agp.invalid/1"),
-    "INVALID_OBJECT_TYPE",
-)
-mutated(
-    "invalid_context_id",
-    lambda x: x.__setitem__("context_id", "Bad ID"),
-    "INVALID_CONTEXT_ID",
-)
-mutated(
-    "invalid_created_at",
-    lambda x: x.__setitem__("created_at", "2026-02-30T20:00:00Z"),
-    "INVALID_TIMESTAMP",
-)
-mutated(
-    "expires_not_later",
-    lambda x: x.__setitem__("expires_at", x["created_at"]),
-    "INVALID_TIMESTAMP",
-)
-mutated(
-    "invalid_policy_digest",
-    lambda x: x["policy"].__setitem__("digest", "ABC"),
-    "INVALID_POLICY",
-)
-mutated(
-    "unsafe_policy_version",
-    lambda x: x["policy"].__setitem__("version", 9007199254740992),
-    "INVALID_SAFE_INTEGER",
-)
-mutated(
-    "reserved_result_member",
-    lambda x: x["proposal"]["payload"].__setitem__("outcome", "accepted"),
-    "RESERVED_RESULT_MEMBER",
-)
-mutated(
-    "empty_participants",
-    lambda x: x.__setitem__("participants", []),
-    "INVALID_PARTICIPANTS",
-)
-mutated(
-    "duplicate_participant",
-    lambda x: x["participants"].append(copy.deepcopy(x["participants"][0])),
-    "DUPLICATE_IDENTIFIER",
-)
-mutated(
-    "unsorted_participants",
-    lambda x: x["participants"].reverse(),
+mutate_from(BASE, "unknown_top_level", lambda x: x.__setitem__("result", "accepted"), "UNKNOWN_TOP_LEVEL_MEMBER")
+mutate_from(BASE, "wrong_object_type", lambda x: x.__setitem__("object_type", "agp.invalid/1"), "INVALID_OBJECT_TYPE")
+mutate_from(BASE, "invalid_context_id", lambda x: x.__setitem__("context_id", "Bad ID"), "INVALID_CONTEXT_ID")
+mutate_from(BASE, "invalid_created_at", lambda x: x.__setitem__("created_at", "2026-02-30T20:00:00Z"), "INVALID_TIMESTAMP")
+mutate_from(BASE, "expires_not_later", lambda x: x.__setitem__("expires_at", x["created_at"]), "INVALID_TIMESTAMP")
+mutate_from(BASE, "invalid_policy_digest", lambda x: x["policy"].__setitem__("digest", "ABC"), "INVALID_POLICY")
+mutate_from(BASE, "unsafe_policy_version", lambda x: x["policy"].__setitem__("version", 9007199254740992), "INVALID_SAFE_INTEGER")
+mutate_from(BASE, "reserved_result_member", lambda x: x["proposal"]["payload"].__setitem__("outcome", "accepted"), "RESERVED_RESULT_MEMBER")
+mutate_from(BASE, "empty_participants", lambda x: x.__setitem__("participants", []), "INVALID_PARTICIPANTS")
+mutate_from(BASE, "duplicate_participant", lambda x: x["participants"].append(copy.deepcopy(x["participants"][0])), "DUPLICATE_IDENTIFIER")
+mutate_from(BASE, "unsorted_participants", lambda x: x["participants"].reverse(), "UNSORTED_COLLECTION")
+mutate_from(BASE, "invalid_evidence_digest", lambda x: x["evidence"][0].__setitem__("digest", "b" * 63), "INVALID_EVIDENCE")
+mutate_from(BASE, "invalid_constraint_parameters", lambda x: x["constraints"][0].__setitem__("parameters", []), "INVALID_CONSTRAINTS")
+add("duplicate_json_member", b'{"object_type":"agp.decision-context/1","object_type":"agp.decision-context/1"}', False, "INVALID_JSON")
+add("utf8_bom", b"\xef\xbb\xbf{}", False, "INVALID_JSON")
+add("decimal_number", encoded(BASE).replace(b'"total":2500000', b'"total":2500000.5'), False, "INVALID_JSON")
+add("nonfinite_number", encoded(BASE).replace(b'"total":2500000', b'"total":NaN'), False, "INVALID_JSON")
+mutate_from(BASE, "duplicate_evidence", lambda x: x["evidence"].append(copy.deepcopy(x["evidence"][0])), "DUPLICATE_IDENTIFIER")
+mutate_from(
+    BASE,
+    "unsorted_evidence",
+    lambda x: x["evidence"].insert(
+        0,
+        {"id": "evidence.z-report", "digest": DIGEST_A, "media_type": "application/json"},
+    ),
     "UNSORTED_COLLECTION",
 )
-mutated(
-    "invalid_evidence_digest",
-    lambda x: x["evidence"][0].__setitem__("digest", "b" * 63),
-    "INVALID_EVIDENCE",
-)
-mutated(
-    "invalid_constraint_parameters",
-    lambda x: x["constraints"][0].__setitem__("parameters", []),
-    "INVALID_CONSTRAINTS",
-)
 
-add(
-    "duplicate_json_member",
-    b'{"object_type":"agp.decision-context/1",'
-    b'"object_type":"agp.decision-context/1"}',
-    False,
-    "INVALID_JSON",
+add("dc3_authoritative_context", encoded(BASE_V3), True)
+empty = copy.deepcopy(BASE_V3)
+empty["evidence"] = []
+add("dc3_empty_evidence", encoded(empty), True)
+multiple = copy.deepcopy(BASE_V3)
+multiple["evidence"].append(
+    {
+        "id": "evidence.security-review",
+        "digest": DIGEST_A,
+        "media_type": "application/json",
+        "evidence_type": "agp.evidence.security-review/1",
+        "issuer_id": "authority:security-lab",
+    }
 )
-add("utf8_bom", b"\xef\xbb\xbf{}", False, "INVALID_JSON")
-add(
-    "decimal_number",
-    encoded(BASE).replace(b'"total":2500000', b'"total":2500000.5'),
-    False,
-    "INVALID_JSON",
-)
-add(
-    "nonfinite_number",
-    encoded(BASE).replace(b'"total":2500000', b'"total":NaN'),
-    False,
-    "INVALID_JSON",
-)
+add("dc3_multiple_sorted", encoded(multiple), True)
 
-mutated(
-    "duplicate_evidence",
-    lambda x: x["evidence"].append(
-        copy.deepcopy(x["evidence"][0])
-    ),
-    "DUPLICATE_IDENTIFIER",
-)
-mutated(
-    "unsorted_evidence",
+mutate_from(BASE_V3, "dc3_missing_evidence_type", lambda x: x["evidence"][0].pop("evidence_type"), "INVALID_EVIDENCE")
+mutate_from(BASE_V3, "dc3_missing_issuer_id", lambda x: x["evidence"][0].pop("issuer_id"), "INVALID_EVIDENCE")
+mutate_from(BASE_V3, "dc3_unknown_evidence_member", lambda x: x["evidence"][0].__setitem__("extra", True), "INVALID_EVIDENCE")
+mutate_from(BASE_V3, "dc3_evidence_type_zero", lambda x: x["evidence"][0].__setitem__("evidence_type", "agp.evidence.quote/0"), "INVALID_EVIDENCE")
+mutate_from(BASE_V3, "dc3_evidence_type_leading_zero", lambda x: x["evidence"][0].__setitem__("evidence_type", "agp.evidence.quote/01"), "INVALID_EVIDENCE")
+mutate_from(BASE_V3, "dc3_evidence_type_missing_version", lambda x: x["evidence"][0].__setitem__("evidence_type", "agp.evidence.quote"), "INVALID_EVIDENCE")
+mutate_from(BASE_V3, "dc3_evidence_type_too_long", lambda x: x["evidence"][0].__setitem__("evidence_type", "a" * 127 + "/1"), "INVALID_EVIDENCE")
+mutate_from(BASE_V3, "dc3_invalid_issuer_id", lambda x: x["evidence"][0].__setitem__("issuer_id", "Bad Issuer"), "INVALID_EVIDENCE")
+mutate_from(BASE_V3, "dc3_duplicate_evidence", lambda x: x["evidence"].append(copy.deepcopy(x["evidence"][0])), "DUPLICATE_IDENTIFIER")
+mutate_from(
+    BASE_V3,
+    "dc3_unsorted_evidence",
     lambda x: x["evidence"].insert(
         0,
         {
             "id": "evidence.z-report",
             "digest": DIGEST_A,
             "media_type": "application/json",
+            "evidence_type": "agp.evidence.report/1",
+            "issuer_id": "authority:reporting",
         },
     ),
     "UNSORTED_COLLECTION",
@@ -186,7 +133,7 @@ if VECTORS.exists():
     shutil.rmtree(VECTORS)
 VECTORS.mkdir(parents=True)
 
-manifest = {"profile": "AGP-DECISION-CONTEXT-0.9", "vectors": []}
+manifest = {"profile": "AGP-DECISION-CONTEXT-0.9+DC3-001", "vectors": []}
 for index, case in enumerate(cases, start=1):
     stem = f"{index:03d}_{case['name']}"
     input_name = f"{stem}.input.json"
@@ -204,9 +151,7 @@ for index, case in enumerate(cases, start=1):
         + "\n",
         encoding="utf-8",
     )
-    manifest["vectors"].append(
-        {"name": case["name"], "input": input_name, "meta": meta_name}
-    )
+    manifest["vectors"].append({"name": case["name"], "input": input_name, "meta": meta_name})
 
 (VECTORS / "manifest.json").write_text(
     json.dumps(manifest, indent=2) + "\n",

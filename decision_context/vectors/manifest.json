@@ -1,5 +1,5 @@
 {
-  "profile": "AGP-DECISION-CONTEXT-0.9",
+  "profile": "AGP-DECISION-CONTEXT-0.9+DC3-001",
   "vectors": [
     {
       "name": "authoritative_context",
@@ -100,6 +100,71 @@
       "name": "unsorted_evidence",
       "input": "020_unsorted_evidence.input.json",
       "meta": "020_unsorted_evidence.meta.json"
+    },
+    {
+      "name": "dc3_authoritative_context",
+      "input": "021_dc3_authoritative_context.input.json",
+      "meta": "021_dc3_authoritative_context.meta.json"
+    },
+    {
+      "name": "dc3_empty_evidence",
+      "input": "022_dc3_empty_evidence.input.json",
+      "meta": "022_dc3_empty_evidence.meta.json"
+    },
+    {
+      "name": "dc3_multiple_sorted",
+      "input": "023_dc3_multiple_sorted.input.json",
+      "meta": "023_dc3_multiple_sorted.meta.json"
+    },
+    {
+      "name": "dc3_missing_evidence_type",
+      "input": "024_dc3_missing_evidence_type.input.json",
+      "meta": "024_dc3_missing_evidence_type.meta.json"
+    },
+    {
+      "name": "dc3_missing_issuer_id",
+      "input": "025_dc3_missing_issuer_id.input.json",
+      "meta": "025_dc3_missing_issuer_id.meta.json"
+    },
+    {
+      "name": "dc3_unknown_evidence_member",
+      "input": "026_dc3_unknown_evidence_member.input.json",
+      "meta": "026_dc3_unknown_evidence_member.meta.json"
+    },
+    {
+      "name": "dc3_evidence_type_zero",
+      "input": "027_dc3_evidence_type_zero.input.json",
+      "meta": "027_dc3_evidence_type_zero.meta.json"
+    },
+    {
+      "name": "dc3_evidence_type_leading_zero",
+      "input": "028_dc3_evidence_type_leading_zero.input.json",
+      "meta": "028_dc3_evidence_type_leading_zero.meta.json"
+    },
+    {
+      "name": "dc3_evidence_type_missing_version",
+      "input": "029_dc3_evidence_type_missing_version.input.json",
+      "meta": "029_dc3_evidence_type_missing_version.meta.json"
+    },
+    {
+      "name": "dc3_evidence_type_too_long",
+      "input": "030_dc3_evidence_type_too_long.input.json",
+      "meta": "030_dc3_evidence_type_too_long.meta.json"
+    },
+    {
+      "name": "dc3_invalid_issuer_id",
+      "input": "031_dc3_invalid_issuer_id.input.json",
+      "meta": "031_dc3_invalid_issuer_id.meta.json"
+    },
+    {
+      "name": "dc3_duplicate_evidence",
+      "input": "032_dc3_duplicate_evidence.input.json",
+      "meta": "032_dc3_duplicate_evidence.meta.json"
+    },
+    {
+      "name": "dc3_unsorted_evidence",
+      "input": "033_dc3_unsorted_evidence.input.json",
+      "meta": "033_dc3_unsorted_evidence.meta.json"
     }
   ]
 }

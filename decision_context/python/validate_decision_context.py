@@ -14,6 +14,9 @@ CONTEXT_ID_RE = re.compile(r"^[a-z0-9][a-z0-9._:-]{2,127}$")
 DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 TIMESTAMP_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$")
 MEDIA_TYPE_RE = re.compile(r"^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$")
+EVIDENCE_TYPE_RE = re.compile(
+    r"^[a-z0-9][a-z0-9._:/-]{1,123}[a-z0-9]/[1-9][0-9]*$"
+)
 ROLES = {"proposer", "voter", "reviewer", "approver", "observer"}
 RESERVED_RESULT_MEMBERS = {
     "decision", "result", "outcome", "accepted", "approved",
@@ -24,6 +27,7 @@ TOP_LEVEL_V1 = {
     "policy", "proposal", "participants", "evidence", "constraints",
 }
 TOP_LEVEL_V2 = TOP_LEVEL_V1 | {"evaluation_time"}
+TOP_LEVEL_V3 = TOP_LEVEL_V2
 
 class ValidationError(Exception):
     def __init__(self, code: str, detail: str):
@@ -113,10 +117,13 @@ def validate_object(value: Any) -> None:
         top_level = TOP_LEVEL_V1
     elif object_type == "agp.decision-context/2":
         top_level = TOP_LEVEL_V2
+    elif object_type == "agp.decision-context/3":
+        top_level = TOP_LEVEL_V3
     else:
         reject(
             "INVALID_OBJECT_TYPE",
-            "object_type must be agp.decision-context/1 or agp.decision-context/2",
+            "object_type must be agp.decision-context/1, "
+            "agp.decision-context/2, or agp.decision-context/3",
         )
 
     unknown = set(value) - top_level
@@ -125,7 +132,10 @@ def validate_object(value: Any) -> None:
     if set(value) != top_level:
         reject("INVALID_OBJECT", "decision context is missing required top-level members")
 
-    if object_type == "agp.decision-context/2":
+    if object_type in {
+        "agp.decision-context/2",
+        "agp.decision-context/3",
+    }:
         nonnegative_safe_integer(value["evaluation_time"], "evaluation_time")
 
     context_id = value["context_id"]
@@ -170,13 +180,29 @@ def validate_object(value: Any) -> None:
     if not isinstance(evidence_raw, list):
         reject("INVALID_EVIDENCE", "evidence must be an array")
     evidence = []
+    evidence_fields = {"id", "digest", "media_type"}
+    if object_type == "agp.decision-context/3":
+        evidence_fields |= {"evidence_type", "issuer_id"}
     for index, raw in enumerate(evidence_raw):
-        entry = exact_object(raw, {"id", "digest", "media_type"}, "INVALID_EVIDENCE", f"evidence[{index}]")
-        identifier(entry["id"], f"evidence[{index}].id")
+        where = f"evidence[{index}]"
+        entry = exact_object(raw, evidence_fields, "INVALID_EVIDENCE", where)
+        identifier(entry["id"], f"{where}.id")
         if not isinstance(entry["digest"], str) or not DIGEST_RE.fullmatch(entry["digest"]):
-            reject("INVALID_EVIDENCE", f"evidence[{index}].digest is invalid")
+            reject("INVALID_EVIDENCE", f"{where}.digest is invalid")
         if not isinstance(entry["media_type"], str) or not MEDIA_TYPE_RE.fullmatch(entry["media_type"]):
-            reject("INVALID_EVIDENCE", f"evidence[{index}].media_type is invalid")
+            reject("INVALID_EVIDENCE", f"{where}.media_type is invalid")
+        if object_type == "agp.decision-context/3":
+            evidence_type = entry["evidence_type"]
+            if (
+                not isinstance(evidence_type, str)
+                or len(evidence_type) > 128
+                or not EVIDENCE_TYPE_RE.fullmatch(evidence_type)
+            ):
+                reject("INVALID_EVIDENCE", f"{where}.evidence_type is invalid")
+            try:
+                identifier(entry["issuer_id"], f"{where}.issuer_id")
+            except ValidationError as exc:
+                reject("INVALID_EVIDENCE", exc.detail)
         evidence.append(entry)
     validate_sorted_unique(evidence, "evidence")
 
