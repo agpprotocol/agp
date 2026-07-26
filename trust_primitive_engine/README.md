@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.6 development validation: 743/743 passed
+AGP TPE 2.6 development validation: 763/763 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -421,6 +421,31 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-NORMATIVE-TRACEABILITY.md`
+
+### TPE 2.6 Python/Go composition validation parity
+
+A shared 20-vector matrix verifies Python/Go structural validation parity for
+`all_of`, `any_of`, and `not` trees whose leaves are restricted to the three
+TPE 2.6 evidence-provenance predicates.
+
+The matrix covers operator arity, exact members, canonical child ordering,
+global requirement-ID uniqueness, depth 8, the 256-node limit, complete branch
+validation, rejection of genuinely unknown nested primitives, and rejection
+of malformed nested policy references.
+
+```bash
+python trust_primitive_engine/tools/test_tpe26_go_composition_validation.py
+```
+
+Expected marker:
+
+```text
+TPE 2.6 Python/Go composition validation parity: 20/20 passed
+```
+
+This profile validates structure only. Go admits only the three TPE 2.6 leaves;
+Python continues to support its broader primitive and policy-reference surface.
+Cross-language composition evaluation remains outside this milestone.
 
 ### TPE 2.6 Python/Go leaf-policy validation parity
 

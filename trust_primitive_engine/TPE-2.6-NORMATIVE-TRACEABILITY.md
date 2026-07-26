@@ -72,6 +72,21 @@ built from the repository:
 This prevents a stale local environment from being mistaken for the contents
 of the newly built distribution.
 
+## Cross-language composition-validation boundary
+
+`trust_primitive_engine/tools/test_tpe26_go_composition_validation.py` applies
+a shared 20-vector matrix to Python and Go.
+
+The bounded claim covers structural validation of `all_of`, `any_of`, and
+`not`, including exact members, arity, canonical child order, globally unique
+requirement IDs, depth 8, 256 nodes, and validation of every branch.
+
+The bounded Go profile admits only the three TPE 2.6 evidence-provenance
+leaves. The shared parity matrix uses genuinely unknown primitives and malformed
+policy references for common rejection cases; it does not claim that Python rejects
+its other valid primitives or well-formed policy references. Composition evaluation
+remains outside this boundary.
+
 ## Cross-language leaf-policy validation boundary
 
 `trust_primitive_engine/tools/test_tpe26_go_policy_validation.py` applies a

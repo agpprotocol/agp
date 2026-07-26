@@ -27,6 +27,14 @@ Expected marker:
 TPE 2.6 Python/Go frozen-profile reproduction: 7/7 passed
 ```
 
+## Composition validation mode
+
+`--validate-policy` now accepts bounded `all_of`, `any_of`, and `not` trees
+with TPE 2.6 leaves. The structural profile enforces depth, node-count,
+canonical ordering, arity, exact-member, and global-ID constraints.
+
+Composition evaluation and policy-reference validation are still excluded.
+
 ## Leaf-policy validation mode
 
 The binary also validates bounded TPE 2.6 leaf policies:
