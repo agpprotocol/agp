@@ -1,0 +1,91 @@
+{
+  "context": {
+    "constraints": [],
+    "context_id": "ctx:example:tpe26-external:issuer-not-allowed",
+    "created_at": "2026-07-24T20:00:00Z",
+    "evaluation_time": 1784923200,
+    "evidence": [
+      {
+        "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "evidence_type": "security:assessment/1",
+        "id": "evidence.assessment-a",
+        "issuer_id": "authority:unapproved",
+        "media_type": "application/json"
+      },
+      {
+        "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "evidence_type": "security:assessment/1",
+        "id": "evidence.assessment-b",
+        "issuer_id": "authority:unapproved",
+        "media_type": "application/json"
+      }
+    ],
+    "expires_at": null,
+    "object_type": "agp.decision-context/3",
+    "participants": [
+      {
+        "id": "authority:operations",
+        "role": "approver",
+        "weight": 1
+      },
+      {
+        "id": "authority:security",
+        "role": "reviewer",
+        "weight": 1
+      }
+    ],
+    "policy": {
+      "digest": "62f2bff0c523b7b436d6018b43a11526918ea120737fc54682964f0dc83a5a16",
+      "id": "policy:example:tpe26-external:issuer-not-allowed",
+      "version": 1
+    },
+    "proposal": {
+      "payload": {
+        "service": "payments-api",
+        "version": "3.0.0"
+      },
+      "type": "proposal:production-change"
+    }
+  },
+  "context_digest": {
+    "algorithm": "sha-256",
+    "value": "9217a06f6faadfc5ac188cb4cf08b33f1cfb8fa5a4b650cbb259c5b7628999f4"
+  },
+  "object_type": "agp.signed-decision-context/3",
+  "signatures": [
+    {
+      "signature": "ROMRj-iX8IFG7U_oWXZER5nMD3vVtvp_z5Q0JBFHb6YNQOFp7BKyqVDmHJEdsj-nRbP_Vb3vqYN1rSpJLNbhCw",
+      "signature_id": "sig:operations:tpe26-external-issuer-not-allowed",
+      "statement": {
+        "algorithm": "ed25519",
+        "context_digest": {
+          "algorithm": "sha-256",
+          "value": "9217a06f6faadfc5ac188cb4cf08b33f1cfb8fa5a4b650cbb259c5b7628999f4"
+        },
+        "context_object_type": "agp.decision-context/3",
+        "key_id": "key:operations:example",
+        "object_type": "agp.signature-statement/3",
+        "purpose": "decision-context-attestation",
+        "signed_at": "2026-07-24T20:01:00Z",
+        "signer_id": "authority:operations"
+      }
+    },
+    {
+      "signature": "6K_MyGvcLHvLAIfHGk4l4enDeRfaVTThtKDMlwrOP5D_KnY-mnPChHsshoMQflpDxhrjQLg8F_HS620rm52eBA",
+      "signature_id": "sig:security:tpe26-external-issuer-not-allowed",
+      "statement": {
+        "algorithm": "ed25519",
+        "context_digest": {
+          "algorithm": "sha-256",
+          "value": "9217a06f6faadfc5ac188cb4cf08b33f1cfb8fa5a4b650cbb259c5b7628999f4"
+        },
+        "context_object_type": "agp.decision-context/3",
+        "key_id": "key:security:example",
+        "object_type": "agp.signature-statement/3",
+        "purpose": "decision-context-attestation",
+        "signed_at": "2026-07-24T20:02:00Z",
+        "signer_id": "authority:security"
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "object_type": "agp.tpe.external-reproduction-manifest/1",
+  "package": "tpe26-external-reproduction",
+  "agp_tpe_version": "2.6.0",
+  "hash_algorithm": "sha-256",
+  "hash_serialization": "UTF-8 JSON, ensure_ascii=false, separators=(',', ':'), sort_keys=true",
+  "cases": [
+    {
+      "name": "satisfied",
+      "expected_status": "satisfied",
+      "expected_failure_codes": [],
+      "expected_sha256": "cdf11e93a5b3e4cb9a20ce992851cc00dc6d3053cacd072dc575c9daeb18e7ff"
+    },
+    {
+      "name": "issuer-not-allowed",
+      "expected_status": "unsatisfied",
+      "expected_failure_codes": [
+        "POLICY_REFERENCE_NOT_SATISFIED",
+        "EVIDENCE_ISSUER_NOT_ALLOWED",
+        "EVIDENCE_TYPE_NOT_ALLOWED",
+        "EVIDENCE_DISTINCT_ISSUER_MINIMUM_NOT_REACHED"
+      ],
+      "expected_sha256": "8e353d84caf8269914a37aff82f30cc21de8524fd69ab378880674d4e61dbfb2"
+    }
+  ]
+}
