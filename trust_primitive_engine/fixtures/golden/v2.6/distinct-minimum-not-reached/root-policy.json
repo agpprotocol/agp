@@ -1,0 +1,18 @@
+{
+  "object_type": "agp.trust-policy/2",
+  "policy_id": "policy:golden:tpe26:distinct-minimum-not-reached",
+  "version": 1,
+  "eligible_roles": [
+    "approver"
+  ],
+  "requirements": [
+    {
+      "requirement_id": "requirement:03-distinct-issuers",
+      "type": "evidence_distinct_issuers_at_least",
+      "minimum": 2,
+      "evidence_types": [
+        "security:assessment/1"
+      ]
+    }
+  ]
+}

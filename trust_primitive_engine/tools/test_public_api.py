@@ -317,6 +317,131 @@ def tpe25_fixture(
     return root, referenced, context
 
 
+def tpe26_fixture(*, approved: bool):
+    import evaluate_trust_policy_v2 as evaluator
+
+    referenced = evaluator.validate_policy({
+        "object_type": "agp.trust-policy/2",
+        "policy_id": "policy:example:tpe26-provenance-review",
+        "version": 1,
+        "eligible_roles": ["reviewer"],
+        "requirements": [
+            {
+                "requirement_id": "requirement:01-approved-issuer",
+                "type": "evidence_issuer_in",
+                "issuer_ids": ["authority:lab-a", "authority:lab-b"],
+                "evidence_types": ["security:assessment/1"],
+            },
+            {
+                "requirement_id": "requirement:02-approved-type",
+                "type": "evidence_type_in",
+                "evidence_types": ["security:assessment/1"],
+                "issuer_ids": ["authority:lab-a", "authority:lab-b"],
+            },
+            {
+                "requirement_id": "requirement:03-distinct-issuers",
+                "type": "evidence_distinct_issuers_at_least",
+                "minimum": 2,
+                "evidence_types": ["security:assessment/1"],
+            },
+        ],
+    })
+    root = evaluator.validate_policy({
+        "object_type": "agp.trust-policy/2",
+        "policy_id": "policy:example:tpe26-production-change",
+        "version": 1,
+        "eligible_roles": ["approver"],
+        "requirements": [
+            {
+                "requirement_id": "requirement:operations-approval",
+                "type": "required_signer",
+                "signer_id": "authority:operations",
+            },
+            {
+                "requirement_id": "requirement:tpe26-policy",
+                "type": "policy_reference",
+                "policy_id": referenced["policy_id"],
+                "policy_version": referenced["version"],
+                "policy_digest": evaluator.policy_digest(referenced),
+            },
+        ],
+    })
+    context = load_json(POSITIVE / "decision-context.json")
+    context["object_type"] = "agp.decision-context/3"
+    context["context_id"] = (
+        "ctx:example:tpe26-public-api:"
+        + ("satisfied" if approved else "unsatisfied")
+    )
+    context["policy"] = {
+        "id": root["policy_id"],
+        "version": root["version"],
+        "digest": evaluator.policy_digest(root),
+    }
+    issuer_a = "authority:lab-a" if approved else "authority:unapproved"
+    issuer_b = "authority:lab-b" if approved else "authority:unapproved"
+    context["evidence"] = [
+        {
+            "id": "evidence.assessment-a",
+            "digest": "a" * 64,
+            "media_type": "application/json",
+            "evidence_type": "security:assessment/1",
+            "issuer_id": issuer_a,
+        },
+        {
+            "id": "evidence.assessment-b",
+            "digest": "b" * 64,
+            "media_type": "application/json",
+            "evidence_type": "security:assessment/1",
+            "issuer_id": issuer_b,
+        },
+    ]
+    return root, referenced, context
+
+
+def test_tpe26_satisfied() -> None:
+    root, referenced, context = tpe26_fixture(approved=True)
+    signed_path = sign_temporary_context(
+        context,
+        name="public-api-tpe26-satisfied",
+    )
+    try:
+        result = evaluate_trust_policy(
+            signed_context=load_json(signed_path),
+            policy=root,
+            keyring=load_json(POSITIVE / "keyring.json"),
+            policy_set=[referenced],
+        )
+    finally:
+        signed_path.unlink(missing_ok=True)
+    assert result["status"] == "satisfied", result
+    assert result["failure_codes"] == [], result
+    print("PASS public API TPE 2.6 satisfied evaluation")
+
+
+def test_tpe26_unsatisfied() -> None:
+    root, referenced, context = tpe26_fixture(approved=False)
+    signed_path = sign_temporary_context(
+        context,
+        name="public-api-tpe26-unsatisfied",
+    )
+    try:
+        result = evaluate_trust_policy(
+            signed_context=load_json(signed_path),
+            policy=root,
+            keyring=load_json(POSITIVE / "keyring.json"),
+            policy_set=[referenced],
+        )
+    finally:
+        signed_path.unlink(missing_ok=True)
+    assert result["status"] == "unsatisfied", result
+    assert result["failure_codes"] == [
+        "POLICY_REFERENCE_NOT_SATISFIED",
+        "EVIDENCE_ISSUER_NOT_ALLOWED",
+        "EVIDENCE_TYPE_NOT_ALLOWED",
+        "EVIDENCE_DISTINCT_ISSUER_MINIMUM_NOT_REACHED",
+    ], result
+    print("PASS public API TPE 2.6 unsatisfied evaluation")
+
 def test_satisfied() -> None:
     result = evaluate_trust_policy(
         signed_context=load_json(POSITIVE / "signed-context.json"),
@@ -564,8 +689,10 @@ def main() -> int:
     test_tpe24_unsatisfied()
     test_tpe25_satisfied()
     test_tpe25_unsatisfied()
+    test_tpe26_satisfied()
+    test_tpe26_unsatisfied()
     test_fatal_error()
-    print("AGP TPE public Python API: 7/7 passed")
+    print("AGP TPE public Python API: 9/9 passed")
     return 0
 
 

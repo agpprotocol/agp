@@ -1,0 +1,49 @@
+{
+  "corpus": "agp.tpe-evidence-provenance-conformance/2.6",
+  "hash_serialization": "json-sort-keys-compact-utf8",
+  "hash_algorithm": "sha-256",
+  "cases": [
+    {
+      "name": "satisfied-all",
+      "directory": "satisfied-all",
+      "expected_status": "satisfied",
+      "expected_sha256": "1fe753204836f7da662c9789a87c3d66a5310ac3e0c34ab385e613d0b90affe0"
+    },
+    {
+      "name": "issuer-not-allowed",
+      "directory": "issuer-not-allowed",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "30d3395a6a0957a22a96738ba597a9c2478aaa7975b5ff8b8f9c57ed35ca66c3"
+    },
+    {
+      "name": "type-not-allowed",
+      "directory": "type-not-allowed",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "617978dfaa115c6998a3599f88922dc8aa3af4cd76213a5588ad7266f3ca7b97"
+    },
+    {
+      "name": "distinct-minimum-not-reached",
+      "directory": "distinct-minimum-not-reached",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "30312992e91b65dd872818ebd9f1de01211ed409353ac3653e23c186c1cd8fe6"
+    },
+    {
+      "name": "empty-dc3-manifest",
+      "directory": "empty-dc3-manifest",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "884d03cfaf936c9af786ecf4c6ba93f7c1f3eecc7830ff3eb3d3c98c15493c7d"
+    },
+    {
+      "name": "dc2-provenance-unavailable",
+      "directory": "dc2-provenance-unavailable",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "e1c8c2968718c79927dbd5fb362d5fcdf85eb18b934152ca2b324afdf84397c4"
+    },
+    {
+      "name": "recursive-reference-projection",
+      "directory": "recursive-reference-projection",
+      "expected_status": "unsatisfied",
+      "expected_sha256": "1341f5775d34fb795d03843e0991a5674f0b510f3c0f77ceb65f3e10b9bfe980"
+    }
+  ]
+}

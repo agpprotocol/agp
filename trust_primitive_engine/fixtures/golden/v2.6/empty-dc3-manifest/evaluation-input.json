@@ -1,0 +1,37 @@
+{
+  "object_type": "agp.signed-decision-context/3",
+  "context_digest": "context-digest:tpe-2.6:empty-dc3-manifest",
+  "context": {
+    "object_type": "agp.decision-context/3",
+    "context_id": "context:tpe-2.6:empty-dc3-manifest",
+    "policy": {
+      "id": "policy:golden:tpe26:empty-dc3-manifest",
+      "version": 1,
+      "digest": "5c45b2444017e5abd900e67492e35d02e632a81b72493a4af8897f8c3f51868c"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.6:golden",
+      "payload": {
+        "environment": "production"
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 1
+      }
+    ],
+    "evidence": [],
+    "constraints": [],
+    "evaluation_time": 1700000000
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "object_type": "agp.signed-decision-context/3",
+  "context_digest": "context-digest:tpe-2.6:recursive-reference-projection",
+  "context": {
+    "object_type": "agp.decision-context/3",
+    "context_id": "context:tpe-2.6:recursive-reference-projection",
+    "policy": {
+      "id": "policy:golden:tpe26:recursive-root",
+      "version": 1,
+      "digest": "a15f7b25417fb5cc3390ed6ed6a2c35aafbdfa2960546736464ff9ab3d62c5f0"
+    },
+    "proposal": {
+      "type": "proposal:tpe-2.6:golden",
+      "payload": {
+        "environment": "production"
+      }
+    },
+    "participants": [
+      {
+        "id": "authority:alpha",
+        "role": "approver",
+        "weight": 1
+      }
+    ],
+    "evidence": [
+      {
+        "id": "evidence.assessment-a",
+        "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "media_type": "application/json",
+        "evidence_type": "security:assessment/1",
+        "issuer_id": "authority:unapproved"
+      },
+      {
+        "id": "evidence.assessment-b",
+        "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "media_type": "application/json",
+        "evidence_type": "security:assessment/1",
+        "issuer_id": "authority:unapproved"
+      }
+    ],
+    "constraints": [],
+    "evaluation_time": 1700000000
+  },
+  "signatures": [
+    {
+      "signature_id": "signature:alpha",
+      "statement": {
+        "signer_id": "authority:alpha"
+      }
+    }
+  ]
+}
