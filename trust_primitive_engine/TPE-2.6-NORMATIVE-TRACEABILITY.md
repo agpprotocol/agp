@@ -72,6 +72,19 @@ built from the repository:
 This prevents a stale local environment from being mistaken for the contents
 of the newly built distribution.
 
+## Cross-language leaf-policy validation boundary
+
+`trust_primitive_engine/tools/test_tpe26_go_policy_validation.py` applies a
+shared 22-vector matrix to the Python policy validator and the independent Go
+validator.
+
+The bounded profile covers exact root members, policy identity and version,
+eligible-role constraints, the requirements array, TPE 2.6 leaf validation,
+canonical top-level requirement ordering, and duplicate requirement IDs.
+
+Composition trees, policy references, non-TPE-2.6 leaves, and strict raw-JSON
+parser parity remain outside this conformance claim.
+
 ## Cross-language requirement-validation boundary
 
 `trust_primitive_engine/tools/test_tpe26_go_validation.py` exercises a shared

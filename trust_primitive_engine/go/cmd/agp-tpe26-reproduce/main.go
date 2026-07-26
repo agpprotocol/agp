@@ -17,6 +17,7 @@ const (
 	typeDistinctIssuer = "evidence_distinct_issuers_at_least"
 	typePolicyRef      = "policy_reference"
 	maxSetSize         = 64
+	maxSafeInteger     = 9007199254740991
 )
 
 var (
@@ -327,6 +328,124 @@ func validateRequirement(requirement map[string]any) error {
 	default:
 		return fmt.Errorf("unsupported requirement type: %s", primitiveType)
 	}
+}
+
+func validatePolicy(value any) error {
+	policyValue, ok := value.(map[string]any)
+	if !ok {
+		return errors.New("trust policy must be an object")
+	}
+
+	if err := validateExactMembers(
+		policyValue,
+		[]string{
+			"object_type",
+			"policy_id",
+			"version",
+			"eligible_roles",
+			"requirements",
+		},
+		nil,
+	); err != nil {
+		return err
+	}
+
+	objectType, err := asString(policyValue["object_type"], "object_type")
+	if err != nil {
+		return err
+	}
+	if objectType != "agp.trust-policy/2" {
+		return errors.New("object_type must be agp.trust-policy/2")
+	}
+
+	if _, err := validateIdentifier(policyValue["policy_id"], "policy_id"); err != nil {
+		return err
+	}
+
+	version, err := asInt(policyValue["version"], "version")
+	if err != nil {
+		return err
+	}
+	if version < 1 || version > maxSafeInteger {
+		return fmt.Errorf(
+			"version must be an integer from 1 to %d",
+			maxSafeInteger,
+		)
+	}
+
+	roles, err := asStrings(policyValue["eligible_roles"], "eligible_roles")
+	if err != nil {
+		return err
+	}
+	if len(roles) == 0 {
+		return errors.New("eligible_roles must be a non-empty array")
+	}
+	allowedRoles := map[string]struct{}{
+		"approver": {},
+		"observer": {},
+		"proposer": {},
+		"reviewer": {},
+		"voter":    {},
+	}
+	for _, role := range roles {
+		if _, present := allowedRoles[role]; !present {
+			return errors.New("eligible_roles contains an unsupported role")
+		}
+	}
+	sortedRoles := append([]string(nil), roles...)
+	sort.Strings(sortedRoles)
+	if !reflect.DeepEqual(roles, sortedRoles) {
+		return errors.New("eligible_roles must be lexicographically sorted")
+	}
+	for index := 1; index < len(roles); index++ {
+		if roles[index] == roles[index-1] {
+			return errors.New("eligible_roles must not contain duplicates")
+		}
+	}
+
+	rawRequirements, ok := policyValue["requirements"].([]any)
+	if !ok {
+		return errors.New("requirements must be an array")
+	}
+	if len(rawRequirements) == 0 {
+		return errors.New("requirements must be a non-empty array")
+	}
+
+	requirementIDs := make([]string, 0, len(rawRequirements))
+	for _, rawRequirement := range rawRequirements {
+		requirement, ok := rawRequirement.(map[string]any)
+		if !ok {
+			return errors.New("requirements[] must be an object")
+		}
+		if err := validateRequirement(requirement); err != nil {
+			return err
+		}
+		requirementID, err := asString(
+			requirement["requirement_id"],
+			"requirement_id",
+		)
+		if err != nil {
+			return err
+		}
+		requirementIDs = append(requirementIDs, requirementID)
+	}
+
+	sortedIDs := append([]string(nil), requirementIDs...)
+	sort.Strings(sortedIDs)
+	if !reflect.DeepEqual(requirementIDs, sortedIDs) {
+		return errors.New(
+			"requirements must be ordered by requirement_id",
+		)
+	}
+	for index := 1; index < len(requirementIDs); index++ {
+		if requirementIDs[index] == requirementIDs[index-1] {
+			return errors.New(
+				"requirement_id values must be unique",
+			)
+		}
+	}
+
+	return nil
 }
 
 func contains(values []string, candidate string) bool {
@@ -794,6 +913,27 @@ func reproduce(
 	}, nil
 }
 
+func policyValidationReceipt(path string) error {
+	var value any
+	if err := decodeFile(path, &value); err != nil {
+		return err
+	}
+	err := validatePolicy(value)
+	receipt := map[string]any{
+		"accepted":   err == nil,
+		"error_code": nil,
+	}
+	if err != nil {
+		receipt["error_code"] = "INVALID_POLICY"
+	}
+	encoded, marshalErr := json.Marshal(receipt)
+	if marshalErr != nil {
+		return marshalErr
+	}
+	_, writeErr := os.Stdout.Write(encoded)
+	return writeErr
+}
+
 func validationReceipt(path string) error {
 	var requirement map[string]any
 	if err := decodeFile(path, &requirement); err != nil {
@@ -816,6 +956,14 @@ func validationReceipt(path string) error {
 }
 
 func main() {
+	if len(os.Args) == 3 && os.Args[1] == "--validate-policy" {
+		if err := policyValidationReceipt(os.Args[2]); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	if len(os.Args) == 3 && os.Args[1] == "--validate-requirement" {
 		if err := validationReceipt(os.Args[2]); err != nil {
 			fmt.Fprintln(os.Stderr, err)
