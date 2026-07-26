@@ -80,7 +80,7 @@ def main() -> int:
     if projection is None:
         raise TestFailure("projection unexpectedly missing")
 
-    if set(projection) != {"proposal", "evidence"}:
+    if set(projection) != {"object_type", "proposal", "evidence"}:
         raise TestFailure("projection exposed forbidden context members")
 
     print("PASS  projection_scope                           restricted")
@@ -297,11 +297,17 @@ def main() -> int:
     print("PASS  policy_local_context_propagation           preserved")
     passed += 1
 
-    if passed != 19:
+    if projection["object_type"] != "agp.decision-context/2":
+        raise TestFailure("projection did not preserve object_type")
+
+    print("PASS  projection_object_type                     preserved")
+    passed += 1
+
+    if passed != 20:
         raise TestFailure(f"expected 19 checks, observed {passed}")
 
     print(
-        "TPE 2.4 context projection and resolution: "
+        "TPE context projection and resolution: "
         f"{passed}/{passed} passed"
     )
     return 0

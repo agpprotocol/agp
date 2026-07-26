@@ -308,6 +308,39 @@ CASES = [
         },
         "not_before",
     ),
+    PrimitiveCase(
+        "evidence_issuer_in",
+        {
+            "requirement_id": "requirement:evidence-issuer",
+            "type": "evidence_issuer_in",
+            "issuer_ids": [
+                "authority:lab-a",
+                "authority:lab-b",
+            ],
+        },
+        "issuer_ids",
+    ),
+    PrimitiveCase(
+        "evidence_type_in",
+        {
+            "requirement_id": "requirement:evidence-type",
+            "type": "evidence_type_in",
+            "evidence_types": [
+                "security:assessment/1",
+                "security:penetration-test/1",
+            ],
+        },
+        "evidence_types",
+    ),
+    PrimitiveCase(
+        "evidence_distinct_issuers_at_least",
+        {
+            "requirement_id": "requirement:distinct-issuers",
+            "type": "evidence_distinct_issuers_at_least",
+            "minimum": 2,
+        },
+        "minimum",
+    ),
 ]
 
 
@@ -356,7 +389,7 @@ def main() -> int:
     evaluator = load_evaluator()
     checks = 0
 
-    # Four common checks for every primitive: 15 * 4 = 60.
+    # Four common checks for every primitive: 18 * 4 = 72.
     for case in CASES:
         check(
             name=f"{case.primitive_type}.valid",
@@ -693,7 +726,7 @@ def main() -> int:
             )
             checks += 1
 
-    expected_checks = 140
+    expected_checks = 152
     if checks != expected_checks:
         raise TestFailure(
             f"internal matrix count mismatch: {checks} != {expected_checks}"

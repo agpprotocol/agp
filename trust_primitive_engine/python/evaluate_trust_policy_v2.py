@@ -53,6 +53,11 @@ from primitives.context_values import (
     ContextValuePresentPrimitive,
 )
 from primitives.evidence_count import EvidenceCountAtLeastPrimitive
+from primitives.evidence_provenance import (
+    EvidenceDistinctIssuersAtLeastPrimitive,
+    EvidenceIssuerInPrimitive,
+    EvidenceTypeInPrimitive,
+)
 from primitives.evidence_present import EvidencePresentPrimitive
 from primitives.exactly_n_signers import ExactlyNSignersPrimitive
 from primitives.at_least_n_signers import AtLeastNSignersPrimitive
@@ -122,6 +127,9 @@ ALLOWED_ROLES = {
 }
 
 SUPPORTED_PRIMITIVES = {
+    "evidence_distinct_issuers_at_least",
+    "evidence_issuer_in",
+    "evidence_type_in",
     "evidence_count_at_least",
     "evidence_present",
     "context_integer_at_least",
@@ -151,6 +159,9 @@ SUPPORTED_PRIMITIVES = {
 
 PRIMITIVE_REGISTRY = PrimitiveRegistry(
     [
+        EvidenceDistinctIssuersAtLeastPrimitive(),
+        EvidenceIssuerInPrimitive(),
+        EvidenceTypeInPrimitive(),
         EvidenceCountAtLeastPrimitive(),
         EvidencePresentPrimitive(),
         ContextIntegerAtLeastPrimitive(),

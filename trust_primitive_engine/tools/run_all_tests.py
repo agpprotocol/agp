@@ -18,7 +18,7 @@ SUITES = [
     (
         "context projection and resolution",
         ROOT / "trust_primitive_engine/tools/test_context_resolution.py",
-        19,
+        20,
     ),
     (
         "context value primitives",
@@ -39,6 +39,11 @@ SUITES = [
         "TPE 2.5 evidence count",
         ROOT / "trust_primitive_engine/tools/test_evidence_count_at_least.py",
         34,
+    ),
+    (
+        "TPE 2.6 evidence provenance predicates",
+        ROOT / "trust_primitive_engine/tools/test_evidence_provenance_predicates.py",
+        9,
     ),
     (
         "TPE 2.5 formal integration",
@@ -73,7 +78,7 @@ SUITES = [
     (
         "primitive validation matrix",
         ROOT / "trust_primitive_engine/tools/test_primitive_schema_runtime_matrix.py",
-        140,
+        152,
     ),
     (
         "property hardening",
