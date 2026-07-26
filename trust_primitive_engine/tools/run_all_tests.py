@@ -201,9 +201,9 @@ SUITES = [
         1,
     ),
     (
-        "package installation",
+        "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
-        1,
+        4,
     ),
 ]
 
