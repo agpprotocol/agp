@@ -1,7 +1,7 @@
-# TPE 2.4 Integration Guide
+# TPE 2.5 Integration Guide
 
 This guide explains how an external system can integrate with the AGP Trust
-Primitive Engine (TPE) 2.4 through its command-line interface and stable public
+Primitive Engine (TPE) 2.5 through its command-line interface and stable public
 Python API.
 
 For normative semantics, see:
@@ -11,10 +11,11 @@ For normative semantics, see:
 - `rfcs/TPE-2.2-001-deterministic-policy-composition.md`
 - `rfcs/TPE-2.3-001-deterministic-policy-references.md`
 - `rfcs/TPE-2.4-001-deterministic-context-requirements.md`
+- `rfcs/TPE-2.5-001-deterministic-contextual-predicates.md`
 
 ## 1. Integration inputs
 
-A complete TPE 2.4 evaluation can require four JSON inputs:
+A complete TPE 2.5 evaluation can require four JSON inputs:
 
 1. a Signed Decision Context;
 2. a root Trust Policy 2 object;
@@ -140,7 +141,7 @@ own procedures for:
 - key distribution;
 - protection against unauthorized keyring modification.
 
-TPE 2.4 verifies signatures against the supplied keyring. The keyring itself is
+TPE 2.5 verifies signatures against the supplied keyring. The keyring itself is
 not automatically authenticated by TPE.
 
 ## 6. Root Trust Policy
@@ -582,7 +583,69 @@ TPE determines whether supplied cryptographic and policy inputs satisfy the
 defined policy. It does not determine whether the surrounding system supplied
 the correct trusted policy package or keyring.
 
-## 18. Executable examples
+## 18. TPE 2.5 contextual predicates
+
+TPE 2.5 reuses the signed and immutable Decision Context projection introduced
+by TPE 2.4 and adds three deterministic leaf requirements.
+
+### `context_value_in`
+
+```json
+{
+  "requirement_id": "requirement:allowed-environment",
+  "type": "context_value_in",
+  "path": "/proposal/payload/environment",
+  "values": [
+    "canary",
+    "production"
+  ]
+}
+```
+
+Failure code:
+
+```text
+CONTEXT_VALUE_NOT_IN_SET
+```
+
+### `context_path_equals`
+
+```json
+{
+  "requirement_id": "requirement:approved-version",
+  "type": "context_path_equals",
+  "left_path": "/proposal/payload/requested_version",
+  "right_path": "/proposal/payload/approved_version"
+}
+```
+
+Failure code:
+
+```text
+CONTEXT_PATH_VALUES_NOT_EQUAL
+```
+
+### `evidence_count_at_least`
+
+```json
+{
+  "requirement_id": "requirement:minimum-json-evidence",
+  "type": "evidence_count_at_least",
+  "minimum": 2,
+  "media_type": "application/json"
+}
+```
+
+Failure code:
+
+```text
+EVIDENCE_COUNT_NOT_REACHED
+```
+
+These requirements may appear at the top level, inside `all_of`, `any_of`, or
+`not`, and inside directly or recursively referenced policies.
+
+## 19. Executable examples
 
 ### Positive example
 
@@ -645,6 +708,30 @@ Expected final line:
 TPE 2.4 context/evidence golden corpus: 10/10 passed
 ```
 
+### TPE 2.5 contextual predicate examples
+
+```bash
+bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
+```
+
+Expected final marker:
+
+```text
+TPE_2_5_CONTEXTUAL_PREDICATES_EXAMPLES_PASS
+```
+
+### TPE 2.5 golden corpus
+
+```bash
+python trust_primitive_engine/tools/test_tpe25_golden_corpus.py
+```
+
+Expected final line:
+
+```text
+TPE 2.5 contextual predicates golden corpus: 5/5 passed
+```
+
 ### External package integration
 
 ```bash
@@ -672,7 +759,15 @@ security boundaries, and reproducible verification procedure are recorded in:
 trust_primitive_engine/TPE-2.4-CONFORMANCE-STATEMENT.md
 ```
 
-## 19. Recommended integration workflow
+## TPE 2.5 release conformance
+
+The TPE 2.5 release evidence is recorded in:
+
+```text
+trust_primitive_engine/TPE-2.5-CONFORMANCE-STATEMENT.md
+```
+
+## 20. Recommended integration workflow
 
 A production caller should:
 
@@ -687,7 +782,7 @@ A production caller should:
 8. apply the organization's business action only after mapping the result to an
    explicit local decision rule.
 
-## 20. Package installation
+## 21. Package installation
 
 Install the published package from PyPI:
 
@@ -708,7 +803,7 @@ from trust_primitive_engine import evaluate_trust_policy
 ```
 
 The distribution name is `agp-tpe`. The import package is
-`trust_primitive_engine`. TPE 2.4 requires Python 3.12 or newer.
+`trust_primitive_engine`. TPE 2.5 requires Python 3.12 or newer.
 
 The repository includes a clean-wheel installation test:
 
@@ -720,7 +815,7 @@ This test builds a wheel, installs it into a temporary isolated virtual
 environment, imports the public API, and verifies that packaged schemas are
 available.
 
-## 21. Public Python API
+## 22. Public Python API
 
 Add the TPE Python directory to the interpreter path or package it within the
 integrating application, then import the stable facade:
@@ -751,9 +846,9 @@ The public API accepts Python mappings and sequences. It returns ordinary
 Callers should import only from `trust_primitive_engine`, not from internal
 `engine`, `primitives`, or `evaluate_trust_policy_v2` modules.
 
-## 22. Stability boundary
+## 23. Stability boundary
 
-TPE 2.4 uses:
+TPE 2.5 uses:
 
 ```text
 agp.trust-policy/2

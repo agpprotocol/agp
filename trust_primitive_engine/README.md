@@ -418,6 +418,7 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 ## Release conformance
 
 - `TPE-2.4-CONFORMANCE-STATEMENT.md`
+- `TPE-2.5-CONFORMANCE-STATEMENT.md`
 
 ## Normative specifications
 
