@@ -45,8 +45,19 @@ def base_context(version: int = 1) -> dict[str, Any]:
         "constraints": [],
     }
 
-    if version == 2:
+    if version in {2, 3}:
         context["evaluation_time"] = 1784894400
+
+    if version == 3:
+        context["evidence"] = [
+            {
+                "id": "evidence.security-review",
+                "digest": "2" * 64,
+                "media_type": "application/json",
+                "evidence_type": "agp.evidence.security-review/1",
+                "issuer_id": "authority:security-lab",
+            }
+        ]
 
     return context
 
@@ -140,11 +151,39 @@ def run_raw_case(name: str, raw: bytes, expected_code: str) -> bool:
 def main() -> int:
     valid = valid_object(1)
     valid_v2 = valid_object(2)
+    valid_v3 = valid_object(3)
 
     cases: list[tuple[str, Any, str | None]] = [
         ("valid_single_signature_v1", valid, None),
         ("valid_single_signature_v2", valid_v2, None),
+        ("valid_single_signature_v3", valid_v3, None),
     ]
+
+    x = deepcopy(valid_v3)
+    del x["context"]["evidence"][0]["issuer_id"]
+    cases.append(("v3_missing_issuer_id", x, "INVALID_CONTEXT"))
+
+    x = deepcopy(valid_v3)
+    del x["context"]["evidence"][0]["evidence_type"]
+    cases.append(("v3_missing_evidence_type", x, "INVALID_CONTEXT"))
+
+    x = deepcopy(valid_v3)
+    x["context"]["evidence"][0]["evidence_type"] = "agp.evidence.review/0"
+    cases.append(("v3_invalid_evidence_type", x, "INVALID_CONTEXT"))
+
+    x = deepcopy(valid_v3)
+    x["object_type"] = "agp.signed-decision-context/2"
+    cases.append(("wrapper_v2_context_v3_mismatch", x, "INVALID_CONTEXT"))
+
+    x = deepcopy(valid_v3)
+    x["signatures"][0]["statement"]["object_type"] = (
+        "agp.signature-statement/2"
+    )
+    cases.append((
+        "wrapper_v3_statement_v2_mismatch",
+        x,
+        "INVALID_SIGNATURE_STATEMENT",
+    ))
 
     x = deepcopy(valid_v2)
     del x["context"]["evaluation_time"]

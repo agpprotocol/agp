@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agpprotocol.org/schema/agp.signed-decision-context-3.schema.json",
+  "title": "AGP Signed Decision Context 3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "object_type",
+    "context",
+    "context_digest",
+    "signatures"
+  ],
+  "properties": {
+    "object_type": {
+      "const": "agp.signed-decision-context/3"
+    },
+    "context": {
+      "$ref": "agp.decision-context-3.schema.json"
+    },
+    "context_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "algorithm",
+        "value"
+      ],
+      "properties": {
+        "algorithm": {
+          "const": "sha-256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "signatures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "signature_id",
+          "statement",
+          "signature"
+        ],
+        "properties": {
+          "signature_id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9._:/-]{1,126}[a-z0-9]$"
+          },
+          "statement": {
+            "$ref": "agp.signature-statement-3.schema.json"
+          },
+          "signature": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          }
+        }
+      }
+    }
+  }
+}

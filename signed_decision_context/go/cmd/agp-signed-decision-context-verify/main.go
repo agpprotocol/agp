@@ -36,6 +36,9 @@ var (
 		`^[0-9]{4}-[0-9]{2}-[0-9]{2}T` +
 			`[0-9]{2}:[0-9]{2}:[0-9]{2}Z$`,
 	)
+	evidenceTypeRE = regexp.MustCompile(
+		`^[a-z0-9][a-z0-9._:/-]{1,123}[a-z0-9]/[1-9][0-9]*$`,
+	)
 )
 
 type failure struct {
@@ -424,10 +427,137 @@ func validateDigest(value any) (map[string]any, error) {
 	return digest, nil
 }
 
+type versionConfig struct {
+	signedType    string
+	contextType   string
+	statementType string
+}
+
+func resolveVersionConfig(objectType any) (*versionConfig, error) {
+	value, ok := objectType.(string)
+	if !ok {
+		return nil, invalid("INVALID_OBJECT_TYPE", "unexpected object_type")
+	}
+
+	configs := map[string]versionConfig{
+		"agp.signed-decision-context/1": {
+			signedType:    "agp.signed-decision-context/1",
+			contextType:   "agp.decision-context/1",
+			statementType: "agp.signature-statement/1",
+		},
+		"agp.signed-decision-context/2": {
+			signedType:    "agp.signed-decision-context/2",
+			contextType:   "agp.decision-context/2",
+			statementType: "agp.signature-statement/2",
+		},
+		"agp.signed-decision-context/3": {
+			signedType:    "agp.signed-decision-context/3",
+			contextType:   "agp.decision-context/3",
+			statementType: "agp.signature-statement/3",
+		},
+	}
+
+	config, exists := configs[value]
+	if !exists {
+		return nil, invalid("INVALID_OBJECT_TYPE", "unexpected object_type")
+	}
+	return &config, nil
+}
+
+func validateContextForVersion(
+	value any,
+	config *versionConfig,
+) (map[string]any, error) {
+	context, ok := value.(map[string]any)
+	if !ok || context["object_type"] != config.contextType {
+		return nil, invalid(
+			"INVALID_CONTEXT",
+			"context object_type must be "+config.contextType,
+		)
+	}
+
+	contextID, ok := context["context_id"].(string)
+	if !ok || !contextIDRE.MatchString(contextID) {
+		return nil, invalid("INVALID_CONTEXT", "context_id is invalid")
+	}
+
+	if config.contextType == "agp.decision-context/2" ||
+		config.contextType == "agp.decision-context/3" {
+		evaluationTime, ok := context["evaluation_time"].(int64)
+		if !ok || evaluationTime < 0 || evaluationTime > maxSafeInt {
+			return nil, invalid(
+				"INVALID_CONTEXT",
+				"evaluation_time must be a non-negative safe integer",
+			)
+		}
+	}
+
+	if config.contextType == "agp.decision-context/3" {
+		evidence, ok := context["evidence"].([]any)
+		if !ok {
+			return nil, invalid("INVALID_CONTEXT", "evidence must be an array")
+		}
+
+		for index, raw := range evidence {
+			entry, ok := raw.(map[string]any)
+			if !ok || !exactMembers(
+				entry,
+				"id",
+				"digest",
+				"media_type",
+				"evidence_type",
+				"issuer_id",
+			) {
+				return nil, invalid(
+					"INVALID_CONTEXT",
+					fmt.Sprintf("evidence[%d] has invalid members", index),
+				)
+			}
+
+			for _, field := range []string{"id", "issuer_id"} {
+				fieldValue, ok := entry[field].(string)
+				if !ok || !identifierRE.MatchString(fieldValue) {
+					return nil, invalid(
+						"INVALID_CONTEXT",
+						fmt.Sprintf("evidence[%d].%s is invalid", index, field),
+					)
+				}
+			}
+
+			digest, ok := entry["digest"].(string)
+			if !ok || len(digest) != 64 {
+				return nil, invalid(
+					"INVALID_CONTEXT",
+					fmt.Sprintf("evidence[%d].digest is invalid", index),
+				)
+			}
+			if _, err := hex.DecodeString(digest); err != nil ||
+				strings.ToLower(digest) != digest {
+				return nil, invalid(
+					"INVALID_CONTEXT",
+					fmt.Sprintf("evidence[%d].digest is invalid", index),
+				)
+			}
+
+			evidenceType, ok := entry["evidence_type"].(string)
+			if !ok || len(evidenceType) > 128 ||
+				!evidenceTypeRE.MatchString(evidenceType) {
+				return nil, invalid(
+					"INVALID_CONTEXT",
+					fmt.Sprintf("evidence[%d].evidence_type is invalid", index),
+				)
+			}
+		}
+	}
+
+	return context, nil
+}
+
 func validateStatement(
 	value any,
 	index int,
 	contextDigest map[string]any,
+	config *versionConfig,
 ) (map[string]any, error) {
 	statement, ok := value.(map[string]any)
 	if !ok {
@@ -461,7 +591,7 @@ func validateStatement(
 		)
 	}
 
-	if statement["object_type"] != "agp.signature-statement/1" {
+	if statement["object_type"] != config.statementType {
 		return nil, invalid(
 			"INVALID_SIGNATURE_STATEMENT",
 			fmt.Sprintf(
@@ -481,7 +611,7 @@ func validateStatement(
 		)
 	}
 
-	if statement["context_object_type"] != "agp.decision-context/1" {
+	if statement["context_object_type"] != config.contextType {
 		return nil, invalid(
 			"STATEMENT_CONTEXT_TYPE_MISMATCH",
 			fmt.Sprintf(
@@ -567,11 +697,9 @@ func structuralValidate(value any) (*structuralResult, error) {
 		)
 	}
 
-	if object["object_type"] != "agp.signed-decision-context/1" {
-		return nil, invalid(
-			"INVALID_OBJECT_TYPE",
-			"unexpected object_type",
-		)
+	config, err := resolveVersionConfig(object["object_type"])
+	if err != nil {
+		return nil, err
 	}
 
 	if !exactMembers(
@@ -598,20 +726,12 @@ func structuralValidate(value any) (*structuralResult, error) {
 		)
 	}
 
-	context, ok := object["context"].(map[string]any)
-	if !ok || context["object_type"] != "agp.decision-context/1" {
-		return nil, invalid(
-			"INVALID_CONTEXT",
-			"invalid decision context",
-		)
-	}
-
-	contextID, ok := context["context_id"].(string)
-	if !ok || !contextIDRE.MatchString(contextID) {
-		return nil, invalid(
-			"INVALID_CONTEXT",
-			"context_id is invalid",
-		)
+	context, err := validateContextForVersion(
+		object["context"],
+		config,
+	)
+	if err != nil {
+		return nil, err
 	}
 
 	contextDigest, err := validateDigest(object["context_digest"])
@@ -698,6 +818,7 @@ func structuralValidate(value any) (*structuralResult, error) {
 			entry["statement"],
 			index,
 			contextDigest,
+			config,
 		)
 		if err != nil {
 			return nil, err

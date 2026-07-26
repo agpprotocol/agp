@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create or append to an AGP Signed Decision Context 1 or 2."""
+"""Create or append to an AGP Signed Decision Context 1, 2, or 3."""
 
 from __future__ import annotations
 
@@ -62,6 +62,10 @@ CONTEXT_VERSIONS = {
     "agp.decision-context/2": {
         "statement_type": "agp.signature-statement/2",
         "signed_context_type": "agp.signed-decision-context/2",
+    },
+    "agp.decision-context/3": {
+        "statement_type": "agp.signature-statement/3",
+        "signed_context_type": "agp.signed-decision-context/3",
     },
 }
 
@@ -234,7 +238,7 @@ def context_version_config(
             "INVALID_OBJECT_TYPE",
             (
                 "context object_type must be "
-                "agp.decision-context/1 or agp.decision-context/2"
+                "agp.decision-context/1, agp.decision-context/2, or agp.decision-context/3"
             ),
         )
 
@@ -442,7 +446,7 @@ def write_output(path: Path, value: dict[str, Any]) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Create or append to an AGP Signed Decision Context 1 or 2 "
+            "Create or append to an AGP Signed Decision Context 1, 2, or 3 "
             "using an Ed25519 private key."
         )
     )

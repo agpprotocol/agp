@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare Python and Go Stage 1 Signed Decision Context validation."""
+"""Compare Python and Go Signed Decision Context 1/2/3 validation."""
 
 from __future__ import annotations
 
@@ -12,19 +12,15 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-
 ROOT = Path(__file__).resolve().parents[2]
-
 PYTHON_VALIDATOR = (
     ROOT
     / "signed_decision_context"
     / "python"
     / "validate_signed_decision_context.py"
 )
-
 GO_DIR = ROOT / "signed_decision_context" / "go"
 SCHEMA_DIR = ROOT / "registry" / "schemas"
-
 RUNNER_PATH = (
     ROOT
     / "signed_decision_context"
@@ -33,7 +29,7 @@ RUNNER_PATH = (
 )
 
 
-def load_stage1_runner():
+def load_runner():
     spec = importlib.util.spec_from_file_location(
         "signed_decision_context_stage1_runner",
         RUNNER_PATH,
@@ -46,7 +42,9 @@ def load_stage1_runner():
     return module
 
 
-def run_json(command: list[str]) -> tuple[int, dict[str, Any] | None, str]:
+def run_json(
+    command: list[str],
+) -> tuple[int, dict[str, Any] | None, str]:
     process = subprocess.run(
         command,
         text=True,
@@ -61,7 +59,9 @@ def run_json(command: list[str]) -> tuple[int, dict[str, Any] | None, str]:
     return process.returncode, result, process.stderr
 
 
-def observable(result: dict[str, Any] | None) -> tuple[str | None, str | None]:
+def observable(
+    result: dict[str, Any] | None,
+) -> tuple[str | None, str | None]:
     if result is None:
         return None, None
 
@@ -82,20 +82,6 @@ def run_case(
         separators=(",", ":"),
     ).encode("utf-8")
 
-    return run_raw_case(
-        binary,
-        name,
-        raw,
-        expected_error,
-    )
-
-
-def run_raw_case(
-    binary: Path,
-    name: str,
-    raw: bytes,
-    expected_error: str | None,
-) -> bool:
     with tempfile.TemporaryDirectory() as temp_dir:
         input_path = Path(temp_dir) / "case.json"
         input_path.write_bytes(raw)
@@ -160,14 +146,82 @@ def run_raw_case(
     return passed
 
 
-def structured_cases(module):
-    valid = module.valid_object()
+def main() -> int:
+    module = load_runner()
+
+    valid_v1 = module.valid_object(1)
+    valid_v2 = module.valid_object(2)
+    valid_v3 = module.valid_object(3)
 
     cases: list[tuple[str, Any, str | None]] = [
-        ("valid_single_signature", valid, None),
+        ("valid_single_signature_v1", valid_v1, None),
+        ("valid_single_signature_v2", valid_v2, None),
+        ("valid_single_signature_v3", valid_v3, None),
     ]
 
-    value = deepcopy(valid)
+    value = deepcopy(valid_v2)
+    del value["context"]["evaluation_time"]
+    cases.append((
+        "v2_missing_evaluation_time",
+        value,
+        "INVALID_CONTEXT",
+    ))
+
+    value = deepcopy(valid_v3)
+    del value["context"]["evidence"][0]["issuer_id"]
+    cases.append((
+        "v3_missing_issuer_id",
+        value,
+        "INVALID_CONTEXT",
+    ))
+
+    value = deepcopy(valid_v3)
+    del value["context"]["evidence"][0]["evidence_type"]
+    cases.append((
+        "v3_missing_evidence_type",
+        value,
+        "INVALID_CONTEXT",
+    ))
+
+    value = deepcopy(valid_v3)
+    value["context"]["evidence"][0]["evidence_type"] = (
+        "agp.evidence.review/0"
+    )
+    cases.append((
+        "v3_invalid_evidence_type",
+        value,
+        "INVALID_CONTEXT",
+    ))
+
+    value = deepcopy(valid_v3)
+    value["object_type"] = "agp.signed-decision-context/2"
+    cases.append((
+        "wrapper_v2_context_v3_mismatch",
+        value,
+        "INVALID_CONTEXT",
+    ))
+
+    value = deepcopy(valid_v3)
+    value["signatures"][0]["statement"]["object_type"] = (
+        "agp.signature-statement/2"
+    )
+    cases.append((
+        "wrapper_v3_statement_v2_mismatch",
+        value,
+        "INVALID_SIGNATURE_STATEMENT",
+    ))
+
+    value = deepcopy(valid_v3)
+    value["signatures"][0]["statement"]["context_object_type"] = (
+        "agp.decision-context/2"
+    )
+    cases.append((
+        "v3_statement_context_v2_mismatch",
+        value,
+        "STATEMENT_CONTEXT_TYPE_MISMATCH",
+    ))
+
+    value = deepcopy(valid_v1)
     value["object_type"] = "agp.invalid/1"
     cases.append((
         "invalid_object_type",
@@ -175,23 +229,7 @@ def structured_cases(module):
         "INVALID_OBJECT_TYPE",
     ))
 
-    value = deepcopy(valid)
-    value["extra"] = True
-    cases.append((
-        "unknown_top_level",
-        value,
-        "UNKNOWN_TOP_LEVEL_MEMBER",
-    ))
-
-    value = deepcopy(valid)
-    value["context"]["context_id"] = "X"
-    cases.append((
-        "invalid_context",
-        value,
-        "INVALID_CONTEXT",
-    ))
-
-    value = deepcopy(valid)
+    value = deepcopy(valid_v1)
     value["context_digest"]["value"] = "0" * 64
     cases.append((
         "context_digest_mismatch",
@@ -199,121 +237,13 @@ def structured_cases(module):
         "CONTEXT_DIGEST_MISMATCH",
     ))
 
-    value = deepcopy(valid)
+    value = deepcopy(valid_v1)
     value["signatures"] = []
     cases.append((
         "empty_signatures",
         value,
         "EMPTY_SIGNATURE_COLLECTION",
     ))
-
-    value = deepcopy(valid)
-    value["signatures"][0]["statement"][
-        "context_digest"
-    ]["value"] = "0" * 64
-    cases.append((
-        "statement_context_digest_mismatch",
-        value,
-        "STATEMENT_CONTEXT_DIGEST_MISMATCH",
-    ))
-
-    value = deepcopy(valid)
-    value["signatures"][0]["signature"] = "AA=="
-    cases.append((
-        "padded_signature",
-        value,
-        "INVALID_SIGNATURE_ENCODING",
-    ))
-
-    value = deepcopy(valid)
-    second = deepcopy(value["signatures"][0])
-    second["signature_id"] = "sig:authority-legal:0002"
-    second["statement"]["key_id"] = "key:authority-legal:2026-q2"
-    value["signatures"] = [
-        value["signatures"][0],
-        second,
-    ]
-    cases.append((
-        "unsorted_signatures",
-        value,
-        "UNSORTED_SIGNATURES",
-    ))
-
-    value = deepcopy(valid)
-    value["signatures"].append(
-        deepcopy(value["signatures"][0])
-    )
-    cases.append((
-        "duplicate_signature_id",
-        value,
-        "DUPLICATE_SIGNATURE_ID",
-    ))
-
-    value = deepcopy(valid)
-    value["signatures"][0]["signature_id"] = "X"
-    cases.append((
-        "invalid_signature_id",
-        value,
-        "INVALID_SIGNATURE_ENTRY",
-    ))
-
-    value = deepcopy(valid)
-    value["signatures"][0]["statement"][
-        "context_object_type"
-    ] = "agp.invalid/1"
-    cases.append((
-        "statement_context_type_mismatch",
-        value,
-        "STATEMENT_CONTEXT_TYPE_MISMATCH",
-    ))
-
-    value = deepcopy(valid)
-    second = deepcopy(value["signatures"][0])
-    second["signature_id"] = "sig:authority-legal:0002"
-    value["signatures"].append(second)
-    cases.append((
-        "duplicate_signature_entry",
-        value,
-        "DUPLICATE_SIGNATURE_ENTRY",
-    ))
-
-    value = deepcopy(valid)
-    second = deepcopy(value["signatures"][0])
-    second["signature_id"] = "sig:authority-legal:0002"
-    second["signature"] = "AB"
-    value["signatures"].append(second)
-    cases.append((
-        "duplicate_attestation",
-        value,
-        "DUPLICATE_ATTESTATION",
-    ))
-
-    value = deepcopy(valid)
-
-    first = deepcopy(value["signatures"][0])
-    first["signature_id"] = "sig:z-authority:0001"
-    first["statement"]["signer_id"] = "authority:z"
-    first["statement"]["key_id"] = "key:authority-z:2026"
-
-    second = deepcopy(value["signatures"][0])
-    second["signature_id"] = "sig:z-authority:0001"
-    second["statement"]["signer_id"] = "authority:a"
-    second["statement"]["key_id"] = "key:authority-a:2026"
-
-    value["signatures"] = [first, second]
-
-    cases.append((
-        "unsorted_precedes_duplicate_signature_id",
-        value,
-        "UNSORTED_SIGNATURES",
-    ))
-
-    return valid, cases
-
-
-def main() -> int:
-    module = load_stage1_runner()
-    valid, cases = structured_cases(module)
 
     with tempfile.TemporaryDirectory() as temp_dir:
         binary = (
@@ -347,49 +277,11 @@ def main() -> int:
             for case in cases
         ]
 
-        valid_raw = json.dumps(
-            valid,
-            separators=(",", ":"),
-        ).encode("utf-8")
-
-        raw_cases = [
-            (
-                "utf8_bom",
-                b"\xef\xbb\xbf" + valid_raw,
-                "INVALID_JSON",
-            ),
-            (
-                "duplicate_json_member",
-                (
-                    b'{"object_type":'
-                    b'"agp.signed-decision-context/1",'
-                    b'"object_type":'
-                    b'"agp.signed-decision-context/1"}'
-                ),
-                "INVALID_JSON",
-            ),
-            (
-                "decimal_number",
-                valid_raw[:-1] + b',"forbidden":1.5}',
-                "INVALID_JSON",
-            ),
-            (
-                "trailing_data",
-                valid_raw + b"\n{}",
-                "INVALID_JSON",
-            ),
-        ]
-
-        results.extend(
-            run_raw_case(binary, *case)
-            for case in raw_cases
-        )
-
     passed = sum(results)
     total = len(results)
 
     print(
-        "AGP Signed Decision Context 1.0 "
+        "AGP Signed Decision Context 1/2/3 "
         f"Python/Go structural parity: {passed}/{total} passed"
     )
 

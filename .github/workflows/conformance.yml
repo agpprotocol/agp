@@ -27,5 +27,16 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements-v0.4.txt
 
-      - name: Run all AGP suites
+      - name: Run historical AGP suites
         run: python3 run_benchmark_all.py
+
+      - name: Run Signed Decision Context suites
+        run: |
+          python signed_decision_context/tools/run_conformance.py
+          python signed_decision_context/tools/run_cross_language_conformance.py
+          python signed_decision_context/tools/run_crypto_conformance.py
+          python signed_decision_context/tools/run_crypto_cross_language_conformance.py
+          python signed_decision_context/tools/run_signer_conformance.py
+          python signed_decision_context/tools/run_signer_v2_conformance.py
+          python signed_decision_context/tools/run_signer_v3_conformance.py
+          python signed_decision_context/tools/run_append_signer_conformance.py
