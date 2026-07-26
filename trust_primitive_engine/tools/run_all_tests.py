@@ -36,6 +36,11 @@ SUITES = [
         32,
     ),
     (
+        "TPE 2.5 evidence count",
+        ROOT / "trust_primitive_engine/tools/test_evidence_count_at_least.py",
+        34,
+    ),
+    (
         "policy-tree validation",
         ROOT / "trust_primitive_engine/tools/test_policy_tree_validation.py",
         20,

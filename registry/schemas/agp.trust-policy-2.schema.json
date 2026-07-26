@@ -552,6 +552,17 @@
         }
       }
     },
+    "evidenceCountAtLeast": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "type", "minimum"],
+      "properties": {
+        "requirement_id": {"$ref": "#/$defs/identifier"},
+        "type": {"const": "evidence_count_at_least"},
+        "minimum": {"type": "integer", "minimum": 1, "maximum": 256},
+        "media_type": {"type": "string", "pattern": "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$"}
+      }
+    },
     "evidencePresent": {
       "type": "object",
       "additionalProperties": false,
@@ -662,6 +673,9 @@
         },
         {
           "$ref": "#/$defs/contextIntegerAtMost"
+        },
+        {
+          "$ref": "#/$defs/evidenceCountAtLeast"
         },
         {
           "$ref": "#/$defs/evidencePresent"
