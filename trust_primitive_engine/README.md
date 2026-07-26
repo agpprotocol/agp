@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.5 development validation: 682/682 passed
+AGP TPE 2.6 development validation: 682/682 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -419,6 +419,7 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 
 - `TPE-2.4-CONFORMANCE-STATEMENT.md`
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
+- `TPE-2.6-CONFORMANCE-STATEMENT.md`
 
 ## Normative specifications
 

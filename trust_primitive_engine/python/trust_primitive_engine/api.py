@@ -1,4 +1,4 @@
-"""Stable public Python API for AGP Trust Primitive Engine 2.5."""
+"""Stable public Python API for AGP Trust Primitive Engine 2.6."""
 
 from __future__ import annotations
 

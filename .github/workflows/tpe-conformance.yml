@@ -1,4 +1,4 @@
-name: AGP TPE 2.5 Conformance
+name: AGP TPE 2.6 Conformance
 
 on:
   push:
@@ -34,7 +34,7 @@ env:
 
 jobs:
   conformance:
-    name: TPE 2.5 complete validation
+    name: TPE 2.6 complete validation
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -65,7 +65,7 @@ jobs:
 
       - name: Verify expected validation total
         run: |
-          grep -Fqx             "AGP TPE 2.5 development validation: 682/682 passed"             /tmp/tpe-validation.log
+          grep -Fqx             "AGP TPE 2.6 development validation: 682/682 passed"             /tmp/tpe-validation.log
 
       - name: Run executable policy-reference example
         run: |

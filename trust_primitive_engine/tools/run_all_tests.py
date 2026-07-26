@@ -225,7 +225,7 @@ def main() -> int:
         total += checks
 
     print("=" * 88)
-    print(f"AGP TPE 2.5 development validation: {total}/{total} passed")
+    print(f"AGP TPE 2.6 development validation: {total}/{total} passed")
     return 0
 
 
