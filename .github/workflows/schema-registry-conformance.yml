@@ -65,6 +65,46 @@ jobs:
         run: |
           python registry/tools/run_conformance.py
 
+      - name: Verify activated Decision Context 3 objects
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          registry = json.loads(
+              Path("registry/registry.json").read_text(
+                  encoding="utf-8"
+              )
+          )
+          objects = {
+              entry["id"]: entry
+              for entry in registry["objects"]
+          }
+
+          expected = {
+              "agp.decision-context/3":
+                  "registry/schemas/agp.decision-context-3.schema.json",
+              "agp.signature-statement/3":
+                  "registry/schemas/agp.signature-statement-3.schema.json",
+              "agp.signed-decision-context/3":
+                  "registry/schemas/agp.signed-decision-context-3.schema.json",
+          }
+
+          for object_id, schema in expected.items():
+              entry = objects[object_id]
+              assert entry["status"] == "active", entry
+              assert entry["schema_version"] == 3, entry
+              assert entry["canonicalization"] == "agp-c14n/0.7", entry
+              assert entry["digest"] == "sha-256", entry
+              assert entry["schema"] == schema, entry
+              assert entry["spec"] == (
+                  "decision_context/rfcs/"
+                  "DC-3-001-context-attested-evidence-provenance.md"
+              ), entry
+
+          print("Verified active DC3 registry object family")
+          PY
+
       - name: Verify generated vectors are reproducible
         run: |
           python registry/tools/generate_vectors.py
