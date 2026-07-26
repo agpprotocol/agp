@@ -97,12 +97,18 @@ def create_context_projection(
     if not isinstance(evidence, (list, tuple)):
         raise ValueError("decision_context.evidence must be an array")
 
-    frozen = _freeze_json(
-        {
-            "proposal": {"payload": payload},
-            "evidence": evidence,
-        }
-    )
+    object_type = decision_context.get("object_type")
+    if object_type is not None and not isinstance(object_type, str):
+        raise ValueError("decision_context.object_type must be a string")
+
+    projected = {
+        "proposal": {"payload": payload},
+        "evidence": evidence,
+    }
+    if object_type is not None:
+        projected["object_type"] = object_type
+
+    frozen = _freeze_json(projected)
 
     if not isinstance(frozen, Mapping):
         raise AssertionError("context projection did not freeze as mapping")

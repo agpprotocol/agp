@@ -461,8 +461,12 @@
     },
     "contextScalar": {
       "oneOf": [
-        {"type": "null"},
-        {"type": "boolean"},
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
         {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -477,59 +481,119 @@
     "contextValuePresent": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["requirement_id", "type", "path"],
+      "required": [
+        "requirement_id",
+        "type",
+        "path"
+      ],
       "properties": {
-        "requirement_id": {"$ref": "#/$defs/identifier"},
-        "type": {"const": "context_value_present"},
-        "path": {"$ref": "#/$defs/contextPath"}
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "context_value_present"
+        },
+        "path": {
+          "$ref": "#/$defs/contextPath"
+        }
       }
     },
     "contextValueEquals": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["requirement_id", "type", "path", "value"],
+      "required": [
+        "requirement_id",
+        "type",
+        "path",
+        "value"
+      ],
       "properties": {
-        "requirement_id": {"$ref": "#/$defs/identifier"},
-        "type": {"const": "context_value_equals"},
-        "path": {"$ref": "#/$defs/contextPath"},
-        "value": {"$ref": "#/$defs/contextScalar"}
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "context_value_equals"
+        },
+        "path": {
+          "$ref": "#/$defs/contextPath"
+        },
+        "value": {
+          "$ref": "#/$defs/contextScalar"
+        }
       }
     },
     "contextValueIn": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["requirement_id", "type", "path", "values"],
+      "required": [
+        "requirement_id",
+        "type",
+        "path",
+        "values"
+      ],
       "properties": {
-        "requirement_id": {"$ref": "#/$defs/identifier"},
-        "type": {"const": "context_value_in"},
-        "path": {"$ref": "#/$defs/contextPath"},
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "context_value_in"
+        },
+        "path": {
+          "$ref": "#/$defs/contextPath"
+        },
         "values": {
           "type": "array",
           "minItems": 1,
           "maxItems": 64,
-          "items": {"$ref": "#/$defs/contextScalar"}
+          "items": {
+            "$ref": "#/$defs/contextScalar"
+          }
         }
       }
     },
     "contextPathEquals": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["requirement_id", "type", "left_path", "right_path"],
+      "required": [
+        "requirement_id",
+        "type",
+        "left_path",
+        "right_path"
+      ],
       "properties": {
-        "requirement_id": {"$ref": "#/$defs/identifier"},
-        "type": {"const": "context_path_equals"},
-        "left_path": {"$ref": "#/$defs/contextPath"},
-        "right_path": {"$ref": "#/$defs/contextPath"}
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "context_path_equals"
+        },
+        "left_path": {
+          "$ref": "#/$defs/contextPath"
+        },
+        "right_path": {
+          "$ref": "#/$defs/contextPath"
+        }
       }
     },
     "contextIntegerAtLeast": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["requirement_id", "type", "path", "minimum"],
+      "required": [
+        "requirement_id",
+        "type",
+        "path",
+        "minimum"
+      ],
       "properties": {
-        "requirement_id": {"$ref": "#/$defs/identifier"},
-        "type": {"const": "context_integer_at_least"},
-        "path": {"$ref": "#/$defs/contextPath"},
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "context_integer_at_least"
+        },
+        "path": {
+          "$ref": "#/$defs/contextPath"
+        },
         "minimum": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -540,11 +604,22 @@
     "contextIntegerAtMost": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["requirement_id", "type", "path", "maximum"],
+      "required": [
+        "requirement_id",
+        "type",
+        "path",
+        "maximum"
+      ],
       "properties": {
-        "requirement_id": {"$ref": "#/$defs/identifier"},
-        "type": {"const": "context_integer_at_most"},
-        "path": {"$ref": "#/$defs/contextPath"},
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "context_integer_at_most"
+        },
+        "path": {
+          "$ref": "#/$defs/contextPath"
+        },
         "maximum": {
           "type": "integer",
           "minimum": -9007199254740991,
@@ -555,22 +630,47 @@
     "evidenceCountAtLeast": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["requirement_id", "type", "minimum"],
+      "required": [
+        "requirement_id",
+        "type",
+        "minimum"
+      ],
       "properties": {
-        "requirement_id": {"$ref": "#/$defs/identifier"},
-        "type": {"const": "evidence_count_at_least"},
-        "minimum": {"type": "integer", "minimum": 1, "maximum": 256},
-        "media_type": {"type": "string", "pattern": "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$"}
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "evidence_count_at_least"
+        },
+        "minimum": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "media_type": {
+          "type": "string",
+          "pattern": "^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$"
+        }
       }
     },
     "evidencePresent": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["requirement_id", "type", "evidence_id"],
+      "required": [
+        "requirement_id",
+        "type",
+        "evidence_id"
+      ],
       "properties": {
-        "requirement_id": {"$ref": "#/$defs/identifier"},
-        "type": {"const": "evidence_present"},
-        "evidence_id": {"$ref": "#/$defs/identifier"},
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "evidence_present"
+        },
+        "evidence_id": {
+          "$ref": "#/$defs/identifier"
+        },
         "digest": {
           "type": "string",
           "pattern": "^[0-9a-f]{64}$"
@@ -678,6 +778,15 @@
           "$ref": "#/$defs/evidenceCountAtLeast"
         },
         {
+          "$ref": "#/$defs/evidenceIssuerIn"
+        },
+        {
+          "$ref": "#/$defs/evidenceTypeIn"
+        },
+        {
+          "$ref": "#/$defs/evidenceDistinctIssuersAtLeast"
+        },
+        {
           "$ref": "#/$defs/evidencePresent"
         },
         {
@@ -759,6 +868,100 @@
         },
         "requirement": {
           "$ref": "#/$defs/requirement"
+        }
+      }
+    },
+    "issuerIdSet": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/identifier"
+      }
+    },
+    "evidenceType": {
+      "type": "string",
+      "maxLength": 128,
+      "pattern": "^[a-z0-9][a-z0-9._:/-]{1,123}[a-z0-9]/[1-9][0-9]*$"
+    },
+    "evidenceTypeSet": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/evidenceType"
+      }
+    },
+    "evidenceIssuerIn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "issuer_ids"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "evidence_issuer_in"
+        },
+        "issuer_ids": {
+          "$ref": "#/$defs/issuerIdSet"
+        },
+        "evidence_types": {
+          "$ref": "#/$defs/evidenceTypeSet"
+        }
+      }
+    },
+    "evidenceTypeIn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "evidence_types"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "evidence_type_in"
+        },
+        "evidence_types": {
+          "$ref": "#/$defs/evidenceTypeSet"
+        },
+        "issuer_ids": {
+          "$ref": "#/$defs/issuerIdSet"
+        }
+      }
+    },
+    "evidenceDistinctIssuersAtLeast": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "type",
+        "minimum"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "const": "evidence_distinct_issuers_at_least"
+        },
+        "minimum": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 256
+        },
+        "evidence_types": {
+          "$ref": "#/$defs/evidenceTypeSet"
         }
       }
     }

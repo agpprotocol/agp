@@ -12,6 +12,11 @@ from .context_values import (
     ContextValueEqualsPrimitive,
     ContextValuePresentPrimitive,
 )
+from .evidence_provenance import (
+    EvidenceDistinctIssuersAtLeastPrimitive,
+    EvidenceIssuerInPrimitive,
+    EvidenceTypeInPrimitive,
+)
 from .evidence_present import EvidencePresentPrimitive
 from .time_window import TimeWindowPrimitive
 
@@ -30,6 +35,9 @@ from .separation_of_duties import SeparationOfDutiesPrimitive
 from .signer_threshold import SignerThresholdPrimitive
 
 __all__ = [
+    "EvidenceDistinctIssuersAtLeastPrimitive",
+    "EvidenceIssuerInPrimitive",
+    "EvidenceTypeInPrimitive",
     "EvidencePresentPrimitive",
     "ContextIntegerAtLeastPrimitive",
     "ContextIntegerAtMostPrimitive",
