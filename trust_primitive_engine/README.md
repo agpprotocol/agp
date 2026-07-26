@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.6 development validation: 684/684 passed
+AGP TPE 2.6 development validation: 687/687 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -420,6 +420,7 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 - `TPE-2.4-CONFORMANCE-STATEMENT.md`
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-CONFORMANCE-STATEMENT.md`
+- `TPE-2.6-NORMATIVE-TRACEABILITY.md`
 
 ### Independent TPE 2.6 external reproduction
 
@@ -439,6 +440,28 @@ TPE 2.6 external reproduction: 2/2 passed
 
 The consumer imports only the stable `trust_primitive_engine` public API and
 verifies both deterministic result hashes from an installed wheel.
+
+### Installed-wheel schema audit
+
+The package-installation suite verifies four independent properties:
+
+1. all 13 registry schemas are present in the built wheel;
+2. every packaged schema is byte-identical to its authoritative registry file;
+3. the stable public API imports from a clean installed wheel;
+4. an installed-wheel `Signed Decision Context 3` schema validates a frozen,
+   cryptographically signed DC3 fixture with local `$ref` resolution.
+
+Run:
+
+```bash
+python trust_primitive_engine/tools/test_package_install.py
+```
+
+Expected final marker:
+
+```text
+AGP TPE package installation and schema audit: 4/4 passed
+```
 
 ## Normative specifications
 
