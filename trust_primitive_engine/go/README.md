@@ -27,6 +27,17 @@ Expected marker:
 TPE 2.6 Python/Go frozen-profile reproduction: 7/7 passed
 ```
 
+## Leaf-policy validation mode
+
+The binary also validates bounded TPE 2.6 leaf policies:
+
+```bash
+agp-tpe26-reproduce --validate-policy policy.json
+```
+
+The 22-vector parity matrix compares complete-policy acceptance with Python
+while deliberately excluding composition and policy-reference semantics.
+
 ## Requirement validation mode
 
 The same binary exposes a bounded validation mode:

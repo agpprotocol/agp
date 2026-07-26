@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.6 development validation: 721/721 passed
+AGP TPE 2.6 development validation: 743/743 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -421,6 +421,29 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-NORMATIVE-TRACEABILITY.md`
+
+### TPE 2.6 Python/Go leaf-policy validation parity
+
+A shared 22-vector matrix verifies Python/Go acceptance parity for complete,
+non-compositional Trust Policy 2 documents whose leaves are restricted to the
+three TPE 2.6 evidence-provenance predicates.
+
+It covers root members, object type, policy identifier and version, eligible
+roles, the requirements container, unsupported leaves, canonical requirement
+ordering, and duplicate requirement identifiers.
+
+```bash
+python trust_primitive_engine/tools/test_tpe26_go_policy_validation.py
+```
+
+Expected marker:
+
+```text
+TPE 2.6 Python/Go leaf-policy validation parity: 22/22 passed
+```
+
+This profile does not yet cover composition nodes, policy references, the full
+Trust Policy 2 primitive registry, or raw-JSON duplicate-member parity.
 
 ### TPE 2.6 Python/Go validation parity
 

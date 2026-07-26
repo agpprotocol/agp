@@ -196,6 +196,13 @@ SUITES = [
         27,
     ),
     (
+        "TPE 2.6 Python/Go leaf-policy validation parity",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_tpe26_go_policy_validation.py",
+        22,
+    ),
+    (
         "public Python API",
         ROOT / "trust_primitive_engine/tools/test_public_api.py",
         9,
