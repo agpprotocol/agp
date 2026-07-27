@@ -7,8 +7,12 @@ import (
 )
 
 const (
-	TypeRequired  = "required_signer"
-	TypeThreshold = "signer_threshold"
+	TypeRequired   = "required_signer"
+	TypeThreshold  = "signer_threshold"
+	TypeProhibited = "prohibited_signer"
+	TypeAnyOf      = "any_of_signers"
+	TypeAllOf      = "all_of_signers"
+	TypeExactlyOne = "exactly_one_of_signers"
 )
 
 func matchedSet(values []string) map[string]struct{} {
@@ -115,5 +119,155 @@ func EvaluateThreshold(
 			"signer_ids":         signerIDs,
 		},
 		"failure_code": failure,
+	}, nil
+}
+
+func signerMatches(
+	signerIDs []string,
+	matchedSigners []string,
+) []string {
+	matchedState := matchedSet(matchedSigners)
+	matched := make([]string, 0, len(signerIDs))
+	for _, signerID := range signerIDs {
+		if _, ok := matchedState[signerID]; ok {
+			matched = append(matched, signerID)
+		}
+	}
+	return matched
+}
+
+func EvaluateProhibited(
+	requirement map[string]any,
+	matchedSigners []string,
+) (map[string]any, error) {
+	requirementID, err := parser.AsString(
+		requirement["requirement_id"],
+		"requirement_id",
+	)
+	if err != nil {
+		return nil, err
+	}
+	signerID, err := parser.AsString(requirement["signer_id"], "signer_id")
+	if err != nil {
+		return nil, err
+	}
+
+	_, present := matchedSet(matchedSigners)[signerID]
+	matched := []string{}
+	status := "satisfied"
+	var failure any
+	if present {
+		matched = []string{signerID}
+		status = "unsatisfied"
+		failure = "PROHIBITED_SIGNER_PRESENT"
+	}
+
+	return map[string]any{
+		"requirement_id":  requirementID,
+		"type":            TypeProhibited,
+		"status":          status,
+		"matched_signers": matched,
+		"observed": map[string]any{
+			"present": present,
+		},
+		"expected": map[string]any{
+			"signer_id": signerID,
+		},
+		"failure_code": failure,
+	}, nil
+}
+
+func EvaluateAnyOf(
+	requirement map[string]any,
+	matchedSigners []string,
+) (map[string]any, error) {
+	return evaluateSignerSet(requirement, matchedSigners, TypeAnyOf)
+}
+
+func EvaluateAllOf(
+	requirement map[string]any,
+	matchedSigners []string,
+) (map[string]any, error) {
+	return evaluateSignerSet(requirement, matchedSigners, TypeAllOf)
+}
+
+func EvaluateExactlyOne(
+	requirement map[string]any,
+	matchedSigners []string,
+) (map[string]any, error) {
+	return evaluateSignerSet(requirement, matchedSigners, TypeExactlyOne)
+}
+
+func evaluateSignerSet(
+	requirement map[string]any,
+	matchedSigners []string,
+	primitiveType string,
+) (map[string]any, error) {
+	requirementID, err := parser.AsString(
+		requirement["requirement_id"],
+		"requirement_id",
+	)
+	if err != nil {
+		return nil, err
+	}
+	signerIDs, err := parser.AsStrings(requirement["signer_ids"], "signer_ids")
+	if err != nil {
+		return nil, err
+	}
+
+	matched := signerMatches(signerIDs, matchedSigners)
+	status := "satisfied"
+	var failure any
+	observed := map[string]any{"matched_count": len(matched)}
+	var expected map[string]any
+
+	switch primitiveType {
+	case TypeAnyOf:
+		expected = map[string]any{
+			"minimum_matches": 1,
+			"signer_ids":      signerIDs,
+		}
+		if len(matched) == 0 {
+			status = "unsatisfied"
+			failure = "ANY_OF_SIGNERS_MISSING"
+		}
+
+	case TypeAllOf:
+		matchedState := matchedSet(matchedSigners)
+		missing := []string{}
+		for _, signerID := range signerIDs {
+			if _, ok := matchedState[signerID]; !ok {
+				missing = append(missing, signerID)
+			}
+		}
+		observed["missing_signer_ids"] = missing
+		expected = map[string]any{
+			"required_count": len(signerIDs),
+			"signer_ids":     signerIDs,
+		}
+		if len(missing) != 0 {
+			status = "unsatisfied"
+			failure = "ALL_OF_SIGNERS_NOT_SATISFIED"
+		}
+
+	case TypeExactlyOne:
+		expected = map[string]any{
+			"exact_matches": 1,
+			"signer_ids":    signerIDs,
+		}
+		if len(matched) != 1 {
+			status = "unsatisfied"
+			failure = "EXACTLY_ONE_OF_SIGNERS_NOT_SATISFIED"
+		}
+	}
+
+	return map[string]any{
+		"requirement_id":  requirementID,
+		"type":            primitiveType,
+		"status":          status,
+		"matched_signers": matched,
+		"observed":        observed,
+		"expected":        expected,
+		"failure_code":    failure,
 	}, nil
 }

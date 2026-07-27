@@ -85,6 +85,14 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Phase 4.1B signer-set primitives
+
+The reusable engine evaluates `prohibited_signer`, `any_of_signers`,
+`all_of_signers`, and `exactly_one_of_signers` against the deterministic
+matched-signer projection.
+
+See `PHASE-4.1B.md`.
+
 ## Phase 4.1A basic signer primitives
 
 The reusable engine evaluates `required_signer` and `signer_threshold` against

@@ -16,6 +16,10 @@ const (
 	typeDistinctIssuer      = "evidence_distinct_issuers_at_least"
 	typeRequiredSigner      = "required_signer"
 	typeSignerThreshold     = "signer_threshold"
+	typeProhibitedSigner    = "prohibited_signer"
+	typeAnyOfSigners        = "any_of_signers"
+	typeAllOfSigners        = "all_of_signers"
+	typeExactlyOneSigners   = "exactly_one_of_signers"
 	maxSetSize              = 64
 	maxSafeInteger          = 9007199254740991
 	maxRequirementDepth     = 8
@@ -129,6 +133,28 @@ func ValidateRequirement(requirement map[string]any) error {
 		}
 		return nil
 
+	case typeProhibitedSigner:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "signer_id"},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["signer_id"],
+			"signer_id",
+		); err != nil {
+			return err
+		}
+		return nil
+
 	case typeSignerThreshold:
 		if err := validateExactMembers(
 			requirement,
@@ -172,6 +198,33 @@ func ValidateRequirement(requirement map[string]any) error {
 			return errors.New(
 				"minimum_signatures must not exceed signer_ids length",
 			)
+		}
+		return nil
+
+	case typeAnyOfSigners, typeAllOfSigners, typeExactlyOneSigners:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "signer_ids"},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		signerIDs, err := validateCanonicalSet(
+			requirement["signer_ids"],
+			"signer_ids",
+			identifierPattern,
+		)
+		if err != nil {
+			return err
+		}
+		if len(signerIDs) < 2 {
+			return errors.New("signer_ids must contain at least two entries")
 		}
 		return nil
 
