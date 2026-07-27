@@ -7,6 +7,7 @@ import (
 
 	"agpprotocol.org/agp/trust-primitive-engine/internal/model"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/parser"
+	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/evidence"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/provenance"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/role"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/signer"
@@ -183,6 +184,20 @@ func evaluateRequirementNode(
 			return nil, err
 		}
 		return role.EvaluateWeightThreshold(requirement, ctx, matchedSigners)
+
+	case evidence.TypePresent:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := evidence.EvaluatePresent(requirement, ctx)
+		return result, err
+
+	case evidence.TypeCount:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := evidence.EvaluateCount(requirement, ctx)
+		return result, err
 
 	case provenance.TypeIssuerIn:
 		if err := validation.ValidateRequirement(requirement); err != nil {

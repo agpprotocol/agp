@@ -239,3 +239,11 @@ The public and internal Go context models preserve evidence `digest` and
 `media_type` through JSON decoding and public-to-internal conversion.
 
 See `PHASE-4.1G-1.md`.
+
+## Phase 4.1G-2 evidence presence and count primitives
+
+The reusable Go evaluator supports `evidence_present` and
+`evidence_count_at_least`, including deterministic validation,
+observations, filters, and failure projection.
+
+See `PHASE-4.1G-2.md`.

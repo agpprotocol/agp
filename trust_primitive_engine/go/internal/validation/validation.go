@@ -14,6 +14,8 @@ const (
 	typeIssuerIn            = "evidence_issuer_in"
 	typeEvidenceIn          = "evidence_type_in"
 	typeDistinctIssuer      = "evidence_distinct_issuers_at_least"
+	typeEvidencePresent     = "evidence_present"
+	typeEvidenceCount       = "evidence_count_at_least"
 	typeRequiredSigner      = "required_signer"
 	typeSignerThreshold     = "signer_threshold"
 	typeProhibitedSigner    = "prohibited_signer"
@@ -41,6 +43,12 @@ var (
 	)
 	evidenceTypePattern = regexp.MustCompile(
 		`^[a-z0-9][a-z0-9._:/-]{1,123}[a-z0-9]/[1-9][0-9]*$`,
+	)
+	digestPattern = regexp.MustCompile(
+		`^[0-9a-f]{64}$`,
+	)
+	mediaTypePattern = regexp.MustCompile(
+		`^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+$`,
 	)
 )
 
@@ -408,6 +416,82 @@ func ValidateRequirement(requirement map[string]any) error {
 				"%s must be between one and the maximum safe integer",
 				limitField,
 			)
+		}
+		return nil
+
+	case typeEvidencePresent:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "evidence_id"},
+			[]string{"digest", "media_type"},
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["evidence_id"],
+			"evidence_id",
+		); err != nil {
+			return err
+		}
+		if digest, present := requirement["digest"]; present {
+			value, err := parser.AsString(digest, "digest")
+			if err != nil {
+				return err
+			}
+			if !digestPattern.MatchString(value) {
+				return fmt.Errorf(
+					"digest must be 64 lowercase hexadecimal characters",
+				)
+			}
+		}
+		if mediaType, present := requirement["media_type"]; present {
+			value, err := parser.AsString(mediaType, "media_type")
+			if err != nil {
+				return err
+			}
+			if !mediaTypePattern.MatchString(value) {
+				return fmt.Errorf("media_type is invalid")
+			}
+		}
+		return nil
+
+	case typeEvidenceCount:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "minimum"},
+			[]string{"media_type"},
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		minimum, err := parser.AsInt(requirement["minimum"], "minimum")
+		if err != nil {
+			return err
+		}
+		if minimum < 1 || minimum > 256 {
+			return fmt.Errorf(
+				"minimum must be an integer between 1 and 256",
+			)
+		}
+		if mediaType, present := requirement["media_type"]; present {
+			value, err := parser.AsString(mediaType, "media_type")
+			if err != nil {
+				return err
+			}
+			if !mediaTypePattern.MatchString(value) {
+				return fmt.Errorf("media_type is invalid")
+			}
 		}
 		return nil
 
