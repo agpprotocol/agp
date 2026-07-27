@@ -247,3 +247,11 @@ The reusable Go evaluator supports `evidence_present` and
 observations, filters, and failure projection.
 
 See `PHASE-4.1G-2.md`.
+
+## Phase 4.1H-1 context projection and path resolution
+
+The Go TPE preserves `proposal.payload` and provides deterministic
+restricted context-path parsing and resolution for later contextual
+predicate phases.
+
+See `PHASE-4.1H-1.md`.

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	verifyapi "agpprotocol.org/agp/signed-decision-context/verify"
+	"agpprotocol.org/agp/trust-primitive-engine/internal/parser"
 )
 
 func signedFailureCode(code string) Code {
@@ -52,7 +53,7 @@ func verifiedInput(
 	}
 
 	var context Context
-	if err := json.Unmarshal(encodedContext, &context); err != nil {
+	if err := parser.Decode(encodedContext, &context); err != nil {
 		return EvaluationInput{}, WrapError(
 			CodeInvalidSignedDecisionContext,
 			"decode verified decision context",
