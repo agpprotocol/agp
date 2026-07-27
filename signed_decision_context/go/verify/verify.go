@@ -684,6 +684,7 @@ type signatureEntry struct {
 
 type structuralResult struct {
 	objectType       string
+	context          map[string]any
 	contextDigest    map[string]any
 	signatureEntries []signatureEntry
 }
@@ -939,6 +940,7 @@ func structuralValidate(value any) (*structuralResult, error) {
 
 	return &structuralResult{
 		objectType:       object["object_type"].(string),
+		context:          context,
 		contextDigest:    contextDigest,
 		signatureEntries: entries,
 	}, nil
@@ -1242,14 +1244,25 @@ func verify(
 	}, nil
 }
 
+// VerifiedSignature is one cryptographically verified attestation projected
+// for downstream consumers.
+type VerifiedSignature struct {
+	SignatureID string
+	SignerID    string
+}
+
 // VerificationResult is the typed reusable signature-verification projection.
+// Context is the structurally validated Decision Context covered by the
+// verified digest and signatures.
 type VerificationResult struct {
 	Status                 string
 	ObjectType             string
+	Context                map[string]any
 	ContextDigest          any
 	SignatureCount         int
 	VerifiedSignatureCount int
 	VerifiedSignatureIDs   []string
+	VerifiedSignatures     []VerifiedSignature
 }
 
 // StructuralResult is the stable reusable structural-validation projection.
@@ -1319,14 +1332,33 @@ func VerifyTyped(value any, keyring Keyring) (VerificationResult, error) {
 		return VerificationResult{}, err
 	}
 
+	structural, err := structuralValidate(value)
+	if err != nil {
+		return VerificationResult{}, err
+	}
+
 	ids, _ := raw["verified_signature_ids"].([]string)
+	signatures := make(
+		[]VerifiedSignature,
+		0,
+		len(structural.signatureEntries),
+	)
+	for _, entry := range structural.signatureEntries {
+		signatures = append(signatures, VerifiedSignature{
+			SignatureID: entry.signatureID,
+			SignerID:    entry.statement["signer_id"].(string),
+		})
+	}
+
 	return VerificationResult{
 		Status:                 raw["status"].(string),
 		ObjectType:             raw["object_type"].(string),
+		Context:                structural.context,
 		ContextDigest:          raw["context_digest"],
 		SignatureCount:         raw["signature_count"].(int),
 		VerifiedSignatureCount: raw["verified_signature_count"].(int),
 		VerifiedSignatureIDs:   append([]string(nil), ids...),
+		VerifiedSignatures:     signatures,
 	}, nil
 }
 
