@@ -85,6 +85,13 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Phase 1 core types
+
+Typed fatal errors, internal policy/result invariants, and canonical JSON
+helpers are introduced without changing the bounded reproducer.
+
+See `PHASE-1.md`.
+
 ## Go module identity
 
 The reusable engine module is:
