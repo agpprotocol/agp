@@ -85,6 +85,13 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Phase 4B public evaluation API
+
+External Go callers can evaluate policies through the stable `tpe.Evaluate`
+facade without importing internal packages.
+
+See `PHASE-4B.md`.
+
 ## Phase 4A final evaluation assembly
 
 Signature/input models, signer projection, and complete deterministic
