@@ -142,3 +142,60 @@ func TestParseKeyringRejectsInvalidJSON(t *testing.T) {
 		t.Fatalf("unexpected failure: status=%q code=%q", status, code)
 	}
 }
+
+func TestVerifyTypedReturnsVerifiedEnvelope(t *testing.T) {
+	root := moduleRoot(t)
+
+	inputRaw, err := os.ReadFile(filepath.Join(
+		root,
+		"vectors",
+		"001_valid_ed25519_signature.input.json",
+	))
+	if err != nil {
+		t.Fatalf("read input: %v", err)
+	}
+	keyringRaw, err := os.ReadFile(filepath.Join(
+		root,
+		"vectors",
+		"001_valid_ed25519_signature.keyring.json",
+	))
+	if err != nil {
+		t.Fatalf("read keyring: %v", err)
+	}
+
+	value, err := verifyapi.ParseJSON(inputRaw)
+	if err != nil {
+		t.Fatalf("parse input: %v", err)
+	}
+	keyring, err := verifyapi.ParseKeyring(keyringRaw)
+	if err != nil {
+		t.Fatalf("parse keyring: %v", err)
+	}
+
+	result, err := verifyapi.VerifyTyped(value, keyring)
+	if err != nil {
+		t.Fatalf("verify typed: %v", err)
+	}
+	if result.Context["context_id"] != "ctx:example:001" {
+		t.Fatalf("unexpected context: %#v", result.Context)
+	}
+	if len(result.VerifiedSignatures) != 1 {
+		t.Fatalf(
+			"unexpected verified signatures: %#v",
+			result.VerifiedSignatures,
+		)
+	}
+	if result.VerifiedSignatures[0].SignatureID !=
+		"sig:authority-legal:0001" {
+		t.Fatalf(
+			"unexpected signature id: %q",
+			result.VerifiedSignatures[0].SignatureID,
+		)
+	}
+	if result.VerifiedSignatures[0].SignerID != "authority:legal" {
+		t.Fatalf(
+			"unexpected signer id: %q",
+			result.VerifiedSignatures[0].SignerID,
+		)
+	}
+}
