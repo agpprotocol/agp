@@ -204,3 +204,10 @@ This is not yet a complete second implementation of the Trust Primitive
 Engine. It does not implement every Trust Policy 2 primitive, composition
 form, validation rule, signature-verification path, or arbitrary reference
 graph.
+
+## Phase 4.1C signer cardinality primitives
+
+The reusable engine evaluates `at_least_n_signers`, `at_most_n_signers`, and
+`exactly_n_signers` with Python-compatible validation and result shapes.
+
+See `PHASE-4.1C.md`.

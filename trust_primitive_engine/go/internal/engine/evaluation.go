@@ -129,6 +129,24 @@ func evaluateRequirementNode(
 		}
 		return signer.EvaluateExactlyOne(requirement, matchedSigners)
 
+	case signer.TypeAtLeast:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateAtLeast(requirement, matchedSigners)
+
+	case signer.TypeAtMost:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateAtMost(requirement, matchedSigners)
+
+	case signer.TypeExactlyN:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateExactlyN(requirement, matchedSigners)
+
 	case provenance.TypeIssuerIn:
 		if err := validation.ValidateRequirement(requirement); err != nil {
 			return nil, err
