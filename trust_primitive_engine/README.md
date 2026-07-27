@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.6 development validation: 775/775 passed
+AGP TPE 2.6 development validation: 783/783 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -421,6 +421,26 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-NORMATIVE-TRACEABILITY.md`
+
+### TPE 2.6 Python/Go composition + policy-reference parity
+
+A shared 8-vector matrix compares complete Python and Go evaluation objects
+when `policy_reference` appears inside `all_of`, `any_of`, and `not`.
+
+It covers satisfied and unsatisfied references, failure suppression beneath
+satisfied outer compositions, transitive references, repeated shared-policy
+evaluation, recursive `referenced_policy` evidence, and path-based failure
+ordering.
+
+```bash
+python trust_primitive_engine/tools/test_tpe26_go_composition_policy_reference_evaluation.py
+```
+
+Expected marker:
+
+```text
+TPE 2.6 Python/Go composition + policy-reference evaluation parity: 8/8 passed
+```
 
 ### TPE 2.6 Python/Go composition evaluation parity
 

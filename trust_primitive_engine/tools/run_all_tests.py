@@ -217,6 +217,13 @@ SUITES = [
         12,
     ),
     (
+        "TPE 2.6 Python/Go composition + policy-reference evaluation parity",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_tpe26_go_composition_policy_reference_evaluation.py",
+        8,
+    ),
+    (
         "public Python API",
         ROOT / "trust_primitive_engine/tools/test_public_api.py",
         9,
