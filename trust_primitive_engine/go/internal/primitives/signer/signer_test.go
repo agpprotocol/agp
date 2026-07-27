@@ -176,3 +176,25 @@ func TestEvaluateSignerCardinalities(t *testing.T) {
 		})
 	}
 }
+
+func TestEvaluateMutualExclusion(t *testing.T) {
+	requirement := map[string]any{
+		"requirement_id": "requirement:mutual",
+		"type":           TypeMutual,
+		"signer_ids":     []any{"authority:a", "authority:b"},
+	}
+	result, err := EvaluateMutualExclusion(requirement, []string{"authority:a", "authority:b"})
+	if err != nil {
+		t.Fatalf("evaluate mutual exclusion: %v", err)
+	}
+	if result["failure_code"] != "MUTUAL_EXCLUSION_VIOLATED" {
+		t.Fatalf("unexpected result: %#v", result)
+	}
+	result, err = EvaluateMutualExclusion(requirement, []string{"authority:a"})
+	if err != nil {
+		t.Fatalf("evaluate mutual exclusion: %v", err)
+	}
+	if result["status"] != "satisfied" {
+		t.Fatalf("unexpected result: %#v", result)
+	}
+}

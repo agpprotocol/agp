@@ -12,6 +12,7 @@ const (
 	TypeWeightThreshold = "role_weight_threshold"
 	TypeGlobalThreshold = "global_signature_threshold"
 	TypeGlobalWeight    = "global_weight_threshold"
+	TypeSeparation      = "separation_of_duties"
 )
 
 func matchedForRole(
@@ -220,5 +221,71 @@ func EvaluateGlobalWeight(
 			"minimum_weight": minimum,
 		},
 		"failure_code": failure,
+	}, nil
+}
+
+func EvaluateSeparationOfDuties(
+	requirement map[string]any,
+	ctx model.Context,
+	matchedSigners []string,
+) (map[string]any, error) {
+	requirementID, err := parser.AsString(requirement["requirement_id"], "requirement_id")
+	if err != nil {
+		return nil, err
+	}
+	roles, err := parser.AsStrings(requirement["roles"], "roles")
+	if err != nil {
+		return nil, err
+	}
+
+	participants := make(map[string]model.Participant, len(ctx.Participants))
+	for _, participant := range ctx.Participants {
+		participants[participant.ID] = participant
+	}
+
+	matchedByRole := make(map[string][]string, len(roles))
+	for _, requiredRole := range roles {
+		matchedByRole[requiredRole] = []string{}
+	}
+	for _, signerID := range matchedSigners {
+		participant, present := participants[signerID]
+		if !present {
+			continue
+		}
+		if _, required := matchedByRole[participant.Role]; required {
+			matchedByRole[participant.Role] = append(matchedByRole[participant.Role], signerID)
+		}
+	}
+
+	matched := []string{}
+	presentRoles := []string{}
+	missingRoles := []string{}
+	for _, requiredRole := range roles {
+		roleMatched := matchedByRole[requiredRole]
+		sort.Strings(roleMatched)
+		matched = append(matched, roleMatched...)
+		if len(roleMatched) == 0 {
+			missingRoles = append(missingRoles, requiredRole)
+		} else {
+			presentRoles = append(presentRoles, requiredRole)
+		}
+	}
+	sort.Strings(matched)
+
+	status := "satisfied"
+	var failure any
+	if len(missingRoles) != 0 {
+		status = "unsatisfied"
+		failure = "SEPARATION_OF_DUTIES_NOT_SATISFIED"
+	}
+
+	return map[string]any{
+		"requirement_id":  requirementID,
+		"type":            TypeSeparation,
+		"status":          status,
+		"matched_signers": matched,
+		"observed":        map[string]any{"present_roles": presentRoles, "missing_roles": missingRoles},
+		"expected":        map[string]any{"roles": roles, "distinct_identities": 2},
+		"failure_code":    failure,
 	}, nil
 }

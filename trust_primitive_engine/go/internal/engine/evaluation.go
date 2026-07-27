@@ -142,11 +142,23 @@ func evaluateRequirementNode(
 		}
 		return signer.EvaluateAtMost(requirement, matchedSigners)
 
+	case signer.TypeMutual:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateMutualExclusion(requirement, matchedSigners)
+
 	case signer.TypeExactlyN:
 		if err := validation.ValidateRequirement(requirement); err != nil {
 			return nil, err
 		}
 		return signer.EvaluateExactlyN(requirement, matchedSigners)
+
+	case role.TypeSeparation:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return role.EvaluateSeparationOfDuties(requirement, ctx, matchedSigners)
 
 	case role.TypeGlobalThreshold:
 		if err := validation.ValidateRequirement(requirement); err != nil {
