@@ -9,6 +9,7 @@ import (
 
 	"agpprotocol.org/agp/trust-primitive-engine/internal/model"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/parser"
+	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/provenance"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/validation"
 )
 
@@ -19,31 +20,10 @@ const (
 	typePolicyRef      = "policy_reference"
 )
 
-type policyBinding struct {
-	ID      string `json:"id"`
-	Version int    `json:"version"`
-	Digest  string `json:"digest"`
-}
-
-type participant struct {
-	ID     string `json:"id"`
-	Role   string `json:"role"`
-	Weight int    `json:"weight"`
-}
-
-type evidence struct {
-	ID           string `json:"id"`
-	EvidenceType string `json:"evidence_type"`
-	IssuerID     string `json:"issuer_id"`
-}
-
-type context struct {
-	ObjectType   string        `json:"object_type"`
-	ContextID    string        `json:"context_id"`
-	Policy       policyBinding `json:"policy"`
-	Participants []participant `json:"participants"`
-	Evidence     []evidence    `json:"evidence"`
-}
+type policyBinding = model.PolicyBinding
+type participant = model.Participant
+type evidence = model.Evidence
+type context = model.Context
 
 type signatureStatement struct {
 	SignerID string `json:"signer_id"`
@@ -77,15 +57,6 @@ func asInt(value any, field string) (int, error) {
 
 func asStrings(value any, field string) ([]string, error) {
 	return parser.AsStrings(value, field)
-}
-
-func optionalStrings(requirement map[string]any, field string) ([]string, bool, error) {
-	value, present := requirement[field]
-	if !present {
-		return nil, false, nil
-	}
-	result, err := asStrings(value, field)
-	return result, true, err
 }
 
 func validateRequirement(requirement map[string]any) error {
@@ -122,220 +93,25 @@ func uniqueSorted(values []string) []string {
 	return result
 }
 
-func filteredEvidence(
+func evaluateIssuerIn(
+	requirement map[string]any,
 	ctx context,
-	issuerIDs []string,
-	filterIssuer bool,
-	evidenceTypes []string,
-	filterType bool,
-) []evidence {
-	unique := map[string]evidence{}
-	for _, entry := range ctx.Evidence {
-		if entry.ID == "" || entry.IssuerID == "" || entry.EvidenceType == "" {
-			continue
-		}
-		if _, exists := unique[entry.ID]; !exists {
-			unique[entry.ID] = entry
-		}
-	}
-
-	ids := make([]string, 0, len(unique))
-	for id := range unique {
-		ids = append(ids, id)
-	}
-	sort.Strings(ids)
-
-	result := make([]evidence, 0, len(ids))
-	for _, id := range ids {
-		entry := unique[id]
-		if filterIssuer && !contains(issuerIDs, entry.IssuerID) {
-			continue
-		}
-		if filterType && !contains(evidenceTypes, entry.EvidenceType) {
-			continue
-		}
-		result = append(result, entry)
-	}
-	return result
+) (map[string]any, string, error) {
+	return provenance.EvaluateIssuerIn(requirement, ctx)
 }
 
-func provenanceStatus(ctx context) string {
-	if ctx.ObjectType == "agp.decision-context/3" {
-		return "available"
-	}
-	return "unavailable"
+func evaluateEvidenceTypeIn(
+	requirement map[string]any,
+	ctx context,
+) (map[string]any, string, error) {
+	return provenance.EvaluateEvidenceTypeIn(requirement, ctx)
 }
 
-func observedEntries(status string, entries []evidence) map[string]any {
-	evidenceIDs := make([]string, 0, len(entries))
-	issuerIDs := make([]string, 0, len(entries))
-	evidenceTypes := make([]string, 0, len(entries))
-	for _, entry := range entries {
-		evidenceIDs = append(evidenceIDs, entry.ID)
-		issuerIDs = append(issuerIDs, entry.IssuerID)
-		evidenceTypes = append(evidenceTypes, entry.EvidenceType)
-	}
-	return map[string]any{
-		"provenance_status": status,
-		"evidence_ids":      uniqueSorted(evidenceIDs),
-		"issuer_ids":        uniqueSorted(issuerIDs),
-		"evidence_types":    uniqueSorted(evidenceTypes),
-	}
-}
-
-func evaluateIssuerIn(requirement map[string]any, ctx context) (map[string]any, string, error) {
-	requirementID, err := asString(requirement["requirement_id"], "requirement_id")
-	if err != nil {
-		return nil, "", err
-	}
-	issuerIDs, err := asStrings(requirement["issuer_ids"], "issuer_ids")
-	if err != nil {
-		return nil, "", err
-	}
-	evidenceTypes, hasTypes, err := optionalStrings(requirement, "evidence_types")
-	if err != nil {
-		return nil, "", err
-	}
-
-	status := provenanceStatus(ctx)
-	entries := []evidence{}
-	if status == "available" {
-		entries = filteredEvidence(ctx, issuerIDs, true, evidenceTypes, hasTypes)
-	}
-	satisfied := status == "available" && len(entries) > 0
-	failure := ""
-	var failureValue any = nil
-	resultStatus := "satisfied"
-	if !satisfied {
-		resultStatus = "unsatisfied"
-		failure = "EVIDENCE_ISSUER_NOT_ALLOWED"
-		failureValue = failure
-	}
-
-	var expectedTypes any = nil
-	if hasTypes {
-		expectedTypes = evidenceTypes
-	}
-	return map[string]any{
-		"requirement_id":  requirementID,
-		"type":            typeIssuerIn,
-		"status":          resultStatus,
-		"matched_signers": []string{},
-		"observed":        observedEntries(status, entries),
-		"expected": map[string]any{
-			"issuer_ids":     issuerIDs,
-			"evidence_types": expectedTypes,
-		},
-		"failure_code": failureValue,
-	}, failure, nil
-}
-
-func evaluateEvidenceTypeIn(requirement map[string]any, ctx context) (map[string]any, string, error) {
-	requirementID, err := asString(requirement["requirement_id"], "requirement_id")
-	if err != nil {
-		return nil, "", err
-	}
-	evidenceTypes, err := asStrings(requirement["evidence_types"], "evidence_types")
-	if err != nil {
-		return nil, "", err
-	}
-	issuerIDs, hasIssuers, err := optionalStrings(requirement, "issuer_ids")
-	if err != nil {
-		return nil, "", err
-	}
-
-	status := provenanceStatus(ctx)
-	entries := []evidence{}
-	if status == "available" {
-		entries = filteredEvidence(ctx, issuerIDs, hasIssuers, evidenceTypes, true)
-	}
-	satisfied := status == "available" && len(entries) > 0
-	failure := ""
-	var failureValue any = nil
-	resultStatus := "satisfied"
-	if !satisfied {
-		resultStatus = "unsatisfied"
-		failure = "EVIDENCE_TYPE_NOT_ALLOWED"
-		failureValue = failure
-	}
-
-	var expectedIssuers any = nil
-	if hasIssuers {
-		expectedIssuers = issuerIDs
-	}
-	return map[string]any{
-		"requirement_id":  requirementID,
-		"type":            typeEvidenceIn,
-		"status":          resultStatus,
-		"matched_signers": []string{},
-		"observed":        observedEntries(status, entries),
-		"expected": map[string]any{
-			"evidence_types": evidenceTypes,
-			"issuer_ids":     expectedIssuers,
-		},
-		"failure_code": failureValue,
-	}, failure, nil
-}
-
-func evaluateDistinctIssuers(requirement map[string]any, ctx context) (map[string]any, string, error) {
-	requirementID, err := asString(requirement["requirement_id"], "requirement_id")
-	if err != nil {
-		return nil, "", err
-	}
-	minimum, err := asInt(requirement["minimum"], "minimum")
-	if err != nil {
-		return nil, "", err
-	}
-	evidenceTypes, hasTypes, err := optionalStrings(requirement, "evidence_types")
-	if err != nil {
-		return nil, "", err
-	}
-
-	status := provenanceStatus(ctx)
-	entries := []evidence{}
-	if status == "available" {
-		entries = filteredEvidence(ctx, nil, false, evidenceTypes, hasTypes)
-	}
-	issuerIDs := make([]string, 0, len(entries))
-	evidenceIDs := make([]string, 0, len(entries))
-	for _, entry := range entries {
-		issuerIDs = append(issuerIDs, entry.IssuerID)
-		evidenceIDs = append(evidenceIDs, entry.ID)
-	}
-	issuerIDs = uniqueSorted(issuerIDs)
-	evidenceIDs = uniqueSorted(evidenceIDs)
-
-	satisfied := status == "available" && len(issuerIDs) >= minimum
-	failure := ""
-	var failureValue any = nil
-	resultStatus := "satisfied"
-	if !satisfied {
-		resultStatus = "unsatisfied"
-		failure = "EVIDENCE_DISTINCT_ISSUER_MINIMUM_NOT_REACHED"
-		failureValue = failure
-	}
-
-	var expectedTypes any = nil
-	if hasTypes {
-		expectedTypes = evidenceTypes
-	}
-	return map[string]any{
-		"requirement_id":  requirementID,
-		"type":            typeDistinctIssuer,
-		"status":          resultStatus,
-		"matched_signers": []string{},
-		"observed": map[string]any{
-			"provenance_status": status,
-			"count":             len(issuerIDs),
-			"issuer_ids":        issuerIDs,
-			"evidence_ids":      evidenceIDs,
-		},
-		"expected": map[string]any{
-			"minimum":        minimum,
-			"evidence_types": expectedTypes,
-		},
-		"failure_code": failureValue,
-	}, failure, nil
+func evaluateDistinctIssuers(
+	requirement map[string]any,
+	ctx context,
+) (map[string]any, string, error) {
+	return provenance.EvaluateDistinctIssuers(requirement, ctx)
 }
 
 func findPolicy(policySet []policy, id string, version int) (policy, bool) {
