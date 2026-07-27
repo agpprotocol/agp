@@ -85,6 +85,13 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Phase 2A strict JSON parsing
+
+Strict JSON loading and conversion helpers are reusable through
+`internal/parser`, while the bounded CLI preserves its existing surface.
+
+See `PHASE-2A.md`.
+
 ## Phase 1 core types
 
 Typed fatal errors, internal policy/result invariants, and canonical JSON
