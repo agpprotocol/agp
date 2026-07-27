@@ -85,6 +85,18 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Reusable engine successor
+
+The bounded reproducer is not the target architecture for a complete Go
+implementation. The successor design is specified in:
+
+```text
+trust_primitive_engine/rfcs/TPE-GO-001-reusable-engine-architecture.md
+```
+
+Implementation proceeds incrementally while this command remains the frozen
+compatibility shell.
+
 ## Closure status
 
 The bounded TPE 2.6 Go reproduction line is formally closed by:

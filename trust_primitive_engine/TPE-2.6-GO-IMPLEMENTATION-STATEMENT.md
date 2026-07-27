@@ -151,3 +151,9 @@ That work requires a separate architecture and implementation plan covering:
 
 The successor workstream does not modify the closure status of this bounded
 TPE 2.6 reproduction profile.
+
+Its architecture and phased implementation plan are defined by:
+
+```text
+trust_primitive_engine/rfcs/TPE-GO-001-reusable-engine-architecture.md
+```
