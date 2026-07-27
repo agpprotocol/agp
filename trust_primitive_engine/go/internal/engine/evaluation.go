@@ -148,6 +148,18 @@ func evaluateRequirementNode(
 		}
 		return signer.EvaluateExactlyN(requirement, matchedSigners)
 
+	case role.TypeGlobalThreshold:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return role.EvaluateGlobalThreshold(requirement, matchedSigners)
+
+	case role.TypeGlobalWeight:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return role.EvaluateGlobalWeight(requirement, ctx, matchedSigners)
+
 	case role.TypeThreshold:
 		if err := validation.ValidateRequirement(requirement); err != nil {
 			return nil, err

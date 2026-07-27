@@ -99,3 +99,44 @@ func TestEvaluateWeightThresholdNotReached(t *testing.T) {
 		t.Fatalf("unexpected result: %#v", result)
 	}
 }
+
+func TestEvaluateGlobalThresholdCountsIdentities(t *testing.T) {
+	requirement := map[string]any{
+		"requirement_id":     "requirement:global-count",
+		"type":               TypeGlobalThreshold,
+		"minimum_signatures": 3,
+	}
+	result, err := EvaluateGlobalThreshold(
+		requirement,
+		[]string{"authority:a", "authority:b"},
+	)
+	if err != nil {
+		t.Fatalf("evaluate global threshold: %v", err)
+	}
+	if result["failure_code"] != "GLOBAL_SIGNATURE_THRESHOLD_NOT_REACHED" {
+		t.Fatalf("unexpected result: %#v", result)
+	}
+	observed := result["observed"].(map[string]any)
+	if observed["signature_count"] != 2 {
+		t.Fatalf("unexpected observed: %#v", observed)
+	}
+}
+
+func TestEvaluateGlobalWeight(t *testing.T) {
+	requirement := map[string]any{
+		"requirement_id": "requirement:global-weight",
+		"type":           TypeGlobalWeight,
+		"minimum_weight": 5,
+	}
+	result, err := EvaluateGlobalWeight(
+		requirement,
+		testContext(),
+		[]string{"authority:a", "authority:b"},
+	)
+	if err != nil {
+		t.Fatalf("evaluate global weight: %v", err)
+	}
+	if result["status"] != "satisfied" {
+		t.Fatalf("unexpected result: %#v", result)
+	}
+}

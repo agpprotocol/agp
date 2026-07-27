@@ -116,3 +116,50 @@ func TestReproduce(t *testing.T) {
 		t.Fatalf("unexpected signature count: %#v", result["signature_count"])
 	}
 }
+
+func TestReproduceSignatureCountUsesMatchedIdentities(t *testing.T) {
+	input := model.EvaluationInput{
+		ContextDigest: "context-digest",
+		Context: model.Context{
+			ContextID: "context:1",
+			Policy: model.PolicyBinding{
+				ID:      "policy:root",
+				Version: 1,
+				Digest:  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			},
+			Participants: []model.Participant{
+				{ID: "authority:a", Role: "approver", Weight: 2},
+				{ID: "authority:b", Role: "approver", Weight: 3},
+			},
+		},
+		Signatures: []model.Signature{
+			{SignatureID: "signature:1", Statement: model.SignatureStatement{SignerID: "authority:a"}},
+			{SignatureID: "signature:2", Statement: model.SignatureStatement{SignerID: "authority:a"}},
+			{SignatureID: "signature:3", Statement: model.SignatureStatement{SignerID: "authority:b"}},
+		},
+	}
+	root := model.Policy{
+		ObjectType:    "agp.trust-policy/2",
+		PolicyID:      "policy:root",
+		Version:       1,
+		EligibleRoles: []string{"approver"},
+		Requirements: []map[string]any{
+			{
+				"requirement_id":     "requirement:global-count",
+				"type":               "global_signature_threshold",
+				"minimum_signatures": 2,
+			},
+		},
+	}
+
+	result, err := Reproduce(input, root, nil)
+	if err != nil {
+		t.Fatalf("reproduce: %v", err)
+	}
+	if result["signature_count"] != 2 {
+		t.Fatalf("expected two matched identities: %#v", result)
+	}
+	if len(result["verified_signature_ids"].([]string)) != 3 {
+		t.Fatalf("expected three verified signatures: %#v", result)
+	}
+}

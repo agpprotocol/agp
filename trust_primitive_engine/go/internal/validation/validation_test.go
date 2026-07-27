@@ -240,3 +240,32 @@ func TestValidateRoleThresholdRequirements(t *testing.T) {
 		t.Fatal("boolean minimum accepted")
 	}
 }
+
+func TestValidateGlobalThresholdRequirements(t *testing.T) {
+	valid := []map[string]any{
+		{
+			"requirement_id":     "requirement:global-count",
+			"type":               "global_signature_threshold",
+			"minimum_signatures": 2,
+		},
+		{
+			"requirement_id": "requirement:global-weight",
+			"type":           "global_weight_threshold",
+			"minimum_weight": 5,
+		},
+	}
+	for _, requirement := range valid {
+		if err := ValidateRequirement(requirement); err != nil {
+			t.Fatalf("valid %s rejected: %v", requirement["type"], err)
+		}
+	}
+
+	invalid := map[string]any{
+		"requirement_id":     "requirement:global-count",
+		"type":               "global_signature_threshold",
+		"minimum_signatures": true,
+	}
+	if err := ValidateRequirement(invalid); err == nil {
+		t.Fatal("boolean minimum accepted")
+	}
+}
