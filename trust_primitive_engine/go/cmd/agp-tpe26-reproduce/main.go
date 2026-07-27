@@ -12,12 +12,14 @@ import (
 )
 
 const (
-	typeIssuerIn       = "evidence_issuer_in"
-	typeEvidenceIn     = "evidence_type_in"
-	typeDistinctIssuer = "evidence_distinct_issuers_at_least"
-	typePolicyRef      = "policy_reference"
-	maxSetSize         = 64
-	maxSafeInteger     = 9007199254740991
+	typeIssuerIn            = "evidence_issuer_in"
+	typeEvidenceIn          = "evidence_type_in"
+	typeDistinctIssuer      = "evidence_distinct_issuers_at_least"
+	typePolicyRef           = "policy_reference"
+	maxSetSize              = 64
+	maxSafeInteger          = 9007199254740991
+	maxRequirementDepth     = 8
+	maxRequirementNodeCount = 256
 )
 
 var (
@@ -330,6 +332,135 @@ func validateRequirement(requirement map[string]any) error {
 	}
 }
 
+func validateRequirementTree(raw any) error {
+	rawRequirements, ok := raw.([]any)
+	if !ok || len(rawRequirements) == 0 {
+		return errors.New("requirements must be a non-empty array")
+	}
+
+	seenIDs := map[string]struct{}{}
+	nodeCount := 0
+
+	var validateNode func(any, int) (string, error)
+	validateNode = func(rawNode any, depth int) (string, error) {
+		if depth > maxRequirementDepth {
+			return "", fmt.Errorf(
+				"requirement tree depth exceeds %d",
+				maxRequirementDepth,
+			)
+		}
+
+		nodeCount++
+		if nodeCount > maxRequirementNodeCount {
+			return "", fmt.Errorf(
+				"requirement tree node count exceeds %d",
+				maxRequirementNodeCount,
+			)
+		}
+
+		node, ok := rawNode.(map[string]any)
+		if !ok {
+			return "", errors.New(
+				"requirement tree node must be an object",
+			)
+		}
+
+		requirementID, err := validateIdentifier(
+			node["requirement_id"],
+			"requirement_id",
+		)
+		if err != nil {
+			return "", err
+		}
+		if _, exists := seenIDs[requirementID]; exists {
+			return "", errors.New(
+				"requirement_id values must be globally unique",
+			)
+		}
+		seenIDs[requirementID] = struct{}{}
+
+		operatorType, err := asString(node["type"], "type")
+		if err != nil {
+			return "", errors.New("primitive type must be a string")
+		}
+
+		switch operatorType {
+		case "all_of", "any_of":
+			if err := validateExactMembers(
+				node,
+				[]string{"requirement_id", "type", "requirements"},
+				nil,
+			); err != nil {
+				return "", err
+			}
+
+			children, ok := node["requirements"].([]any)
+			if !ok || len(children) < 2 {
+				return "", fmt.Errorf(
+					"%s requirements must contain at least two children",
+					operatorType,
+				)
+			}
+
+			childIDs := make([]string, 0, len(children))
+			for _, child := range children {
+				childID, err := validateNode(child, depth+1)
+				if err != nil {
+					return "", err
+				}
+				childIDs = append(childIDs, childID)
+			}
+
+			sortedIDs := append([]string(nil), childIDs...)
+			sort.Strings(sortedIDs)
+			if !reflect.DeepEqual(childIDs, sortedIDs) {
+				return "", fmt.Errorf(
+					"%s children must be ordered by requirement_id",
+					operatorType,
+				)
+			}
+
+		case "not":
+			if err := validateExactMembers(
+				node,
+				[]string{"requirement_id", "type", "requirement"},
+				nil,
+			); err != nil {
+				return "", err
+			}
+			if _, err := validateNode(node["requirement"], depth+1); err != nil {
+				return "", err
+			}
+
+		default:
+			if err := validateRequirement(node); err != nil {
+				return "", err
+			}
+		}
+
+		return requirementID, nil
+	}
+
+	topLevelIDs := make([]string, 0, len(rawRequirements))
+	for _, rawRequirement := range rawRequirements {
+		requirementID, err := validateNode(rawRequirement, 1)
+		if err != nil {
+			return err
+		}
+		topLevelIDs = append(topLevelIDs, requirementID)
+	}
+
+	sortedTopLevelIDs := append([]string(nil), topLevelIDs...)
+	sort.Strings(sortedTopLevelIDs)
+	if !reflect.DeepEqual(topLevelIDs, sortedTopLevelIDs) {
+		return errors.New(
+			"requirements must be ordered by requirement_id",
+		)
+	}
+
+	return nil
+}
+
 func validatePolicy(value any) error {
 	policyValue, ok := value.(map[string]any)
 	if !ok {
@@ -358,7 +489,10 @@ func validatePolicy(value any) error {
 		return errors.New("object_type must be agp.trust-policy/2")
 	}
 
-	if _, err := validateIdentifier(policyValue["policy_id"], "policy_id"); err != nil {
+	if _, err := validateIdentifier(
+		policyValue["policy_id"],
+		"policy_id",
+	); err != nil {
 		return err
 	}
 
@@ -403,49 +537,7 @@ func validatePolicy(value any) error {
 		}
 	}
 
-	rawRequirements, ok := policyValue["requirements"].([]any)
-	if !ok {
-		return errors.New("requirements must be an array")
-	}
-	if len(rawRequirements) == 0 {
-		return errors.New("requirements must be a non-empty array")
-	}
-
-	requirementIDs := make([]string, 0, len(rawRequirements))
-	for _, rawRequirement := range rawRequirements {
-		requirement, ok := rawRequirement.(map[string]any)
-		if !ok {
-			return errors.New("requirements[] must be an object")
-		}
-		if err := validateRequirement(requirement); err != nil {
-			return err
-		}
-		requirementID, err := asString(
-			requirement["requirement_id"],
-			"requirement_id",
-		)
-		if err != nil {
-			return err
-		}
-		requirementIDs = append(requirementIDs, requirementID)
-	}
-
-	sortedIDs := append([]string(nil), requirementIDs...)
-	sort.Strings(sortedIDs)
-	if !reflect.DeepEqual(requirementIDs, sortedIDs) {
-		return errors.New(
-			"requirements must be ordered by requirement_id",
-		)
-	}
-	for index := 1; index < len(requirementIDs); index++ {
-		if requirementIDs[index] == requirementIDs[index-1] {
-			return errors.New(
-				"requirement_id values must be unique",
-			)
-		}
-	}
-
-	return nil
+	return validateRequirementTree(policyValue["requirements"])
 }
 
 func contains(values []string, candidate string) bool {
