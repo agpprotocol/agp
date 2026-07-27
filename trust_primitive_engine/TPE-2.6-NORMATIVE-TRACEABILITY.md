@@ -72,6 +72,18 @@ built from the repository:
 This prevents a stale local environment from being mistaken for the contents
 of the newly built distribution.
 
+## Cross-language composition plus policy-reference boundary
+
+`trust_primitive_engine/tools/test_tpe26_go_composition_policy_reference_evaluation.py`
+compares complete Python and Go evaluation objects across 8 bounded vectors.
+
+The claim covers policy references inside all three composition operators,
+transitive references, repeated references to a shared policy, recursive
+`referenced_policy` evidence, outer-composition failure suppression, and
+deterministic failure projection by full requirement path.
+
+The matrix remains restricted to the three TPE 2.6 evidence-provenance leaves.
+
 ## Cross-language composition-evaluation boundary
 
 `trust_primitive_engine/tools/test_tpe26_go_composition_evaluation.py`

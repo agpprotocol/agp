@@ -27,6 +27,15 @@ Expected marker:
 TPE 2.6 Python/Go frozen-profile reproduction: 7/7 passed
 ```
 
+## Composition with policy references
+
+The reproduction binary evaluates policy references nested under `all_of`,
+`any_of`, and `not`, including transitive references and repeated shared-policy
+branches.
+
+The 8-vector suite compares complete Python and Go evaluation objects,
+including nested `referenced_policy` results and failure-code ordering.
+
 ## Composition evaluation
 
 The reproduction binary evaluates bounded `all_of`, `any_of`, and `not`
