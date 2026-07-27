@@ -232,3 +232,10 @@ The reusable engine evaluates `separation_of_duties` and
 `mutual_exclusion` with Python-compatible validation and result shapes.
 
 See `PHASE-4.1F.md`.
+
+## Phase 4.1G-1 evidence manifest projection
+
+The public and internal Go context models preserve evidence `digest` and
+`media_type` through JSON decoding and public-to-internal conversion.
+
+See `PHASE-4.1G-1.md`.

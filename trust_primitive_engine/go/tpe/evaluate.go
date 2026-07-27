@@ -31,6 +31,8 @@ func toInternalContext(value Context) model.Context {
 	for index, item := range value.Evidence {
 		evidence[index] = model.Evidence{
 			ID:           item.ID,
+			Digest:       item.Digest,
+			MediaType:    item.MediaType,
 			EvidenceType: item.EvidenceType,
 			IssuerID:     item.IssuerID,
 		}
