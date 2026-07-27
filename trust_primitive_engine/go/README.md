@@ -85,6 +85,13 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Phase 3A provenance leaf evaluation
+
+Decision-context models and TPE 2.6 provenance leaf evaluators are reusable
+through `internal/model` and `internal/primitives/provenance`.
+
+See `PHASE-3A.md`.
+
 ## Phase 2C policy-reference graph validation
 
 The shared policy model and bounded graph validation are reusable through
