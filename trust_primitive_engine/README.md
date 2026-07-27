@@ -370,7 +370,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 The expected final line is:
 
 ```text
-AGP TPE 2.6 development validation: 783/783 passed
+AGP TPE 2.6 development validation: 796/796 passed
 ```
 
 TPE 2.4 coverage includes:
@@ -421,6 +421,26 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-NORMATIVE-TRACEABILITY.md`
+
+### TPE 2.6 Python/Go policy-reference graph validation parity
+
+A bounded 13-case matrix checks direct, transitive, and shared references;
+missing references and digest mismatches; controlled self and indirect cycles;
+depth 8/9; policy-count and expanded-node limits; and policy-set order
+independence.
+
+The Go reproducer performs this graph preflight before recursive evaluation, so
+an invalid graph cannot emit a partial evaluation object.
+
+```bash
+python trust_primitive_engine/tools/test_tpe26_go_policy_reference_graph_validation.py
+```
+
+Expected marker:
+
+```text
+TPE 2.6 Python/Go policy-reference graph validation parity: 13/13 passed
+```
 
 ### TPE 2.6 Python/Go composition + policy-reference parity
 
