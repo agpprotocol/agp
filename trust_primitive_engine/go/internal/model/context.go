@@ -17,6 +17,8 @@ type Participant struct {
 // Evidence is one decision-context evidence manifest entry.
 type Evidence struct {
 	ID           string `json:"id"`
+	Digest       string `json:"digest"`
+	MediaType    string `json:"media_type"`
 	EvidenceType string `json:"evidence_type"`
 	IssuerID     string `json:"issuer_id"`
 }
