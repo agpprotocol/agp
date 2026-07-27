@@ -269,3 +269,23 @@ func TestValidateGlobalThresholdRequirements(t *testing.T) {
 		t.Fatal("boolean minimum accepted")
 	}
 }
+
+func TestValidateDutyAndMutualExclusionRequirements(t *testing.T) {
+	valid := []map[string]any{
+		{"requirement_id": "requirement:separation", "type": "separation_of_duties", "roles": []any{"approver", "reviewer"}},
+		{"requirement_id": "requirement:mutual", "type": "mutual_exclusion", "signer_ids": []any{"authority:a", "authority:b"}},
+	}
+	for _, requirement := range valid {
+		if err := ValidateRequirement(requirement); err != nil {
+			t.Fatalf("valid %s rejected: %v", requirement["type"], err)
+		}
+	}
+	invalidSeparation := map[string]any{"requirement_id": "requirement:separation", "type": "separation_of_duties", "roles": []any{"reviewer", "approver"}}
+	if err := ValidateRequirement(invalidSeparation); err == nil {
+		t.Fatal("unsorted separation roles accepted")
+	}
+	invalidMutual := map[string]any{"requirement_id": "requirement:mutual", "type": "mutual_exclusion", "signer_ids": []any{"authority:a", "authority:b", "authority:c"}}
+	if err := ValidateRequirement(invalidMutual); err == nil {
+		t.Fatal("three-way mutual exclusion accepted")
+	}
+}

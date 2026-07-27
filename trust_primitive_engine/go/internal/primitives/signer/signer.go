@@ -16,6 +16,7 @@ const (
 	TypeAtLeast    = "at_least_n_signers"
 	TypeAtMost     = "at_most_n_signers"
 	TypeExactlyN   = "exactly_n_signers"
+	TypeMutual     = "mutual_exclusion"
 )
 
 func matchedSet(values []string) map[string]struct{} {
@@ -371,5 +372,35 @@ func evaluateSignerCardinality(
 			"signer_ids": signerIDs,
 		},
 		"failure_code": failure,
+	}, nil
+}
+
+func EvaluateMutualExclusion(
+	requirement map[string]any,
+	matchedSigners []string,
+) (map[string]any, error) {
+	requirementID, err := parser.AsString(requirement["requirement_id"], "requirement_id")
+	if err != nil {
+		return nil, err
+	}
+	signerIDs, err := parser.AsStrings(requirement["signer_ids"], "signer_ids")
+	if err != nil {
+		return nil, err
+	}
+	present := signerMatches(signerIDs, matchedSigners)
+	status := "satisfied"
+	var failure any
+	if len(present) > 1 {
+		status = "unsatisfied"
+		failure = "MUTUAL_EXCLUSION_VIOLATED"
+	}
+	return map[string]any{
+		"requirement_id":  requirementID,
+		"type":            TypeMutual,
+		"status":          status,
+		"matched_signers": present,
+		"observed":        map[string]any{"present_signer_ids": present},
+		"expected":        map[string]any{"maximum_simultaneous": 1, "signer_ids": signerIDs},
+		"failure_code":    failure,
 	}, nil
 }

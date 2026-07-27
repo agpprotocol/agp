@@ -225,3 +225,10 @@ The reusable engine evaluates `global_signature_threshold` and
 `global_weight_threshold` over distinct matched signer identities.
 
 See `PHASE-4.1E.md`.
+
+## Phase 4.1F duty separation and mutual exclusion
+
+The reusable engine evaluates `separation_of_duties` and
+`mutual_exclusion` with Python-compatible validation and result shapes.
+
+See `PHASE-4.1F.md`.

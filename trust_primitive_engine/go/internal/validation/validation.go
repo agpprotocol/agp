@@ -27,6 +27,8 @@ const (
 	typeRoleWeightThreshold = "role_weight_threshold"
 	typeGlobalThreshold     = "global_signature_threshold"
 	typeGlobalWeight        = "global_weight_threshold"
+	typeSeparationOfDuties  = "separation_of_duties"
+	typeMutualExclusion     = "mutual_exclusion"
 	maxSetSize              = 64
 	maxSafeInteger          = 9007199254740991
 	maxRequirementDepth     = 8
@@ -208,7 +210,7 @@ func ValidateRequirement(requirement map[string]any) error {
 		}
 		return nil
 
-	case typeAnyOfSigners, typeAllOfSigners, typeExactlyOneSigners:
+	case typeAnyOfSigners, typeAllOfSigners, typeExactlyOneSigners, typeMutualExclusion:
 		if err := validateExactMembers(
 			requirement,
 			[]string{"requirement_id", "type", "signer_ids"},
@@ -229,6 +231,12 @@ func ValidateRequirement(requirement map[string]any) error {
 		)
 		if err != nil {
 			return err
+		}
+		if primitiveType == typeMutualExclusion {
+			if len(signerIDs) != 2 {
+				return errors.New("mutual_exclusion signer_ids must contain exactly two entries")
+			}
+			return nil
 		}
 		if len(signerIDs) < 2 {
 			return errors.New("signer_ids must contain at least two entries")
@@ -294,6 +302,36 @@ func ValidateRequirement(requirement map[string]any) error {
 					limitField,
 				)
 			}
+		}
+		return nil
+
+	case typeSeparationOfDuties:
+		if err := validateExactMembers(requirement, []string{"requirement_id", "type", "roles"}, nil); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(requirement["requirement_id"], "requirement_id"); err != nil {
+			return err
+		}
+		roles, err := parser.AsStrings(requirement["roles"], "roles")
+		if err != nil {
+			return err
+		}
+		if len(roles) != 2 {
+			return errors.New("separation_of_duties roles must contain exactly two entries")
+		}
+		allowedRoles := map[string]struct{}{
+			"approver": {}, "observer": {}, "proposer": {}, "reviewer": {}, "voter": {},
+		}
+		for _, roleValue := range roles {
+			if _, present := allowedRoles[roleValue]; !present {
+				return errors.New("separation_of_duties roles contain an unsupported role")
+			}
+		}
+		if roles[0] == roles[1] {
+			return errors.New("separation_of_duties roles must be distinct")
+		}
+		if roles[0] > roles[1] {
+			return errors.New("separation_of_duties roles must be in canonical order")
 		}
 		return nil
 
