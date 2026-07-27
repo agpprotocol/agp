@@ -23,6 +23,8 @@ const (
 	typeAtLeastNSigners     = "at_least_n_signers"
 	typeAtMostNSigners      = "at_most_n_signers"
 	typeExactlyNSigners     = "exactly_n_signers"
+	typeRoleThreshold       = "role_threshold"
+	typeRoleWeightThreshold = "role_weight_threshold"
 	maxSetSize              = 64
 	maxSafeInteger          = 9007199254740991
 	maxRequirementDepth     = 8
@@ -290,6 +292,51 @@ func ValidateRequirement(requirement map[string]any) error {
 					limitField,
 				)
 			}
+		}
+		return nil
+
+	case typeRoleThreshold, typeRoleWeightThreshold:
+		limitField := "minimum_signatures"
+		if primitiveType == typeRoleWeightThreshold {
+			limitField = "minimum_weight"
+		}
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "role", limitField},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		roleValue, err := parser.AsString(requirement["role"], "role")
+		if err != nil {
+			return err
+		}
+		allowedRoles := map[string]struct{}{
+			"approver": {},
+			"observer": {},
+			"proposer": {},
+			"reviewer": {},
+			"voter":    {},
+		}
+		if _, present := allowedRoles[roleValue]; !present {
+			return errors.New("role must be a supported role")
+		}
+		minimum, err := parser.AsInt(requirement[limitField], limitField)
+		if err != nil {
+			return err
+		}
+		const maxSafeInteger = 9007199254740991
+		if minimum < 1 || minimum > maxSafeInteger {
+			return fmt.Errorf(
+				"%s must be between one and the maximum safe integer",
+				limitField,
+			)
 		}
 		return nil
 
