@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"sort"
 
 	"agpprotocol.org/agp/trust-primitive-engine/internal/engine"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/model"
@@ -25,21 +24,9 @@ type participant = model.Participant
 type evidence = model.Evidence
 type context = model.Context
 
-type signatureStatement struct {
-	SignerID string `json:"signer_id"`
-}
-
-type signature struct {
-	SignatureID string             `json:"signature_id"`
-	Statement   signatureStatement `json:"statement"`
-}
-
-type evaluationInput struct {
-	ObjectType    string      `json:"object_type"`
-	ContextDigest string      `json:"context_digest"`
-	Context       context     `json:"context"`
-	Signatures    []signature `json:"signatures"`
-}
+type signatureStatement = model.SignatureStatement
+type signature = model.Signature
+type evaluationInput = model.EvaluationInput
 
 type policy = model.Policy
 
@@ -69,28 +56,6 @@ func validateRequirementTree(raw any) error {
 
 func validatePolicy(value any) error {
 	return validation.ValidatePolicy(value)
-}
-
-func contains(values []string, candidate string) bool {
-	for _, value := range values {
-		if value == candidate {
-			return true
-		}
-	}
-	return false
-}
-
-func uniqueSorted(values []string) []string {
-	set := map[string]struct{}{}
-	for _, value := range values {
-		set[value] = struct{}{}
-	}
-	result := make([]string, 0, len(set))
-	for value := range set {
-		result = append(result, value)
-	}
-	sort.Strings(result)
-	return result
 }
 
 func evaluateIssuerIn(
@@ -239,43 +204,7 @@ func signerProjection(
 	ineligible []string,
 	weight int,
 ) {
-	verifiedSignatureIDs = []string{}
-	verifiedSigners = []string{}
-	matchedSigners = []string{}
-	unauthorized = []string{}
-	ineligible = []string{}
-	signers := []string{}
-	for _, item := range input.Signatures {
-		verifiedSignatureIDs = append(
-			verifiedSignatureIDs,
-			item.SignatureID,
-		)
-		signers = append(signers, item.Statement.SignerID)
-	}
-	verifiedSignatureIDs = uniqueSorted(verifiedSignatureIDs)
-	verifiedSigners = uniqueSorted(signers)
-
-	participants := map[string]participant{}
-	for _, item := range input.Context.Participants {
-		participants[item.ID] = item
-	}
-	for _, signer := range verifiedSigners {
-		item, ok := participants[signer]
-		if !ok {
-			unauthorized = append(unauthorized, signer)
-			continue
-		}
-		if !contains(root.EligibleRoles, item.Role) {
-			ineligible = append(ineligible, signer)
-			continue
-		}
-		matchedSigners = append(matchedSigners, signer)
-		weight += item.Weight
-	}
-	sort.Strings(matchedSigners)
-	sort.Strings(unauthorized)
-	sort.Strings(ineligible)
-	return
+	return engine.SignerProjection(input, root)
 }
 
 func reproduce(
@@ -283,41 +212,7 @@ func reproduce(
 	root policy,
 	policySet []policy,
 ) (map[string]any, error) {
-	if err := validatePolicyReferenceGraph(root, policySet); err != nil {
-		return nil, err
-	}
-
-	requirementResults, failureCodes, status, err :=
-		evaluateRequirements(root, policySet, input.Context)
-	if err != nil {
-		return nil, err
-	}
-
-	verifiedSignatureIDs,
-		verifiedSigners,
-		matchedSigners,
-		unauthorized,
-		ineligible,
-		weight := signerProjection(input, root)
-
-	return map[string]any{
-		"object_type":             "agp.trust-policy-evaluation/2",
-		"status":                  status,
-		"policy_id":               root.PolicyID,
-		"policy_version":          root.Version,
-		"policy_digest":           input.Context.Policy.Digest,
-		"context_id":              input.Context.ContextID,
-		"context_digest":          input.ContextDigest,
-		"verified_signature_ids":  verifiedSignatureIDs,
-		"verified_signers":        verifiedSigners,
-		"matched_signers":         matchedSigners,
-		"unauthorized_signers":    unauthorized,
-		"ineligible_role_signers": ineligible,
-		"signature_count":         len(verifiedSignatureIDs),
-		"weight":                  weight,
-		"requirement_results":     requirementResults,
-		"failure_codes":           failureCodes,
-	}, nil
+	return engine.Reproduce(input, root, policySet)
 }
 
 func policyValidationReceipt(path string) error {
