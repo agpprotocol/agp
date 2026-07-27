@@ -787,134 +787,431 @@ func findPolicy(policySet []policy, id string, version int) (policy, bool) {
 	return policy{}, false
 }
 
+type projectedFailure struct {
+	path          []string
+	emissionIndex int
+	failureCode   string
+}
+
+func resultSatisfied(result map[string]any) bool {
+	status, _ := result["status"].(string)
+	return status == "satisfied"
+}
+
+func resultMatchedSigners(result map[string]any) []string {
+	values, ok := result["matched_signers"].([]string)
+	if ok {
+		return append([]string(nil), values...)
+	}
+	raw, ok := result["matched_signers"].([]any)
+	if !ok {
+		return []string{}
+	}
+	values = make([]string, 0, len(raw))
+	for _, item := range raw {
+		if value, ok := item.(string); ok {
+			values = append(values, value)
+		}
+	}
+	return values
+}
+
+func aggregateChildMatchedSigners(children []any) []string {
+	values := []string{}
+	for _, rawChild := range children {
+		child, ok := rawChild.(map[string]any)
+		if !ok {
+			continue
+		}
+		values = append(values, resultMatchedSigners(child)...)
+	}
+	return uniqueSorted(values)
+}
+
+func evaluateRequirementNode(
+	requirement map[string]any,
+	policySet []policy,
+	ctx context,
+) (map[string]any, error) {
+	primitiveType, err := asString(requirement["type"], "type")
+	if err != nil {
+		return nil, err
+	}
+
+	switch primitiveType {
+	case typeIssuerIn:
+		if err := validateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := evaluateIssuerIn(requirement, ctx)
+		return result, err
+
+	case typeEvidenceIn:
+		if err := validateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := evaluateEvidenceTypeIn(requirement, ctx)
+		return result, err
+
+	case typeDistinctIssuer:
+		if err := validateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := evaluateDistinctIssuers(requirement, ctx)
+		return result, err
+
+	case "all_of", "any_of":
+		rawChildren, ok := requirement["requirements"].([]any)
+		if !ok {
+			return nil, errors.New(
+				"composition requirements must be an array",
+			)
+		}
+
+		children := make([]any, 0, len(rawChildren))
+		satisfiedChildren := 0
+		for _, rawChild := range rawChildren {
+			child, ok := rawChild.(map[string]any)
+			if !ok {
+				return nil, errors.New(
+					"composition child must be an object",
+				)
+			}
+			childResult, innerErr := evaluateRequirementNode(
+				child,
+				policySet,
+				ctx,
+			)
+			if innerErr != nil {
+				return nil, innerErr
+			}
+			if resultSatisfied(childResult) {
+				satisfiedChildren++
+			}
+			children = append(children, childResult)
+		}
+
+		totalChildren := len(children)
+		satisfied := satisfiedChildren == totalChildren
+		expected := map[string]any{
+			"required_satisfied_children": totalChildren,
+		}
+		failureCode := "ALL_OF_NOT_SATISFIED"
+
+		if primitiveType == "any_of" {
+			satisfied = satisfiedChildren >= 1
+			expected = map[string]any{
+				"minimum_satisfied_children": 1,
+			}
+			failureCode = "ANY_OF_NOT_SATISFIED"
+		}
+
+		status := "satisfied"
+		var failureValue any = nil
+		if !satisfied {
+			status = "unsatisfied"
+			failureValue = failureCode
+		}
+
+		requirementID, err := asString(
+			requirement["requirement_id"],
+			"requirement_id",
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		return map[string]any{
+			"requirement_id":  requirementID,
+			"type":            primitiveType,
+			"status":          status,
+			"matched_signers": aggregateChildMatchedSigners(children),
+			"observed": map[string]any{
+				"satisfied_children": satisfiedChildren,
+				"total_children":     totalChildren,
+			},
+			"expected":     expected,
+			"failure_code": failureValue,
+			"children":     children,
+		}, nil
+
+	case "not":
+		rawChild, ok := requirement["requirement"].(map[string]any)
+		if !ok {
+			return nil, errors.New("not child must be an object")
+		}
+
+		child, err := evaluateRequirementNode(
+			rawChild,
+			policySet,
+			ctx,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		childSatisfied := resultSatisfied(child)
+		satisfied := !childSatisfied
+		status := "satisfied"
+		var failureValue any = nil
+		if !satisfied {
+			status = "unsatisfied"
+			failureValue = "NOT_NOT_SATISFIED"
+		}
+
+		childStatus := "unsatisfied"
+		if childSatisfied {
+			childStatus = "satisfied"
+		}
+
+		requirementID, err := asString(
+			requirement["requirement_id"],
+			"requirement_id",
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		return map[string]any{
+			"requirement_id":  requirementID,
+			"type":            "not",
+			"status":          status,
+			"matched_signers": []string{},
+			"observed": map[string]any{
+				"child_status": childStatus,
+			},
+			"expected": map[string]any{
+				"child_status": "unsatisfied",
+			},
+			"failure_code": failureValue,
+			"children":     []any{child},
+		}, nil
+
+	case typePolicyRef:
+		requirementID, innerErr := asString(
+			requirement["requirement_id"],
+			"requirement_id",
+		)
+		if innerErr != nil {
+			return nil, innerErr
+		}
+		policyID, innerErr := asString(
+			requirement["policy_id"],
+			"policy_id",
+		)
+		if innerErr != nil {
+			return nil, innerErr
+		}
+		version, innerErr := asInt(
+			requirement["policy_version"],
+			"policy_version",
+		)
+		if innerErr != nil {
+			return nil, innerErr
+		}
+		digest, innerErr := asString(
+			requirement["policy_digest"],
+			"policy_digest",
+		)
+		if innerErr != nil {
+			return nil, innerErr
+		}
+		referenced, ok := findPolicy(policySet, policyID, version)
+		if !ok {
+			return nil, fmt.Errorf(
+				"referenced policy not found: %s/%d",
+				policyID,
+				version,
+			)
+		}
+
+		nestedResults, nestedFailures, nestedStatus, innerErr :=
+			evaluateRequirements(referenced, policySet, ctx)
+		if innerErr != nil {
+			return nil, innerErr
+		}
+
+		referenceStatus := "satisfied"
+		var referenceFailure any = nil
+		if nestedStatus != "satisfied" {
+			referenceStatus = "unsatisfied"
+			referenceFailure = "POLICY_REFERENCE_NOT_SATISFIED"
+		}
+
+		return map[string]any{
+			"requirement_id":  requirementID,
+			"type":            typePolicyRef,
+			"status":          referenceStatus,
+			"matched_signers": []string{},
+			"observed": map[string]any{
+				"policy_id":      policyID,
+				"policy_version": version,
+				"policy_digest":  digest,
+				"policy_status":  nestedStatus,
+			},
+			"expected": map[string]any{
+				"policy_status": "satisfied",
+			},
+			"failure_code": referenceFailure,
+			"referenced_policy": map[string]any{
+				"policy_id":           policyID,
+				"policy_version":      version,
+				"policy_digest":       digest,
+				"status":              nestedStatus,
+				"requirement_results": nestedResults,
+				"failure_codes":       nestedFailures,
+			},
+		}, nil
+
+	default:
+		return nil, fmt.Errorf(
+			"unsupported requirement type: %s",
+			primitiveType,
+		)
+	}
+}
+
+func compareFailurePaths(left []string, right []string) int {
+	limit := len(left)
+	if len(right) < limit {
+		limit = len(right)
+	}
+	for index := 0; index < limit; index++ {
+		if left[index] < right[index] {
+			return -1
+		}
+		if left[index] > right[index] {
+			return 1
+		}
+	}
+	if len(left) < len(right) {
+		return -1
+	}
+	if len(left) > len(right) {
+		return 1
+	}
+	return 0
+}
+
+func projectRecursiveFailureCodes(results []any) []string {
+	projected := []projectedFailure{}
+	emissionIndex := 0
+
+	var visit func(map[string]any, []string)
+	visit = func(result map[string]any, pathPrefix []string) {
+		if resultSatisfied(result) {
+			return
+		}
+
+		requirementID, _ := result["requirement_id"].(string)
+		failureCode, _ := result["failure_code"].(string)
+		resultPath := append(
+			append([]string(nil), pathPrefix...),
+			requirementID,
+		)
+		projected = append(projected, projectedFailure{
+			path:          resultPath,
+			emissionIndex: emissionIndex,
+			failureCode:   failureCode,
+		})
+		emissionIndex++
+
+		primitiveType, _ := result["type"].(string)
+		switch primitiveType {
+		case "all_of":
+			children, _ := result["children"].([]any)
+			for _, rawChild := range children {
+				child, ok := rawChild.(map[string]any)
+				if ok && !resultSatisfied(child) {
+					visit(child, pathPrefix)
+				}
+			}
+
+		case "any_of":
+			children, _ := result["children"].([]any)
+			for _, rawChild := range children {
+				child, ok := rawChild.(map[string]any)
+				if ok {
+					visit(child, pathPrefix)
+				}
+			}
+
+		case "not":
+			return
+
+		case typePolicyRef:
+			referenced, ok := result["referenced_policy"].(map[string]any)
+			if !ok {
+				return
+			}
+			nested, _ := referenced["requirement_results"].([]any)
+			for _, rawNested := range nested {
+				nestedResult, ok := rawNested.(map[string]any)
+				if ok {
+					visit(nestedResult, resultPath)
+				}
+			}
+		}
+	}
+
+	for _, rawResult := range results {
+		result, ok := rawResult.(map[string]any)
+		if ok {
+			visit(result, nil)
+		}
+	}
+
+	sort.SliceStable(
+		projected,
+		func(left int, right int) bool {
+			compared := compareFailurePaths(
+				projected[left].path,
+				projected[right].path,
+			)
+			if compared != 0 {
+				return compared < 0
+			}
+			return projected[left].emissionIndex <
+				projected[right].emissionIndex
+		},
+	)
+
+	failures := make([]string, 0, len(projected))
+	for _, item := range projected {
+		failures = append(failures, item.failureCode)
+	}
+	return failures
+}
+
 func evaluateRequirements(
 	current policy,
 	policySet []policy,
 	ctx context,
 ) ([]any, []string, string, error) {
 	results := make([]any, 0, len(current.Requirements))
-	failures := []string{}
+	satisfied := true
 
 	for _, requirement := range current.Requirements {
-		primitiveType, err := asString(requirement["type"], "type")
+		result, err := evaluateRequirementNode(
+			requirement,
+			policySet,
+			ctx,
+		)
 		if err != nil {
 			return nil, nil, "", err
 		}
-		if primitiveType != typePolicyRef {
-			if err := validateRequirement(requirement); err != nil {
-				return nil, nil, "", err
-			}
-		}
-
-		var result map[string]any
-		var failure string
-
-		switch primitiveType {
-		case typeIssuerIn:
-			result, failure, err = evaluateIssuerIn(requirement, ctx)
-		case typeEvidenceIn:
-			result, failure, err = evaluateEvidenceTypeIn(requirement, ctx)
-		case typeDistinctIssuer:
-			result, failure, err = evaluateDistinctIssuers(requirement, ctx)
-		case typePolicyRef:
-			requirementID, innerErr := asString(
-				requirement["requirement_id"],
-				"requirement_id",
-			)
-			if innerErr != nil {
-				return nil, nil, "", innerErr
-			}
-			policyID, innerErr := asString(requirement["policy_id"], "policy_id")
-			if innerErr != nil {
-				return nil, nil, "", innerErr
-			}
-			version, innerErr := asInt(
-				requirement["policy_version"],
-				"policy_version",
-			)
-			if innerErr != nil {
-				return nil, nil, "", innerErr
-			}
-			digest, innerErr := asString(
-				requirement["policy_digest"],
-				"policy_digest",
-			)
-			if innerErr != nil {
-				return nil, nil, "", innerErr
-			}
-			referenced, ok := findPolicy(policySet, policyID, version)
-			if !ok {
-				return nil, nil, "", fmt.Errorf(
-					"referenced policy not found: %s/%d",
-					policyID,
-					version,
-				)
-			}
-
-			nestedResults, nestedFailures, nestedStatus, innerErr :=
-				evaluateRequirements(referenced, policySet, ctx)
-			if innerErr != nil {
-				return nil, nil, "", innerErr
-			}
-
-			referenceStatus := "satisfied"
-			var referenceFailure any = nil
-			if nestedStatus != "satisfied" {
-				referenceStatus = "unsatisfied"
-				failure = "POLICY_REFERENCE_NOT_SATISFIED"
-				referenceFailure = failure
-			}
-
-			result = map[string]any{
-				"requirement_id":  requirementID,
-				"type":            typePolicyRef,
-				"status":          referenceStatus,
-				"matched_signers": []string{},
-				"observed": map[string]any{
-					"policy_id":      policyID,
-					"policy_version": version,
-					"policy_digest":  digest,
-					"policy_status":  nestedStatus,
-				},
-				"expected": map[string]any{
-					"policy_status": "satisfied",
-				},
-				"failure_code": referenceFailure,
-				"referenced_policy": map[string]any{
-					"policy_id":           policyID,
-					"policy_version":      version,
-					"policy_digest":       digest,
-					"status":              nestedStatus,
-					"requirement_results": nestedResults,
-					"failure_codes":       nestedFailures,
-				},
-			}
-			if failure != "" {
-				failures = append(failures, failure)
-				failures = append(failures, nestedFailures...)
-			}
-			results = append(results, result)
-			continue
-		default:
-			return nil, nil, "", fmt.Errorf(
-				"unsupported requirement type: %s",
-				primitiveType,
-			)
-		}
-		if err != nil {
-			return nil, nil, "", err
+		if !resultSatisfied(result) {
+			satisfied = false
 		}
 		results = append(results, result)
-		if failure != "" {
-			failures = append(failures, failure)
-		}
 	}
 
 	status := "satisfied"
-	if len(failures) > 0 {
+	if !satisfied {
 		status = "unsatisfied"
 	}
-	return results, failures, status, nil
+
+	return results, projectRecursiveFailureCodes(results), status, nil
 }
 
 func signerProjection(
