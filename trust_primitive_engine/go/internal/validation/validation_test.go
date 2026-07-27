@@ -198,3 +198,45 @@ func TestValidateSignerCardinalities(t *testing.T) {
 		t.Fatal("non-restrictive at-most limit accepted")
 	}
 }
+
+func TestValidateRoleThresholdRequirements(t *testing.T) {
+	valid := []map[string]any{
+		{
+			"requirement_id":     "requirement:role-threshold",
+			"type":               "role_threshold",
+			"role":               "approver",
+			"minimum_signatures": 2,
+		},
+		{
+			"requirement_id": "requirement:role-weight",
+			"type":           "role_weight_threshold",
+			"role":           "reviewer",
+			"minimum_weight": 3,
+		},
+	}
+	for _, requirement := range valid {
+		if err := ValidateRequirement(requirement); err != nil {
+			t.Fatalf("valid %s rejected: %v", requirement["type"], err)
+		}
+	}
+
+	invalidRole := map[string]any{
+		"requirement_id":     "requirement:role-threshold",
+		"type":               "role_threshold",
+		"role":               "administrator",
+		"minimum_signatures": 1,
+	}
+	if err := ValidateRequirement(invalidRole); err == nil {
+		t.Fatal("unsupported role accepted")
+	}
+
+	booleanMinimum := map[string]any{
+		"requirement_id": "requirement:role-weight",
+		"type":           "role_weight_threshold",
+		"role":           "approver",
+		"minimum_weight": true,
+	}
+	if err := ValidateRequirement(booleanMinimum); err == nil {
+		t.Fatal("boolean minimum accepted")
+	}
+}

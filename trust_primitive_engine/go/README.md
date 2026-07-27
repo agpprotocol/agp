@@ -211,3 +211,10 @@ The reusable engine evaluates `at_least_n_signers`, `at_most_n_signers`, and
 `exactly_n_signers` with Python-compatible validation and result shapes.
 
 See `PHASE-4.1C.md`.
+
+## Phase 4.1D role threshold primitives
+
+The reusable engine evaluates `role_threshold` and `role_weight_threshold`
+against the verified participant projection.
+
+See `PHASE-4.1D.md`.
