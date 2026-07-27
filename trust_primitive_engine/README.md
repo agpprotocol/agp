@@ -421,6 +421,7 @@ bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 - `TPE-2.5-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-CONFORMANCE-STATEMENT.md`
 - `TPE-2.6-NORMATIVE-TRACEABILITY.md`
+- `TPE-2.6-GO-IMPLEMENTATION-STATEMENT.md`
 
 ### TPE 2.6 Python/Go policy-reference graph validation parity
 
