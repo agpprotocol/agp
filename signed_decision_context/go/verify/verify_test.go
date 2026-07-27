@@ -1,6 +1,7 @@
 package verify_test
 
 import (
+	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
@@ -74,6 +75,70 @@ func TestVerifyTamperedVector(t *testing.T) {
 	}
 	if status != "unverified" ||
 		code != "SIGNATURE_VERIFICATION_FAILED" {
+		t.Fatalf("unexpected failure: status=%q code=%q", status, code)
+	}
+}
+
+func TestParseKeyringAndVerifyTyped(t *testing.T) {
+	root := moduleRoot(t)
+
+	inputRaw, err := os.ReadFile(filepath.Join(
+		root,
+		"vectors",
+		"001_valid_ed25519_signature.input.json",
+	))
+	if err != nil {
+		t.Fatalf("read input: %v", err)
+	}
+	keyringRaw, err := os.ReadFile(filepath.Join(
+		root,
+		"vectors",
+		"001_valid_ed25519_signature.keyring.json",
+	))
+	if err != nil {
+		t.Fatalf("read keyring: %v", err)
+	}
+
+	value, err := verifyapi.ParseJSON(inputRaw)
+	if err != nil {
+		t.Fatalf("parse input: %v", err)
+	}
+	keyring, err := verifyapi.ParseKeyring(keyringRaw)
+	if err != nil {
+		t.Fatalf("parse keyring: %v", err)
+	}
+
+	result, err := verifyapi.VerifyTyped(value, keyring)
+	if err != nil {
+		t.Fatalf("verify typed: %v", err)
+	}
+	if result.Status != "verified" {
+		t.Fatalf("unexpected status: %q", result.Status)
+	}
+	if result.VerifiedSignatureCount != 1 {
+		t.Fatalf(
+			"unexpected verified signature count: %d",
+			result.VerifiedSignatureCount,
+		)
+	}
+	if len(result.VerifiedSignatureIDs) != 1 {
+		t.Fatalf(
+			"unexpected verified ids: %#v",
+			result.VerifiedSignatureIDs,
+		)
+	}
+}
+
+func TestParseKeyringRejectsInvalidJSON(t *testing.T) {
+	_, err := verifyapi.ParseKeyring([]byte(`{"keys":[`))
+	if err == nil {
+		t.Fatal("invalid keyring unexpectedly parsed")
+	}
+	status, code, _, ok := verifyapi.FailureDetails(err)
+	if !ok {
+		t.Fatalf("unexpected error type: %T", err)
+	}
+	if status != "unverified" || code != "INVALID_KEYRING" {
 		t.Fatalf("unexpected failure: status=%q code=%q", status, code)
 	}
 }
