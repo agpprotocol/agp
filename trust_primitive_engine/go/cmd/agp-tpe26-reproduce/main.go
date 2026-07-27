@@ -1,26 +1,22 @@
 package main
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
 	"sort"
 
+	"agpprotocol.org/agp/trust-primitive-engine/internal/model"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/parser"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/validation"
 )
 
 const (
-	typeIssuerIn              = "evidence_issuer_in"
-	typeEvidenceIn            = "evidence_type_in"
-	typeDistinctIssuer        = "evidence_distinct_issuers_at_least"
-	typePolicyRef             = "policy_reference"
-	maxPolicyReferenceDepth   = 8
-	maxReferencedPolicies     = 32
-	maxExpandedReferenceNodes = 2048
+	typeIssuerIn       = "evidence_issuer_in"
+	typeEvidenceIn     = "evidence_type_in"
+	typeDistinctIssuer = "evidence_distinct_issuers_at_least"
+	typePolicyRef      = "policy_reference"
 )
 
 type policyBinding struct {
@@ -65,13 +61,7 @@ type evaluationInput struct {
 	Signatures    []signature `json:"signatures"`
 }
 
-type policy struct {
-	ObjectType    string           `json:"object_type"`
-	PolicyID      string           `json:"policy_id"`
-	Version       int              `json:"version"`
-	EligibleRoles []string         `json:"eligible_roles"`
-	Requirements  []map[string]any `json:"requirements"`
-}
+type policy = model.Policy
 
 func decodeFile(path string, target any) error {
 	return parser.DecodeFile(path, target)
@@ -357,93 +347,8 @@ func findPolicy(policySet []policy, id string, version int) (policy, bool) {
 	return policy{}, false
 }
 
-type graphValidationError struct {
-	code   string
-	detail string
-}
-
-func (err graphValidationError) Error() string {
-	return err.detail
-}
-
-func graphError(code string, detail string) error {
-	return graphValidationError{code: code, detail: detail}
-}
-
 func graphErrorCode(err error) string {
-	var typed graphValidationError
-	if errors.As(err, &typed) {
-		return typed.code
-	}
-	return "INVALID_POLICY_REFERENCE_GRAPH"
-}
-
-func compactPolicyDigest(value policy) (string, error) {
-	canonicalValue := map[string]any{
-		"eligible_roles": value.EligibleRoles,
-		"object_type":    value.ObjectType,
-		"policy_id":      value.PolicyID,
-		"requirements":   value.Requirements,
-		"version":        value.Version,
-	}
-
-	encoded, err := json.Marshal(canonicalValue)
-	if err != nil {
-		return "", err
-	}
-	sum := sha256.Sum256(encoded)
-	return hex.EncodeToString(sum[:]), nil
-}
-
-func requirementNodes(requirements []map[string]any) ([]map[string]any, error) {
-	nodes := []map[string]any{}
-
-	var visit func(map[string]any) error
-	visit = func(node map[string]any) error {
-		nodes = append(nodes, node)
-
-		primitiveType, err := asString(node["type"], "type")
-		if err != nil {
-			return err
-		}
-
-		switch primitiveType {
-		case "all_of", "any_of":
-			children, ok := node["requirements"].([]any)
-			if !ok {
-				return errors.New("composition requirements must be an array")
-			}
-			for _, rawChild := range children {
-				child, ok := rawChild.(map[string]any)
-				if !ok {
-					return errors.New("composition child must be an object")
-				}
-				if err := visit(child); err != nil {
-					return err
-				}
-			}
-		case "not":
-			child, ok := node["requirement"].(map[string]any)
-			if !ok {
-				return errors.New("not child must be an object")
-			}
-			if err := visit(child); err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-
-	for _, requirement := range requirements {
-		if err := visit(requirement); err != nil {
-			return nil, err
-		}
-	}
-	return nodes, nil
-}
-
-func policyIdentityKey(policyID string, version int, digest string) string {
-	return fmt.Sprintf("%s\x00%d\x00%s", policyID, version, digest)
+	return validation.GraphErrorCode(err)
 }
 
 func validatePolicyReferenceGraphWithIdentityDigests(
@@ -451,207 +356,18 @@ func validatePolicyReferenceGraphWithIdentityDigests(
 	policySet []policy,
 	declaredDigests map[string]string,
 ) error {
-	index := map[string]policy{}
-	digests := map[string]string{}
-
-	for _, candidate := range policySet {
-		key := fmt.Sprintf("%s\x00%d", candidate.PolicyID, candidate.Version)
-		if _, exists := index[key]; exists {
-			return graphError(
-				"INVALID_TRUST_POLICY_SET",
-				"duplicate policy_id/version",
-			)
-		}
-
-		digest, declared := declaredDigests[key]
-		if !declared {
-			var err error
-			digest, err = compactPolicyDigest(candidate)
-			if err != nil {
-				return err
-			}
-		}
-		index[key] = candidate
-		digests[key] = digest
-	}
-
-	rootDigest, err := compactPolicyDigest(root)
-	if err != nil {
-		return err
-	}
-
-	rootNodes, err := requirementNodes(root.Requirements)
-	if err != nil {
-		return err
-	}
-	expandedNodeCount := len(rootNodes)
-	if expandedNodeCount > maxExpandedReferenceNodes {
-		return graphError(
-			"POLICY_REFERENCE_NODE_LIMIT_EXCEEDED",
-			fmt.Sprintf(
-				"expanded_requirement_count=%d limit=%d",
-				expandedNodeCount,
-				maxExpandedReferenceNodes,
-			),
-		)
-	}
-
-	active := map[string]bool{}
-	completed := map[string]bool{}
-	reachable := map[string]bool{}
-
-	var visitPolicy func(policy, string, int) error
-	visitPolicy = func(current policy, identity string, referenceDepth int) error {
-		active[identity] = true
-		defer delete(active, identity)
-
-		nodes, err := requirementNodes(current.Requirements)
-		if err != nil {
-			return err
-		}
-
-		for _, requirement := range nodes {
-			primitiveType, err := asString(requirement["type"], "type")
-			if err != nil {
-				return err
-			}
-			if primitiveType != typePolicyRef {
-				continue
-			}
-
-			policyID, err := asString(requirement["policy_id"], "policy_id")
-			if err != nil {
-				return err
-			}
-			version, err := asInt(
-				requirement["policy_version"],
-				"policy_version",
-			)
-			if err != nil {
-				return err
-			}
-			expectedDigest, err := asString(
-				requirement["policy_digest"],
-				"policy_digest",
-			)
-			if err != nil {
-				return err
-			}
-
-			lookupKey := fmt.Sprintf("%s\x00%d", policyID, version)
-			referenced, exists := index[lookupKey]
-			if !exists {
-				return graphError(
-					"POLICY_REFERENCE_NOT_FOUND",
-					fmt.Sprintf(
-						"policy_id=%s policy_version=%d",
-						policyID,
-						version,
-					),
-				)
-			}
-
-			computedDigest := digests[lookupKey]
-			if computedDigest != expectedDigest {
-				return graphError(
-					"POLICY_REFERENCE_DIGEST_MISMATCH",
-					fmt.Sprintf(
-						"reference=%s computed=%s",
-						expectedDigest,
-						computedDigest,
-					),
-				)
-			}
-
-			referencedIdentity := policyIdentityKey(
-				policyID,
-				version,
-				computedDigest,
-			)
-			if active[referencedIdentity] {
-				return graphError(
-					"POLICY_REFERENCE_CYCLE",
-					fmt.Sprintf(
-						"policy_id=%s policy_version=%d",
-						policyID,
-						version,
-					),
-				)
-			}
-			if completed[referencedIdentity] {
-				continue
-			}
-
-			nextDepth := referenceDepth + 1
-			if nextDepth > maxPolicyReferenceDepth {
-				return graphError(
-					"POLICY_REFERENCE_DEPTH_EXCEEDED",
-					fmt.Sprintf(
-						"reference_depth=%d limit=%d",
-						nextDepth,
-						maxPolicyReferenceDepth,
-					),
-				)
-			}
-
-			if !reachable[referencedIdentity] {
-				if len(reachable)+1 > maxReferencedPolicies {
-					return graphError(
-						"POLICY_REFERENCE_COUNT_EXCEEDED",
-						fmt.Sprintf(
-							"referenced_policy_count=%d limit=%d",
-							len(reachable)+1,
-							maxReferencedPolicies,
-						),
-					)
-				}
-
-				referencedNodes, err := requirementNodes(
-					referenced.Requirements,
-				)
-				if err != nil {
-					return err
-				}
-				expandedNodeCount += len(referencedNodes)
-				if expandedNodeCount > maxExpandedReferenceNodes {
-					return graphError(
-						"POLICY_REFERENCE_NODE_LIMIT_EXCEEDED",
-						fmt.Sprintf(
-							"expanded_requirement_count=%d limit=%d",
-							expandedNodeCount,
-							maxExpandedReferenceNodes,
-						),
-					)
-				}
-				reachable[referencedIdentity] = true
-			}
-
-			if err := visitPolicy(
-				referenced,
-				referencedIdentity,
-				nextDepth,
-			); err != nil {
-				return err
-			}
-		}
-
-		completed[identity] = true
-		return nil
-	}
-
-	return visitPolicy(
+	return validation.ValidatePolicyReferenceGraphWithIdentityDigests(
 		root,
-		policyIdentityKey(root.PolicyID, root.Version, rootDigest),
-		0,
+		policySet,
+		declaredDigests,
 	)
 }
 
-func validatePolicyReferenceGraph(root policy, policySet []policy) error {
-	return validatePolicyReferenceGraphWithIdentityDigests(
-		root,
-		policySet,
-		nil,
-	)
+func validatePolicyReferenceGraph(
+	root policy,
+	policySet []policy,
+) error {
+	return validation.ValidatePolicyReferenceGraph(root, policySet)
 }
 
 type policyGraphFixtureEntry struct {
