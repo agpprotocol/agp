@@ -73,7 +73,7 @@ python trust_primitive_engine/tools/run_all_tests.py
 Expected release result:
 
 ```text
-AGP TPE 2.6 development validation: 682/682 passed
+AGP TPE 2.6 development validation: 796/796 passed
 ```
 
 The complete suite includes schema/runtime parity, primitive validation,
@@ -159,6 +159,19 @@ The wheel includes the public API, evaluator, engine, primitive modules,
 canonicalization and signed-context verification dependencies, and registry
 schemas. The complete validation builds and installs the wheel in isolated
 temporary environments.
+
+## 9.1 Bounded Go implementation evidence
+
+The bounded Go reproduction line is closed and described by:
+
+```text
+trust_primitive_engine/TPE-2.6-GO-IMPLEMENTATION-STATEMENT.md
+```
+
+Its seven registered Python/Go suites cover 109 checks across frozen
+reproduction, validation, composition, recursive references, and reference
+graph preflight. This is a bounded cross-language conformance claim, not a
+declaration that every Trust Policy 2 feature has a second implementation.
 
 ## 10. Security boundary
 

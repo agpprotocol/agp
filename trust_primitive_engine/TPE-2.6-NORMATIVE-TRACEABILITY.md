@@ -72,6 +72,15 @@ built from the repository:
 This prevents a stale local environment from being mistaken for the contents
 of the newly built distribution.
 
+## Bounded Go implementation closure
+
+The complete bounded cross-language claim and its non-scope are recorded in
+`TPE-2.6-GO-IMPLEMENTATION-STATEMENT.md`.
+
+The closure statement aggregates seven registered Python/Go suites totaling
+109 checks and separates the existing reproducer from the successor reusable
+Go-engine workstream.
+
 ## Cross-language policy-reference graph boundary
 
 `trust_primitive_engine/tools/test_tpe26_go_policy_reference_graph_validation.py`

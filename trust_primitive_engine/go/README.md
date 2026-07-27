@@ -85,6 +85,18 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Closure status
+
+The bounded TPE 2.6 Go reproduction line is formally closed by:
+
+```text
+trust_primitive_engine/TPE-2.6-GO-IMPLEMENTATION-STATEMENT.md
+```
+
+That statement records the demonstrated guarantees, production and fixture
+boundaries, explicit non-scope, and the separation from the successor
+full-Go-engine workstream.
+
 ## Scope limitation
 
 This is not yet a complete second implementation of the Trust Primitive
