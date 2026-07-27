@@ -72,6 +72,18 @@ built from the repository:
 This prevents a stale local environment from being mistaken for the contents
 of the newly built distribution.
 
+## Cross-language composition-evaluation boundary
+
+`trust_primitive_engine/tools/test_tpe26_go_composition_evaluation.py`
+compares complete Python and Go evaluation objects across 12 bounded vectors.
+
+The claim covers recursive result trees, `all_of`, `any_of`, and `not` truth
+semantics, complete branch evaluation, deterministic failure projection, and
+failure suppression beneath satisfied compositions.
+
+The matrix uses only the three TPE 2.6 evidence-provenance leaves and excludes
+policy references so that the composition claim remains independently bounded.
+
 ## Cross-language composition-validation boundary
 
 `trust_primitive_engine/tools/test_tpe26_go_composition_validation.py` applies

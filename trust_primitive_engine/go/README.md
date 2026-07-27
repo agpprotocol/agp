@@ -27,6 +27,15 @@ Expected marker:
 TPE 2.6 Python/Go frozen-profile reproduction: 7/7 passed
 ```
 
+## Composition evaluation
+
+The reproduction binary evaluates bounded `all_of`, `any_of`, and `not`
+trees recursively. It emits Python-compatible child evidence and deterministic
+failure-code projection without short-circuiting.
+
+The 12-vector suite compares complete evaluation objects for policies without
+policy references.
+
 ## Composition validation mode
 
 `--validate-policy` now accepts bounded `all_of`, `any_of`, and `not` trees
