@@ -7,6 +7,33 @@ import (
 	"agpprotocol.org/agp/trust-primitive-engine/internal/model"
 )
 
+func cloneJSONValue(value any) any {
+	switch typed := value.(type) {
+	case map[string]any:
+		result := make(map[string]any, len(typed))
+		for key, item := range typed {
+			result[key] = cloneJSONValue(item)
+		}
+		return result
+	case []any:
+		result := make([]any, len(typed))
+		for index, item := range typed {
+			result[index] = cloneJSONValue(item)
+		}
+		return result
+	default:
+		return typed
+	}
+}
+
+func clonePayload(value map[string]any) map[string]any {
+	if value == nil {
+		return nil
+	}
+	cloned, _ := cloneJSONValue(value).(map[string]any)
+	return cloned
+}
+
 func toInternalPolicy(value Policy) model.Policy {
 	return model.Policy{
 		ObjectType:    value.ObjectType,
@@ -45,6 +72,10 @@ func toInternalContext(value Context) model.Context {
 			ID:      value.Policy.ID,
 			Version: value.Policy.Version,
 			Digest:  value.Policy.Digest,
+		},
+		Proposal: model.Proposal{
+			Type:    value.Proposal.Type,
+			Payload: clonePayload(value.Proposal.Payload),
 		},
 		Participants: participants,
 		Evidence:     evidence,

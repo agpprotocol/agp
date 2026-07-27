@@ -7,6 +7,12 @@ type PolicyBinding struct {
 	Digest  string `json:"digest"`
 }
 
+// Proposal is the bounded proposal projection readable by context predicates.
+type Proposal struct {
+	Type    string         `json:"type"`
+	Payload map[string]any `json:"payload"`
+}
+
 // Participant is one decision-context participant.
 type Participant struct {
 	ID     string `json:"id"`
@@ -28,6 +34,7 @@ type Context struct {
 	ObjectType   string        `json:"object_type"`
 	ContextID    string        `json:"context_id"`
 	Policy       PolicyBinding `json:"policy"`
+	Proposal     Proposal      `json:"proposal"`
 	Participants []Participant `json:"participants"`
 	Evidence     []Evidence    `json:"evidence"`
 }
