@@ -114,7 +114,7 @@ func Reproduce(
 		"matched_signers":         matchedSigners,
 		"unauthorized_signers":    unauthorized,
 		"ineligible_role_signers": ineligible,
-		"signature_count":         len(verifiedSignatureIDs),
+		"signature_count":         len(matchedSigners),
 		"weight":                  weight,
 		"requirement_results":     requirementResults,
 		"failure_codes":           failureCodes,

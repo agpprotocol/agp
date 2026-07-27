@@ -25,6 +25,8 @@ const (
 	typeExactlyNSigners     = "exactly_n_signers"
 	typeRoleThreshold       = "role_threshold"
 	typeRoleWeightThreshold = "role_weight_threshold"
+	typeGlobalThreshold     = "global_signature_threshold"
+	typeGlobalWeight        = "global_weight_threshold"
 	maxSetSize              = 64
 	maxSafeInteger          = 9007199254740991
 	maxRequirementDepth     = 8
@@ -292,6 +294,37 @@ func ValidateRequirement(requirement map[string]any) error {
 					limitField,
 				)
 			}
+		}
+		return nil
+
+	case typeGlobalThreshold, typeGlobalWeight:
+		limitField := "minimum_signatures"
+		if primitiveType == typeGlobalWeight {
+			limitField = "minimum_weight"
+		}
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", limitField},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		minimum, err := parser.AsInt(requirement[limitField], limitField)
+		if err != nil {
+			return err
+		}
+		const maxSafeInteger = 9007199254740991
+		if minimum < 1 || minimum > maxSafeInteger {
+			return fmt.Errorf(
+				"%s must be between one and the maximum safe integer",
+				limitField,
+			)
 		}
 		return nil
 

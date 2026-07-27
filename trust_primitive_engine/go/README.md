@@ -218,3 +218,10 @@ The reusable engine evaluates `role_threshold` and `role_weight_threshold`
 against the verified participant projection.
 
 See `PHASE-4.1D.md`.
+
+## Phase 4.1E global threshold primitives
+
+The reusable engine evaluates `global_signature_threshold` and
+`global_weight_threshold` over distinct matched signer identities.
+
+See `PHASE-4.1E.md`.
