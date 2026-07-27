@@ -85,6 +85,13 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Phase 2B structural validation
+
+Requirement, composition-tree, and policy validation are reusable through
+`internal/validation`, while graph validation remains bounded to the CLI.
+
+See `PHASE-2B.md`.
+
 ## Phase 2A strict JSON parsing
 
 Strict JSON loading and conversion helpers are reusable through
