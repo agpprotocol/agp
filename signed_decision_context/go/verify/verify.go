@@ -951,12 +951,7 @@ type keyEntry struct {
 	publicKey string
 }
 
-func loadKeyring(path string) ([]keyEntry, error) {
-	value, err := loadJSON(path)
-	if err != nil {
-		return nil, unverified("INVALID_KEYRING", err.Error())
-	}
-
+func parseKeyringValue(value any) ([]keyEntry, error) {
 	object, ok := value.(map[string]any)
 	if !ok {
 		return nil, unverified(
@@ -1031,6 +1026,14 @@ func loadKeyring(path string) ([]keyEntry, error) {
 	}
 
 	return keys, nil
+}
+
+func loadKeyring(path string) ([]keyEntry, error) {
+	value, err := loadJSON(path)
+	if err != nil {
+		return nil, unverified("INVALID_KEYRING", err.Error())
+	}
+	return parseKeyringValue(value)
 }
 
 func resolveKey(
@@ -1239,6 +1242,16 @@ func verify(
 	}, nil
 }
 
+// VerificationResult is the typed reusable signature-verification projection.
+type VerificationResult struct {
+	Status                 string
+	ObjectType             string
+	ContextDigest          any
+	SignatureCount         int
+	VerifiedSignatureCount int
+	VerifiedSignatureIDs   []string
+}
+
 // StructuralResult is the stable reusable structural-validation projection.
 type StructuralResult struct {
 	ObjectType     string
@@ -1275,6 +1288,20 @@ func StructuralValidate(value any) (StructuralResult, error) {
 	}, nil
 }
 
+// ParseKeyring parses and validates a strict JSON keyring without filesystem
+// dependencies.
+func ParseKeyring(raw []byte) (Keyring, error) {
+	value, err := parseJSON(raw)
+	if err != nil {
+		return Keyring{}, unverified("INVALID_KEYRING", err.Error())
+	}
+	entries, err := parseKeyringValue(value)
+	if err != nil {
+		return Keyring{}, err
+	}
+	return Keyring{entries: entries}, nil
+}
+
 // LoadKeyring loads and validates a verification keyring.
 func LoadKeyring(path string) (Keyring, error) {
 	entries, err := loadKeyring(path)
@@ -1284,9 +1311,39 @@ func LoadKeyring(path string) (Keyring, error) {
 	return Keyring{entries: entries}, nil
 }
 
-// Verify performs deterministic structural and Ed25519 verification.
+// VerifyTyped performs deterministic structural and Ed25519 verification and
+// returns a stable typed result.
+func VerifyTyped(value any, keyring Keyring) (VerificationResult, error) {
+	raw, err := verify(value, keyring.entries)
+	if err != nil {
+		return VerificationResult{}, err
+	}
+
+	ids, _ := raw["verified_signature_ids"].([]string)
+	return VerificationResult{
+		Status:                 raw["status"].(string),
+		ObjectType:             raw["object_type"].(string),
+		ContextDigest:          raw["context_digest"],
+		SignatureCount:         raw["signature_count"].(int),
+		VerifiedSignatureCount: raw["verified_signature_count"].(int),
+		VerifiedSignatureIDs:   append([]string(nil), ids...),
+	}, nil
+}
+
+// Verify preserves the original map-shaped compatibility API.
 func Verify(value any, keyring Keyring) (map[string]any, error) {
-	return verify(value, keyring.entries)
+	result, err := VerifyTyped(value, keyring)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]any{
+		"status":                   result.Status,
+		"object_type":              result.ObjectType,
+		"context_digest":           result.ContextDigest,
+		"signature_count":          result.SignatureCount,
+		"verified_signature_count": result.VerifiedSignatureCount,
+		"verified_signature_ids":   result.VerifiedSignatureIDs,
+	}, nil
 }
 
 // FailureDetails exposes the stable CLI failure projection without exposing
