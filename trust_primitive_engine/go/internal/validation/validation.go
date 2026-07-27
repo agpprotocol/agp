@@ -14,6 +14,8 @@ const (
 	typeIssuerIn            = "evidence_issuer_in"
 	typeEvidenceIn          = "evidence_type_in"
 	typeDistinctIssuer      = "evidence_distinct_issuers_at_least"
+	typeRequiredSigner      = "required_signer"
+	typeSignerThreshold     = "signer_threshold"
 	maxSetSize              = 64
 	maxSafeInteger          = 9007199254740991
 	maxRequirementDepth     = 8
@@ -105,6 +107,74 @@ func ValidateRequirement(requirement map[string]any) error {
 	}
 
 	switch primitiveType {
+	case typeRequiredSigner:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "signer_id"},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["signer_id"],
+			"signer_id",
+		); err != nil {
+			return err
+		}
+		return nil
+
+	case typeSignerThreshold:
+		if err := validateExactMembers(
+			requirement,
+			[]string{
+				"requirement_id",
+				"type",
+				"signer_ids",
+				"minimum_signatures",
+			},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		signerIDs, err := validateCanonicalSet(
+			requirement["signer_ids"],
+			"signer_ids",
+			identifierPattern,
+		)
+		if err != nil {
+			return err
+		}
+		minimum, err := parser.AsInt(
+			requirement["minimum_signatures"],
+			"minimum_signatures",
+		)
+		if err != nil {
+			return err
+		}
+		if minimum < 1 {
+			return errors.New(
+				"minimum_signatures must be a positive integer",
+			)
+		}
+		if minimum > len(signerIDs) {
+			return errors.New(
+				"minimum_signatures must not exceed signer_ids length",
+			)
+		}
+		return nil
+
 	case typeIssuerIn:
 		if err := validateExactMembers(
 			requirement,

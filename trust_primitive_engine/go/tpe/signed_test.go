@@ -40,7 +40,13 @@ func signedRootPolicy() tpe.Policy {
 		PolicyID:      "policy:example:approval",
 		Version:       1,
 		EligibleRoles: []string{"approver"},
-		Requirements:  []map[string]any{},
+		Requirements: []map[string]any{
+			{
+				"requirement_id": "requirement:01",
+				"type":           "required_signer",
+				"signer_id":      "authority:legal",
+			},
+		},
 	}
 }
 
