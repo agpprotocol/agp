@@ -85,6 +85,13 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Phase 3B recursive evaluation
+
+Composition, policy-reference recursion, deterministic failure projection,
+and complete requirement evaluation are reusable through `internal/engine`.
+
+See `PHASE-3B.md`.
+
 ## Phase 3A provenance leaf evaluation
 
 Decision-context models and TPE 2.6 provenance leaf evaluators are reusable
