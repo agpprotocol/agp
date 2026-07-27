@@ -105,6 +105,30 @@ func evaluateRequirementNode(
 		}
 		return signer.EvaluateThreshold(requirement, matchedSigners)
 
+	case signer.TypeProhibited:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateProhibited(requirement, matchedSigners)
+
+	case signer.TypeAnyOf:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateAnyOf(requirement, matchedSigners)
+
+	case signer.TypeAllOf:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateAllOf(requirement, matchedSigners)
+
+	case signer.TypeExactlyOne:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateExactlyOne(requirement, matchedSigners)
+
 	case provenance.TypeIssuerIn:
 		if err := validation.ValidateRequirement(requirement); err != nil {
 			return nil, err

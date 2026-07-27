@@ -111,3 +111,32 @@ func TestValidateSignerRequirements(t *testing.T) {
 		t.Fatal("unsorted signer ids accepted")
 	}
 }
+
+func TestValidateSignerSetRequirements(t *testing.T) {
+	for _, primitiveType := range []string{
+		"any_of_signers",
+		"all_of_signers",
+		"exactly_one_of_signers",
+	} {
+		valid := map[string]any{
+			"requirement_id": "requirement:set",
+			"type":           primitiveType,
+			"signer_ids": []any{
+				"authority:legal",
+				"authority:security",
+			},
+		}
+		if err := ValidateRequirement(valid); err != nil {
+			t.Fatalf("valid %s rejected: %v", primitiveType, err)
+		}
+	}
+
+	tooShort := map[string]any{
+		"requirement_id": "requirement:set",
+		"type":           "any_of_signers",
+		"signer_ids":     []any{"authority:legal"},
+	}
+	if err := ValidateRequirement(tooShort); err == nil {
+		t.Fatal("one-entry signer set accepted")
+	}
+}
