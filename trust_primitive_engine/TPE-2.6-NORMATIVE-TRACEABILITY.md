@@ -72,6 +72,14 @@ built from the repository:
 This prevents a stale local environment from being mistaken for the contents
 of the newly built distribution.
 
+## Cross-language policy-reference graph boundary
+
+`trust_primitive_engine/tools/test_tpe26_go_policy_reference_graph_validation.py`
+covers 13 bounded graph-validation cases. Production validation computes
+canonical policy digests and runs before recursive evaluation. Controlled
+identity digests are accepted only through the fixture-specific conformance
+mode used to reproduce self and indirect cycles.
+
 ## Cross-language composition plus policy-reference boundary
 
 `trust_primitive_engine/tools/test_tpe26_go_composition_policy_reference_evaluation.py`

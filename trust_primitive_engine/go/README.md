@@ -27,6 +27,16 @@ Expected marker:
 TPE 2.6 Python/Go frozen-profile reproduction: 7/7 passed
 ```
 
+## Policy-reference graph preflight
+
+Before evaluation, the reproducer resolves the complete reachable reference
+graph and enforces canonical digests, cycle rejection, maximum reference depth
+8, maximum 32 reachable policies, and maximum 2048 expanded requirement nodes.
+
+`--validate-policy-graph` returns a compact acceptance receipt. A separate
+fixture-only mode permits controlled identity digests for otherwise
+unrepresentable cycle conformance vectors.
+
 ## Composition with policy references
 
 The reproduction binary evaluates policy references nested under `all_of`,
