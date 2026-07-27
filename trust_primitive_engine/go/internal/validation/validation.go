@@ -20,6 +20,9 @@ const (
 	typeAnyOfSigners        = "any_of_signers"
 	typeAllOfSigners        = "all_of_signers"
 	typeExactlyOneSigners   = "exactly_one_of_signers"
+	typeAtLeastNSigners     = "at_least_n_signers"
+	typeAtMostNSigners      = "at_most_n_signers"
+	typeExactlyNSigners     = "exactly_n_signers"
 	maxSetSize              = 64
 	maxSafeInteger          = 9007199254740991
 	maxRequirementDepth     = 8
@@ -225,6 +228,68 @@ func ValidateRequirement(requirement map[string]any) error {
 		}
 		if len(signerIDs) < 2 {
 			return errors.New("signer_ids must contain at least two entries")
+		}
+		return nil
+
+	case typeAtLeastNSigners, typeAtMostNSigners, typeExactlyNSigners:
+		limitField := ""
+		switch primitiveType {
+		case typeAtLeastNSigners:
+			limitField = "minimum_matches"
+		case typeAtMostNSigners:
+			limitField = "maximum_matches"
+		case typeExactlyNSigners:
+			limitField = "exact_matches"
+		}
+		if err := validateExactMembers(
+			requirement,
+			[]string{
+				"requirement_id",
+				"type",
+				"signer_ids",
+				limitField,
+			},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		signerIDs, err := validateCanonicalSet(
+			requirement["signer_ids"],
+			"signer_ids",
+			identifierPattern,
+		)
+		if err != nil {
+			return err
+		}
+		if len(signerIDs) < 2 {
+			return errors.New(
+				"signer_ids must contain at least two entries",
+			)
+		}
+		limit, err := parser.AsInt(requirement[limitField], limitField)
+		if err != nil {
+			return err
+		}
+		switch primitiveType {
+		case typeAtMostNSigners:
+			if limit < 0 || limit >= len(signerIDs) {
+				return errors.New(
+					"maximum_matches must be between zero and signer_ids length minus one",
+				)
+			}
+		default:
+			if limit < 1 || limit > len(signerIDs) {
+				return fmt.Errorf(
+					"%s must be between one and signer_ids length",
+					limitField,
+				)
+			}
 		}
 		return nil
 

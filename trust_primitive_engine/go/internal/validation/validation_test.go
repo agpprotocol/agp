@@ -140,3 +140,61 @@ func TestValidateSignerSetRequirements(t *testing.T) {
 		t.Fatal("one-entry signer set accepted")
 	}
 }
+
+func TestValidateSignerCardinalities(t *testing.T) {
+	valid := []map[string]any{
+		{
+			"requirement_id": "requirement:at-least",
+			"type":           "at_least_n_signers",
+			"signer_ids": []any{
+				"authority:a",
+				"authority:b",
+				"authority:c",
+			},
+			"minimum_matches": 2,
+		},
+		{
+			"requirement_id": "requirement:at-most",
+			"type":           "at_most_n_signers",
+			"signer_ids": []any{
+				"authority:a",
+				"authority:b",
+				"authority:c",
+			},
+			"maximum_matches": 1,
+		},
+		{
+			"requirement_id": "requirement:exactly",
+			"type":           "exactly_n_signers",
+			"signer_ids": []any{
+				"authority:a",
+				"authority:b",
+				"authority:c",
+			},
+			"exact_matches": 2,
+		},
+	}
+
+	for _, requirement := range valid {
+		if err := ValidateRequirement(requirement); err != nil {
+			t.Fatalf(
+				"valid %s rejected: %v",
+				requirement["type"],
+				err,
+			)
+		}
+	}
+
+	invalid := map[string]any{
+		"requirement_id": "requirement:at-most",
+		"type":           "at_most_n_signers",
+		"signer_ids": []any{
+			"authority:a",
+			"authority:b",
+		},
+		"maximum_matches": 2,
+	}
+	if err := ValidateRequirement(invalid); err == nil {
+		t.Fatal("non-restrictive at-most limit accepted")
+	}
+}

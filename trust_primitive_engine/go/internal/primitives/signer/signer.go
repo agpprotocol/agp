@@ -13,6 +13,9 @@ const (
 	TypeAnyOf      = "any_of_signers"
 	TypeAllOf      = "all_of_signers"
 	TypeExactlyOne = "exactly_one_of_signers"
+	TypeAtLeast    = "at_least_n_signers"
+	TypeAtMost     = "at_most_n_signers"
+	TypeExactlyN   = "exactly_n_signers"
 )
 
 func matchedSet(values []string) map[string]struct{} {
@@ -269,5 +272,104 @@ func evaluateSignerSet(
 		"observed":        observed,
 		"expected":        expected,
 		"failure_code":    failure,
+	}, nil
+}
+
+func EvaluateAtLeast(
+	requirement map[string]any,
+	matchedSigners []string,
+) (map[string]any, error) {
+	return evaluateSignerCardinality(
+		requirement,
+		matchedSigners,
+		TypeAtLeast,
+		"minimum_matches",
+	)
+}
+
+func EvaluateAtMost(
+	requirement map[string]any,
+	matchedSigners []string,
+) (map[string]any, error) {
+	return evaluateSignerCardinality(
+		requirement,
+		matchedSigners,
+		TypeAtMost,
+		"maximum_matches",
+	)
+}
+
+func EvaluateExactlyN(
+	requirement map[string]any,
+	matchedSigners []string,
+) (map[string]any, error) {
+	return evaluateSignerCardinality(
+		requirement,
+		matchedSigners,
+		TypeExactlyN,
+		"exact_matches",
+	)
+}
+
+func evaluateSignerCardinality(
+	requirement map[string]any,
+	matchedSigners []string,
+	primitiveType string,
+	limitField string,
+) (map[string]any, error) {
+	requirementID, err := parser.AsString(
+		requirement["requirement_id"],
+		"requirement_id",
+	)
+	if err != nil {
+		return nil, err
+	}
+	signerIDs, err := parser.AsStrings(
+		requirement["signer_ids"],
+		"signer_ids",
+	)
+	if err != nil {
+		return nil, err
+	}
+	limit, err := parser.AsInt(requirement[limitField], limitField)
+	if err != nil {
+		return nil, err
+	}
+
+	matched := signerMatches(signerIDs, matchedSigners)
+	status := "satisfied"
+	var failure any
+
+	switch primitiveType {
+	case TypeAtLeast:
+		if len(matched) < limit {
+			status = "unsatisfied"
+			failure = "AT_LEAST_N_SIGNERS_NOT_REACHED"
+		}
+	case TypeAtMost:
+		if len(matched) > limit {
+			status = "unsatisfied"
+			failure = "AT_MOST_N_SIGNERS_EXCEEDED"
+		}
+	case TypeExactlyN:
+		if len(matched) != limit {
+			status = "unsatisfied"
+			failure = "EXACTLY_N_SIGNERS_NOT_SATISFIED"
+		}
+	}
+
+	return map[string]any{
+		"requirement_id":  requirementID,
+		"type":            primitiveType,
+		"status":          status,
+		"matched_signers": matched,
+		"observed": map[string]any{
+			"matched_count": len(matched),
+		},
+		"expected": map[string]any{
+			limitField:   limit,
+			"signer_ids": signerIDs,
+		},
+		"failure_code": failure,
 	}, nil
 }
