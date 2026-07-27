@@ -85,6 +85,12 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Phase 5B-2C verified signed evaluation
+
+External callers can verify a Signed Decision Context and evaluate its authenticated context through tpe.EvaluateSigned.
+
+See PHASE-5B-2C.md.
+
 ## Phase 4B public evaluation API
 
 External Go callers can evaluate policies through the stable `tpe.Evaluate`
