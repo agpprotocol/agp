@@ -415,6 +415,18 @@ Run the executable TPE 2.5 examples:
 bash trust_primitive_engine/examples/contextual-predicates/run_examples.sh
 ```
 
+## Go engine successor RFC
+
+The architecture and phased implementation plan for the reusable Go Trust
+Primitive Engine is defined by:
+
+```text
+trust_primitive_engine/rfcs/TPE-GO-001-reusable-engine-architecture.md
+```
+
+This successor workstream is separate from the formally closed bounded TPE 2.6
+Go reproduction profile.
+
 ## Release conformance
 
 - `TPE-2.4-CONFORMANCE-STATEMENT.md`
