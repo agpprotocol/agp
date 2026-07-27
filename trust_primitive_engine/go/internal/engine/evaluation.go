@@ -8,6 +8,7 @@ import (
 	"agpprotocol.org/agp/trust-primitive-engine/internal/model"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/parser"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/provenance"
+	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/signer"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/validation"
 )
 
@@ -84,6 +85,7 @@ func evaluateRequirementNode(
 	requirement map[string]any,
 	policySet []model.Policy,
 	ctx model.Context,
+	matchedSigners []string,
 ) (map[string]any, error) {
 	primitiveType, err := parser.AsString(requirement["type"], "type")
 	if err != nil {
@@ -91,6 +93,18 @@ func evaluateRequirementNode(
 	}
 
 	switch primitiveType {
+	case signer.TypeRequired:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateRequired(requirement, matchedSigners)
+
+	case signer.TypeThreshold:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		return signer.EvaluateThreshold(requirement, matchedSigners)
+
 	case provenance.TypeIssuerIn:
 		if err := validation.ValidateRequirement(requirement); err != nil {
 			return nil, err
@@ -133,6 +147,7 @@ func evaluateRequirementNode(
 				child,
 				policySet,
 				ctx,
+				matchedSigners,
 			)
 			if innerErr != nil {
 				return nil, innerErr
@@ -197,6 +212,7 @@ func evaluateRequirementNode(
 			rawChild,
 			policySet,
 			ctx,
+			matchedSigners,
 		)
 		if err != nil {
 			return nil, err
@@ -278,7 +294,12 @@ func evaluateRequirementNode(
 		}
 
 		nestedResults, nestedFailures, nestedStatus, err :=
-			EvaluateRequirements(referenced, policySet, ctx)
+			evaluateRequirementsWithSigners(
+				referenced,
+				policySet,
+				ctx,
+				matchedSigners,
+			)
 		if err != nil {
 			return nil, err
 		}
@@ -435,11 +456,26 @@ func projectRecursiveFailureCodes(results []any) []string {
 	return failures
 }
 
-// EvaluateRequirements evaluates a complete validated policy requirement tree.
+// EvaluateRequirements evaluates a complete validated policy requirement tree
+// without signer state. It remains for bounded compatibility callers.
 func EvaluateRequirements(
 	current model.Policy,
 	policySet []model.Policy,
 	ctx model.Context,
+) ([]any, []string, string, error) {
+	return evaluateRequirementsWithSigners(
+		current,
+		policySet,
+		ctx,
+		nil,
+	)
+}
+
+func evaluateRequirementsWithSigners(
+	current model.Policy,
+	policySet []model.Policy,
+	ctx model.Context,
+	matchedSigners []string,
 ) ([]any, []string, string, error) {
 	results := make([]any, 0, len(current.Requirements))
 	satisfied := true
@@ -449,6 +485,7 @@ func EvaluateRequirements(
 			requirement,
 			policySet,
 			ctx,
+			matchedSigners,
 		)
 		if err != nil {
 			return nil, nil, "", err

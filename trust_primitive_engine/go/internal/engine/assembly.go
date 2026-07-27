@@ -83,18 +83,23 @@ func Reproduce(
 		return nil, err
 	}
 
-	requirementResults, failureCodes, status, err :=
-		EvaluateRequirements(root, policySet, input.Context)
-	if err != nil {
-		return nil, err
-	}
-
 	verifiedSignatureIDs,
 		verifiedSigners,
 		matchedSigners,
 		unauthorized,
 		ineligible,
 		weight := SignerProjection(input, root)
+
+	requirementResults, failureCodes, status, err :=
+		evaluateRequirementsWithSigners(
+			root,
+			policySet,
+			input.Context,
+			matchedSigners,
+		)
+	if err != nil {
+		return nil, err
+	}
 
 	return map[string]any{
 		"object_type":             "agp.trust-policy-evaluation/2",

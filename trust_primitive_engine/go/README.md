@@ -85,6 +85,13 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Phase 4.1A basic signer primitives
+
+The reusable engine evaluates `required_signer` and `signer_threshold` against
+the deterministic authorized and role-eligible signer projection.
+
+See `PHASE-4.1A.md`.
+
 ## Phase 5B-2C verified signed evaluation
 
 External callers can verify a Signed Decision Context and evaluate its authenticated context through tpe.EvaluateSigned.

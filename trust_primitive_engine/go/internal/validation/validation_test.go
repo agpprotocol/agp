@@ -80,3 +80,34 @@ func TestValidateRequirementTreeRejectsDuplicateIDs(t *testing.T) {
 		t.Fatal("duplicate requirement ids accepted")
 	}
 }
+
+func TestValidateSignerRequirements(t *testing.T) {
+	validRequired := map[string]any{
+		"requirement_id": "requirement:required",
+		"type":           "required_signer",
+		"signer_id":      "authority:legal",
+	}
+	if err := ValidateRequirement(validRequired); err != nil {
+		t.Fatalf("valid required signer rejected: %v", err)
+	}
+
+	validThreshold := map[string]any{
+		"requirement_id":     "requirement:threshold",
+		"type":               "signer_threshold",
+		"signer_ids":         []any{"authority:a", "authority:b"},
+		"minimum_signatures": 1,
+	}
+	if err := ValidateRequirement(validThreshold); err != nil {
+		t.Fatalf("valid signer threshold rejected: %v", err)
+	}
+
+	invalid := map[string]any{
+		"requirement_id":     "requirement:threshold",
+		"type":               "signer_threshold",
+		"signer_ids":         []any{"authority:b", "authority:a"},
+		"minimum_signatures": 1,
+	}
+	if err := ValidateRequirement(invalid); err == nil {
+		t.Fatal("unsorted signer ids accepted")
+	}
+}
