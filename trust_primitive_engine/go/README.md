@@ -85,6 +85,17 @@ agp-tpe26-reproduce --validate-requirement requirement.json
 The 27-vector Python/Go parity suite verifies common acceptance and rejection
 semantics for the three TPE 2.6 predicates.
 
+## Go module identity
+
+The reusable engine module is:
+
+```text
+agpprotocol.org/agp/trust-primitive-engine
+```
+
+Phase 0 package boundaries and compatibility constraints are recorded in
+`PHASE-0.md`.
+
 ## Reusable engine successor
 
 The bounded reproducer is not the target architecture for a complete Go

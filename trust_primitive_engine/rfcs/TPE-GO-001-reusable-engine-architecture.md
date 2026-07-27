@@ -83,14 +83,14 @@ are proven.
 
 ## 5. Proposed Go module layout
 
-The module should move from:
+The module identity selected in Phase 0 is:
 
 ```text
-module agp-tpe-go-reproduction
+module agpprotocol.org/agp/trust-primitive-engine
 ```
 
-to a repository-scoped module path chosen before the first public package is
-merged.
+The decision and package-visibility boundary are recorded in
+`trust_primitive_engine/go/PHASE-0.md`.
 
 Proposed package layout:
 
@@ -488,18 +488,20 @@ allocations.
 
 This RFC is not a security audit.
 
-## 18. Open decisions
+## 18. Phase 0 decisions
 
-The following decisions must be resolved before Phase 1 implementation:
+Phase 0 resolves the initial architecture decisions as follows:
 
-1. final Go module path;
-2. whether public API inputs begin as typed structs or JSON-compatible values;
-3. whether JSON Schema validation is embedded, generated, or represented by
-   equivalent native validators;
-4. which lower-level packages are public versus `internal`;
-5. semantic-versioning policy for the Go module;
-6. whether signed-context extraction occurs in the same module or a sibling
-   module.
+1. module path: `agpprotocol.org/agp/trust-primitive-engine`;
+2. initial facade inputs may use decoded JSON-compatible values while typed
+   models stabilize;
+3. initial schema parity uses equivalent native validators;
+4. only `tpe` is public; implementation packages begin under `internal`;
+5. semantic versioning starts only when the public facade is stabilized;
+6. Signed Decision Context remains a sibling module and must expose a reusable
+   verification package before integration.
+
+These decisions are recorded in `trust_primitive_engine/go/PHASE-0.md`.
 
 ## 19. Acceptance
 
