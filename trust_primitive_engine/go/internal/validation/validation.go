@@ -17,6 +17,8 @@ const (
 	typeDistinctIssuer      = "evidence_distinct_issuers_at_least"
 	typeContextValuePresent = "context_value_present"
 	typeContextValueEquals  = "context_value_equals"
+	typeContextValueIn      = "context_value_in"
+	typeContextPathEquals   = "context_path_equals"
 	typeContextIntegerLeast = "context_integer_at_least"
 	typeContextIntegerMost  = "context_integer_at_most"
 	typeEvidencePresent     = "evidence_present"
@@ -471,6 +473,75 @@ func ValidateRequirement(requirement map[string]any) error {
 		if err := contextvalue.ValidateExpectedScalar(
 			requirement["value"],
 		); err != nil {
+			return err
+		}
+		return nil
+
+	case typeContextValueIn:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "path", "values"},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		path, err := parser.AsString(requirement["path"], "path")
+		if err != nil {
+			return err
+		}
+		if _, err := contextvalue.ParsePath(path); err != nil {
+			return err
+		}
+		return contextvalue.ValidateScalarSet(requirement["values"])
+
+	case typeContextPathEquals:
+		if err := validateExactMembers(
+			requirement,
+			[]string{
+				"requirement_id",
+				"type",
+				"left_path",
+				"right_path",
+			},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		leftPath, err := parser.AsString(
+			requirement["left_path"],
+			"left_path",
+		)
+		if err != nil {
+			return err
+		}
+		rightPath, err := parser.AsString(
+			requirement["right_path"],
+			"right_path",
+		)
+		if err != nil {
+			return err
+		}
+		if leftPath == rightPath {
+			return errors.New(
+				"context_path_equals paths must be different",
+			)
+		}
+		if _, err := contextvalue.ParsePath(leftPath); err != nil {
+			return err
+		}
+		if _, err := contextvalue.ParsePath(rightPath); err != nil {
 			return err
 		}
 		return nil

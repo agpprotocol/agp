@@ -262,3 +262,10 @@ The reusable Go evaluator supports context presence, strict scalar
 equality, and safe-integer lower and upper bounds.
 
 See `PHASE-4.1H-2.md`.
+
+## Phase 4.1H-3 context set and path predicates
+
+The reusable Go evaluator supports canonical scalar-set membership
+and strict equality between two resolved context paths.
+
+See `PHASE-4.1H-3.md`.

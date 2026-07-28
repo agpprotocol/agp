@@ -14,6 +14,8 @@ func TestBasicContextLeafDispatch(t *testing.T) {
 				"environment": "production",
 				"coverage":    json.Number("9000"),
 				"rollout":     json.Number("2500"),
+				"requested":   "3.0.0",
+				"approved":    "3.0.0",
 			},
 		},
 	}
@@ -29,6 +31,18 @@ func TestBasicContextLeafDispatch(t *testing.T) {
 			"type":           "context_value_equals",
 			"path":           "/proposal/payload/environment",
 			"value":          "production",
+		},
+		{
+			"requirement_id": "requirement:in",
+			"type":           "context_value_in",
+			"path":           "/proposal/payload/environment",
+			"values":         []any{"production", "staging"},
+		},
+		{
+			"requirement_id": "requirement:path-equals",
+			"type":           "context_path_equals",
+			"left_path":      "/proposal/payload/requested",
+			"right_path":     "/proposal/payload/approved",
 		},
 		{
 			"requirement_id": "requirement:minimum",
