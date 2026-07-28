@@ -31,10 +31,11 @@ type Evidence struct {
 
 // Context is the bounded Decision Context representation used by the Go TPE.
 type Context struct {
-	ObjectType   string        `json:"object_type"`
-	ContextID    string        `json:"context_id"`
-	Policy       PolicyBinding `json:"policy"`
-	Proposal     Proposal      `json:"proposal"`
-	Participants []Participant `json:"participants"`
-	Evidence     []Evidence    `json:"evidence"`
+	ObjectType     string        `json:"object_type"`
+	ContextID      string        `json:"context_id"`
+	EvaluationTime *int64        `json:"evaluation_time,omitempty"`
+	Policy         PolicyBinding `json:"policy"`
+	Proposal       Proposal      `json:"proposal"`
+	Participants   []Participant `json:"participants"`
+	Evidence       []Evidence    `json:"evidence"`
 }
