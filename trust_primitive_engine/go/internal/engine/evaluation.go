@@ -7,6 +7,7 @@ import (
 
 	"agpprotocol.org/agp/trust-primitive-engine/internal/model"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/parser"
+	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/contextvalue"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/evidence"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/provenance"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/role"
@@ -184,6 +185,46 @@ func evaluateRequirementNode(
 			return nil, err
 		}
 		return role.EvaluateWeightThreshold(requirement, ctx, matchedSigners)
+
+	case contextvalue.TypeValuePresent:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := contextvalue.EvaluateValuePresent(
+			requirement,
+			ctx,
+		)
+		return result, err
+
+	case contextvalue.TypeValueEquals:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := contextvalue.EvaluateValueEquals(
+			requirement,
+			ctx,
+		)
+		return result, err
+
+	case contextvalue.TypeIntegerLeast:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := contextvalue.EvaluateIntegerAtLeast(
+			requirement,
+			ctx,
+		)
+		return result, err
+
+	case contextvalue.TypeIntegerMost:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := contextvalue.EvaluateIntegerAtMost(
+			requirement,
+			ctx,
+		)
+		return result, err
 
 	case evidence.TypePresent:
 		if err := validation.ValidateRequirement(requirement); err != nil {

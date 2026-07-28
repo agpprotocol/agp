@@ -8,12 +8,17 @@ import (
 	"sort"
 
 	"agpprotocol.org/agp/trust-primitive-engine/internal/parser"
+	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/contextvalue"
 )
 
 const (
 	typeIssuerIn            = "evidence_issuer_in"
 	typeEvidenceIn          = "evidence_type_in"
 	typeDistinctIssuer      = "evidence_distinct_issuers_at_least"
+	typeContextValuePresent = "context_value_present"
+	typeContextValueEquals  = "context_value_equals"
+	typeContextIntegerLeast = "context_integer_at_least"
+	typeContextIntegerMost  = "context_integer_at_most"
 	typeEvidencePresent     = "evidence_present"
 	typeEvidenceCount       = "evidence_count_at_least"
 	typeRequiredSigner      = "required_signer"
@@ -416,6 +421,90 @@ func ValidateRequirement(requirement map[string]any) error {
 				"%s must be between one and the maximum safe integer",
 				limitField,
 			)
+		}
+		return nil
+
+	case typeContextValuePresent:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "path"},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		path, err := parser.AsString(requirement["path"], "path")
+		if err != nil {
+			return err
+		}
+		if _, err := contextvalue.ParsePath(path); err != nil {
+			return err
+		}
+		return nil
+
+	case typeContextValueEquals:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "path", "value"},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		path, err := parser.AsString(requirement["path"], "path")
+		if err != nil {
+			return err
+		}
+		if _, err := contextvalue.ParsePath(path); err != nil {
+			return err
+		}
+		if err := contextvalue.ValidateExpectedScalar(
+			requirement["value"],
+		); err != nil {
+			return err
+		}
+		return nil
+
+	case typeContextIntegerLeast, typeContextIntegerMost:
+		boundField := "minimum"
+		if primitiveType == typeContextIntegerMost {
+			boundField = "maximum"
+		}
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "path", boundField},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		path, err := parser.AsString(requirement["path"], "path")
+		if err != nil {
+			return err
+		}
+		if _, err := contextvalue.ParsePath(path); err != nil {
+			return err
+		}
+		if _, err := contextvalue.SafeInteger(
+			requirement[boundField],
+			boundField,
+		); err != nil {
+			return err
 		}
 		return nil
 
