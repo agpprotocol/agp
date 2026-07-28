@@ -280,7 +280,7 @@ SUITES = [
         ROOT
         / "trust_primitive_engine/tools/"
         "test_tpe_go_public_api_contract.py",
-        8,
+        12,
     ),
     (
         "public Go vanity import metadata",

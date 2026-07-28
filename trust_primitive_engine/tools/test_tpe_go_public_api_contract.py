@@ -111,6 +111,52 @@ def main() -> int:
     )
     passed += 1
 
+    external_satisfied = run(
+        [
+            "go",
+            "run",
+            "./examples/external-integration/satisfied",
+        ],
+        cwd=GO_DIR,
+    )
+    print("PASS  external satisfied integration executes")
+    passed += 1
+
+    expected_satisfied_marker = (
+        "EXTERNAL_TPE_SATISFIED_PASS "
+        "status=satisfied signer=authority:legal"
+    )
+    if expected_satisfied_marker not in external_satisfied.stdout:
+        raise AssertionError(
+            "unexpected satisfied integration output: "
+            f"{external_satisfied.stdout!r}"
+        )
+    print("PASS  external satisfied integration verifies")
+    passed += 1
+
+    external_rejected = run(
+        [
+            "go",
+            "run",
+            "./examples/external-integration/rejected",
+        ],
+        cwd=GO_DIR,
+    )
+    print("PASS  external rejected integration executes")
+    passed += 1
+
+    expected_rejected_marker = (
+        "EXTERNAL_TPE_REJECTED_PASS "
+        "code=SIGNATURE_VERIFICATION_FAILED"
+    )
+    if expected_rejected_marker not in external_rejected.stdout:
+        raise AssertionError(
+            "unexpected rejected integration output: "
+            f"{external_rejected.stdout!r}"
+        )
+    print("PASS  external rejected integration uses typed error")
+    passed += 1
+
     with tempfile.TemporaryDirectory(
         prefix="agp-tpe-go-public-consumer-"
     ) as raw:

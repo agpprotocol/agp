@@ -28,6 +28,31 @@ Expected output:
 
     SIGNED_TPE_QUICK_START_PASS status=satisfied signer=authority:legal
 
+## External integration examples
+
+The complete public consumer boundary is documented in:
+
+    examples/external-integration/README.md
+
+Run the valid signed integration:
+
+    go run ./examples/external-integration/satisfied
+
+Expected output:
+
+    EXTERNAL_TPE_SATISFIED_PASS status=satisfied signer=authority:legal
+
+Run the tampered-signature integration:
+
+    go run ./examples/external-integration/rejected
+
+Expected output:
+
+    EXTERNAL_TPE_REJECTED_PASS code=SIGNATURE_VERIFICATION_FAILED
+
+The rejected example uses `tpe.ErrorCode(err)` rather than matching
+human-readable error messages.
+
 Run the public package tests:
 
     go test ./tpe
