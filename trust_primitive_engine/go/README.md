@@ -255,3 +255,10 @@ restricted context-path parsing and resolution for later contextual
 predicate phases.
 
 See `PHASE-4.1H-1.md`.
+
+## Phase 4.1H-2 basic context predicates
+
+The reusable Go evaluator supports context presence, strict scalar
+equality, and safe-integer lower and upper bounds.
+
+See `PHASE-4.1H-2.md`.
