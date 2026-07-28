@@ -1,0 +1,114 @@
+{
+  "object_type": "agp.tpe-python-go-mixed-composition-manifest/1",
+  "vector_count": 24,
+  "suites": [
+    {
+      "id": "mixed_composition",
+      "vector_count": 12,
+      "vectors": [
+        {
+          "name": "all_of_signer_context_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "all_of_signer_context_unsatisfied",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "any_of_evidence_time_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "any_of_evidence_time_unsatisfied",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "not_required_signer_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "not_context_equals_unsatisfied",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "nested_all_any_mixed_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "nested_all_any_mixed_unsatisfied",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "all_of_multiple_mixed_failures",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "any_of_suppresses_mixed_failures",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "not_suppresses_child_failure",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "mixed_top_level_failure_order",
+          "expected_status": "unsatisfied"
+        }
+      ]
+    },
+    {
+      "id": "mixed_policy_reference",
+      "vector_count": 12,
+      "vectors": [
+        {
+          "name": "reference_signer_all_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "reference_signer_all_unsatisfied",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "reference_context_any_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "reference_context_any_unsatisfied",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "reference_time_not_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "reference_time_not_unsatisfied",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "reference_evidence_all_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "reference_evidence_all_unsatisfied",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "transitive_reference_mixed_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "transitive_reference_mixed_unsatisfied",
+          "expected_status": "unsatisfied"
+        },
+        {
+          "name": "shared_reference_paths_satisfied",
+          "expected_status": "satisfied"
+        },
+        {
+          "name": "shared_reference_paths_unsatisfied",
+          "expected_status": "unsatisfied"
+        }
+      ]
+    }
+  ]
+}

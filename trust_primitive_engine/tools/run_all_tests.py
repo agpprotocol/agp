@@ -182,6 +182,14 @@ SUITES = [
         7,
     ),
     (
+        "TPE mixed composition frozen coverage guard",
+        ROOT
+        / "trust_primitive_engine"
+        / "tools"
+        / "test_tpe_go_mixed_composition_coverage.py",
+        24,
+    ),
+    (
         "TPE Python/Go mixed composition evaluation parity",
         ROOT
         / "trust_primitive_engine"
