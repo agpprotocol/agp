@@ -1,8 +1,13 @@
-// Package tpe provides the reusable public Go API for deterministic Trust Primitive Engine evaluation. Evaluate accepts public policy, context, and signature types and returns a stable Trust Policy Evaluation 2 result.
+// Package tpe provides the stable public Go API for deterministic Trust Primitive Engine evaluation.
 //
-// Package tpe is the stable public facade for the reusable AGP Trust
-// Primitive Engine.
+// Evaluate accepts an already verified EvaluationInput. EvaluateSigned verifies
+// a serialized Signed Decision Context before evaluating its authenticated
+// Decision Context.
 //
-// Phase 0 defines package identity and boundaries only. No public evaluation
-// API is committed by this package yet.
+// A policy result with status unsatisfied is a successful evaluation, not a
+// fatal Go error. Errors are reserved for invalid input, verification,
+// validation, policy-reference, or execution failures.
+//
+// The public compatibility surface consists of Evaluate, EvaluateSigned, the
+// public input and result types, and the stable machine-readable error codes.
 package tpe
