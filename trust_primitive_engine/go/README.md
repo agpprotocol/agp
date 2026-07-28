@@ -16,6 +16,18 @@ Run the public quick start:
     cd trust_primitive_engine/go
     go run ./examples/basic-evaluation
 
+Run the signed public quick start:
+
+    go run ./examples/signed-evaluation
+
+The signed example embeds a valid Signed Decision Context and its public
+verification keyring. It verifies the Ed25519 signature and evaluates the
+authenticated Decision Context through `tpe.EvaluateSigned`.
+
+Expected output:
+
+    SIGNED_TPE_QUICK_START_PASS status=satisfied signer=authority:legal
+
 Run the public package tests:
 
     go test ./tpe

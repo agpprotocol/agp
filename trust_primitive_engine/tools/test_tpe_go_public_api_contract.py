@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the stable external Go API and quick-start example."""
+"""Validate the stable external Go API and quick-start examples."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 GO_DIR = ROOT / "trust_primitive_engine/go"
 EXAMPLE = GO_DIR / "examples/basic-evaluation/main.go"
+SIGNED_EXAMPLE = GO_DIR / "examples/signed-evaluation/main.go"
 
 
 def run(
@@ -70,6 +71,44 @@ def main() -> int:
     ):
         raise AssertionError("public quick-start does not import tpe")
     print("PASS  public quick-start uses only public package")
+    passed += 1
+
+    signed_example = run(
+        ["go", "run", "./examples/signed-evaluation"],
+        cwd=GO_DIR,
+    )
+    print("PASS  signed public quick-start executes")
+    passed += 1
+
+    expected_signed_marker = (
+        "SIGNED_TPE_QUICK_START_PASS "
+        "status=satisfied signer=authority:legal"
+    )
+    if expected_signed_marker not in signed_example.stdout:
+        raise AssertionError(
+            "unexpected signed quick-start output: "
+            f"{signed_example.stdout!r}"
+        )
+    print("PASS  signed public quick-start verifies and satisfies")
+    passed += 1
+
+    signed_example_text = SIGNED_EXAMPLE.read_text(
+        encoding="utf-8"
+    )
+    if "/internal/" in signed_example_text:
+        raise AssertionError(
+            "signed public quick-start imports an internal package"
+        )
+    if (
+        '"agpprotocol.org/agp/trust-primitive-engine/tpe"'
+        not in signed_example_text
+    ):
+        raise AssertionError(
+            "signed public quick-start does not import tpe"
+        )
+    print(
+        "PASS  signed public quick-start uses only public package"
+    )
     passed += 1
 
     with tempfile.TemporaryDirectory(
