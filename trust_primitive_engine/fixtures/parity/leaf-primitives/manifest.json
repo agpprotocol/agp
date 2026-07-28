@@ -1,0 +1,199 @@
+{
+  "object_type": "agp.tpe-python-go-leaf-parity-manifest/1",
+  "primitive_count": 27,
+  "primitives": [
+    {
+      "cases": {
+        "satisfied": "all_of_signers-satisfied",
+        "unsatisfied": "all_of_signers-unsatisfied"
+      },
+      "type": "all_of_signers"
+    },
+    {
+      "cases": {
+        "satisfied": "any_of_signers-satisfied",
+        "unsatisfied": "any_of_signers-unsatisfied"
+      },
+      "type": "any_of_signers"
+    },
+    {
+      "cases": {
+        "satisfied": "at_least_n_signers-satisfied",
+        "unsatisfied": "at_least_n_signers-unsatisfied"
+      },
+      "type": "at_least_n_signers"
+    },
+    {
+      "cases": {
+        "satisfied": "at_most_n_signers-satisfied",
+        "unsatisfied": "at_most_n_signers-unsatisfied"
+      },
+      "type": "at_most_n_signers"
+    },
+    {
+      "cases": {
+        "satisfied": "context_integer_at_least-satisfied",
+        "unsatisfied": "context_integer_at_least-unsatisfied"
+      },
+      "type": "context_integer_at_least"
+    },
+    {
+      "cases": {
+        "satisfied": "context_integer_at_most-satisfied",
+        "unsatisfied": "context_integer_at_most-unsatisfied"
+      },
+      "type": "context_integer_at_most"
+    },
+    {
+      "cases": {
+        "satisfied": "context_path_equals-satisfied",
+        "unsatisfied": "context_path_equals-unsatisfied"
+      },
+      "type": "context_path_equals"
+    },
+    {
+      "cases": {
+        "satisfied": "context_value_equals-satisfied",
+        "unsatisfied": "context_value_equals-unsatisfied"
+      },
+      "type": "context_value_equals"
+    },
+    {
+      "cases": {
+        "satisfied": "context_value_in-satisfied",
+        "unsatisfied": "context_value_in-unsatisfied"
+      },
+      "type": "context_value_in"
+    },
+    {
+      "cases": {
+        "satisfied": "context_value_present-satisfied",
+        "unsatisfied": "context_value_present-unsatisfied"
+      },
+      "type": "context_value_present"
+    },
+    {
+      "cases": {
+        "satisfied": "evidence_count_at_least-satisfied",
+        "unsatisfied": "evidence_count_at_least-unsatisfied"
+      },
+      "type": "evidence_count_at_least"
+    },
+    {
+      "cases": {
+        "satisfied": "evidence_distinct_issuers_at_least-satisfied",
+        "unsatisfied": "evidence_distinct_issuers_at_least-unsatisfied"
+      },
+      "type": "evidence_distinct_issuers_at_least"
+    },
+    {
+      "cases": {
+        "satisfied": "evidence_issuer_in-satisfied",
+        "unsatisfied": "evidence_issuer_in-unsatisfied"
+      },
+      "type": "evidence_issuer_in"
+    },
+    {
+      "cases": {
+        "satisfied": "evidence_present-satisfied",
+        "unsatisfied": "evidence_present-unsatisfied"
+      },
+      "type": "evidence_present"
+    },
+    {
+      "cases": {
+        "satisfied": "evidence_type_in-satisfied",
+        "unsatisfied": "evidence_type_in-unsatisfied"
+      },
+      "type": "evidence_type_in"
+    },
+    {
+      "cases": {
+        "satisfied": "exactly_n_signers-satisfied",
+        "unsatisfied": "exactly_n_signers-unsatisfied"
+      },
+      "type": "exactly_n_signers"
+    },
+    {
+      "cases": {
+        "satisfied": "exactly_one_of_signers-satisfied",
+        "unsatisfied": "exactly_one_of_signers-unsatisfied"
+      },
+      "type": "exactly_one_of_signers"
+    },
+    {
+      "cases": {
+        "satisfied": "global_signature_threshold-satisfied",
+        "unsatisfied": "global_signature_threshold-unsatisfied"
+      },
+      "type": "global_signature_threshold"
+    },
+    {
+      "cases": {
+        "satisfied": "global_weight_threshold-satisfied",
+        "unsatisfied": "global_weight_threshold-unsatisfied"
+      },
+      "type": "global_weight_threshold"
+    },
+    {
+      "cases": {
+        "satisfied": "mutual_exclusion-satisfied",
+        "unsatisfied": "mutual_exclusion-unsatisfied"
+      },
+      "type": "mutual_exclusion"
+    },
+    {
+      "cases": {
+        "satisfied": "prohibited_signer-satisfied",
+        "unsatisfied": "prohibited_signer-unsatisfied"
+      },
+      "type": "prohibited_signer"
+    },
+    {
+      "cases": {
+        "satisfied": "required_signer-satisfied",
+        "unsatisfied": "required_signer-unsatisfied"
+      },
+      "type": "required_signer"
+    },
+    {
+      "cases": {
+        "satisfied": "role_threshold-satisfied",
+        "unsatisfied": "role_threshold-unsatisfied"
+      },
+      "type": "role_threshold"
+    },
+    {
+      "cases": {
+        "satisfied": "role_weight_threshold-satisfied",
+        "unsatisfied": "role_weight_threshold-unsatisfied"
+      },
+      "type": "role_weight_threshold"
+    },
+    {
+      "cases": {
+        "satisfied": "separation_of_duties-satisfied",
+        "unsatisfied": "separation_of_duties-unsatisfied"
+      },
+      "type": "separation_of_duties"
+    },
+    {
+      "cases": {
+        "satisfied": "signer_threshold-satisfied",
+        "unsatisfied": "signer_threshold-unsatisfied"
+      },
+      "type": "signer_threshold"
+    },
+    {
+      "cases": {
+        "satisfied": "time_window-satisfied",
+        "unsatisfied": "time_window-unsatisfied"
+      },
+      "type": "time_window"
+    }
+  ],
+  "required_outcomes": [
+    "satisfied",
+    "unsatisfied"
+  ]
+}

@@ -182,6 +182,14 @@ SUITES = [
         7,
     ),
     (
+        "TPE Python/Go leaf primitive inventory",
+        ROOT
+        / "trust_primitive_engine"
+        / "tools"
+        / "test_tpe_go_leaf_primitive_inventory.py",
+        1,
+    ),
+    (
         "TPE 2.6 Python/Go frozen-profile reproduction",
         ROOT
         / "trust_primitive_engine/tools/"
