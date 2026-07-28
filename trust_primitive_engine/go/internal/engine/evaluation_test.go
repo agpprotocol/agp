@@ -92,3 +92,100 @@ func TestEvaluateRequirementsPolicyReference(t *testing.T) {
 		t.Fatalf("unexpected status=%s failures=%#v", status, failures)
 	}
 }
+
+func TestPolicyReferenceProjectsMatchedSigners(t *testing.T) {
+	signerID := "authority:approver-a"
+
+	child := model.Policy{
+		PolicyID: "policy:child-signer",
+		Version:  1,
+		Requirements: []map[string]any{
+			{
+				"requirement_id": "requirement:child-signer",
+				"type":           "required_signer",
+				"signer_id":      signerID,
+			},
+		},
+	}
+
+	root := model.Policy{
+		PolicyID: "policy:root-signer-reference",
+		Version:  1,
+		Requirements: []map[string]any{
+			{
+				"requirement_id": "requirement:root",
+				"type":           "all_of",
+				"requirements": []any{
+					map[string]any{
+						"requirement_id": "requirement:a-reference",
+						"type":           typePolicyRef,
+						"policy_id":      child.PolicyID,
+						"policy_version": child.Version,
+						"policy_digest":  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+					},
+					map[string]any{
+						"requirement_id": "requirement:b-signer",
+						"type":           "required_signer",
+						"signer_id":      signerID,
+					},
+				},
+			},
+		},
+	}
+
+	results, failures, status, err := evaluateRequirementsWithSigners(
+		root,
+		[]model.Policy{child},
+		model.Context{},
+		[]string{signerID},
+	)
+	if err != nil {
+		t.Fatalf("evaluation failed: %v", err)
+	}
+	if status != "satisfied" {
+		t.Fatalf("unexpected status: %s", status)
+	}
+	if len(failures) != 0 {
+		t.Fatalf("unexpected failures: %#v", failures)
+	}
+	if len(results) != 1 {
+		t.Fatalf("unexpected result count: %d", len(results))
+	}
+
+	rootResult, ok := results[0].(map[string]any)
+	if !ok {
+		t.Fatalf("root result has unexpected type: %T", results[0])
+	}
+
+	rootMatched := resultMatchedSigners(rootResult)
+	if len(rootMatched) != 1 || rootMatched[0] != signerID {
+		t.Fatalf(
+			"root matched_signers=%#v, expected %#v",
+			rootMatched,
+			[]string{signerID},
+		)
+	}
+
+	children, ok := rootResult["children"].([]any)
+	if !ok || len(children) != 2 {
+		t.Fatalf("unexpected children: %#v", rootResult["children"])
+	}
+
+	referenceResult, ok := children[0].(map[string]any)
+	if !ok {
+		t.Fatalf(
+			"reference result has unexpected type: %T",
+			children[0],
+		)
+	}
+
+	referenceMatched := resultMatchedSigners(referenceResult)
+	if len(referenceMatched) != 1 ||
+		referenceMatched[0] != signerID {
+		t.Fatalf(
+			"reference matched_signers=%#v, expected %#v",
+			referenceMatched,
+			[]string{signerID},
+		)
+	}
+}

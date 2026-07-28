@@ -474,11 +474,15 @@ func evaluateRequirementNode(
 			referenceFailure = "POLICY_REFERENCE_NOT_SATISFIED"
 		}
 
+		nestedMatchedSigners := aggregateChildMatchedSigners(
+			nestedResults,
+		)
+
 		return map[string]any{
 			"requirement_id":  requirementID,
 			"type":            typePolicyRef,
 			"status":          referenceStatus,
-			"matched_signers": []string{},
+			"matched_signers": nestedMatchedSigners,
 			"observed": map[string]any{
 				"policy_id":      policyID,
 				"policy_version": version,
