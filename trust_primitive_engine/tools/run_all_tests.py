@@ -283,6 +283,13 @@ SUITES = [
         5,
     ),
     (
+        "public Go vanity import metadata",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_tpe_go_vanity_import_metadata.py",
+        4,
+    ),
+    (
         "TPE 2.6 external reproduction",
         ROOT
         / "trust_primitive_engine/tools/"
