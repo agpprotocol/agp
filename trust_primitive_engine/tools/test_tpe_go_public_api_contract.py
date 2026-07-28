@@ -11,7 +11,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 GO_DIR = ROOT / "trust_primitive_engine/go"
-SIGNED_CONTEXT_DIR = ROOT / "signed_decision_context/go"
 EXAMPLE = GO_DIR / "examples/basic-evaluation/main.go"
 
 
@@ -86,10 +85,7 @@ def main() -> int:
             "v0.0.0\n\n"
             "replace "
             "agpprotocol.org/agp/trust-primitive-engine "
-            f"=> {GO_DIR}\n\n"
-            "replace "
-            "agpprotocol.org/agp/signed-decision-context "
-            f"=> {SIGNED_CONTEXT_DIR}\n",
+            f"=> {GO_DIR}\n",
             encoding="utf-8",
         )
 
