@@ -182,6 +182,14 @@ SUITES = [
         7,
     ),
     (
+        "TPE Python/Go mixed composition evaluation parity",
+        ROOT
+        / "trust_primitive_engine"
+        / "tools"
+        / "test_tpe_go_mixed_composition_evaluation.py",
+        12,
+    ),
+    (
         "TPE Python/Go leaf primitive evaluation parity",
         ROOT
         / "trust_primitive_engine"
