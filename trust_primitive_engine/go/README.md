@@ -1,4 +1,28 @@
-# TPE 2.6 Go reproduction profile
+# Trust Primitive Engine — Go
+
+The `tpe` package is the stable public Go facade for deterministic policy
+evaluation.
+
+Use `tpe.Evaluate` when signatures were already verified by the caller.
+Use `tpe.EvaluateSigned` to verify a serialized Signed Decision Context
+before evaluating its authenticated context.
+
+An unsatisfied policy is returned as a normal Evaluation whose status is
+`unsatisfied`; fatal validation or verification failures are returned as
+typed errors.
+
+Run the public quick start:
+
+    cd trust_primitive_engine/go
+    go run ./examples/basic-evaluation
+
+Run the public package tests:
+
+    go test ./tpe
+
+The complete historical TPE 2.6 reproduction profile follows below.
+
+## TPE 2.6 reproduction profile
 
 This directory contains a deliberately bounded Go reproduction of the frozen
 TPE 2.6 evidence-provenance corpus.

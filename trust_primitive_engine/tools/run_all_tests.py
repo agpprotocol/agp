@@ -276,6 +276,13 @@ SUITES = [
         9,
     ),
     (
+        "stable public Go API contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_tpe_go_public_api_contract.py",
+        5,
+    ),
+    (
         "TPE 2.6 external reproduction",
         ROOT
         / "trust_primitive_engine/tools/"
