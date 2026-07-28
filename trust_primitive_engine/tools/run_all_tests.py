@@ -182,6 +182,14 @@ SUITES = [
         7,
     ),
     (
+        "TPE Python/Go leaf primitive evaluation parity",
+        ROOT
+        / "trust_primitive_engine"
+        / "tools"
+        / "test_tpe_go_leaf_primitive_evaluation.py",
+        54,
+    ),
+    (
         "TPE Python/Go leaf primitive inventory",
         ROOT
         / "trust_primitive_engine"
