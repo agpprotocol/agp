@@ -26,6 +26,14 @@ func cloneJSONValue(value any) any {
 	}
 }
 
+func cloneInt64Pointer(value *int64) *int64 {
+	if value == nil {
+		return nil
+	}
+	cloned := *value
+	return &cloned
+}
+
 func clonePayload(value map[string]any) map[string]any {
 	if value == nil {
 		return nil
@@ -66,8 +74,9 @@ func toInternalContext(value Context) model.Context {
 	}
 
 	return model.Context{
-		ObjectType: value.ObjectType,
-		ContextID:  value.ContextID,
+		ObjectType:     value.ObjectType,
+		ContextID:      value.ContextID,
+		EvaluationTime: cloneInt64Pointer(value.EvaluationTime),
 		Policy: model.PolicyBinding{
 			ID:      value.Policy.ID,
 			Version: value.Policy.Version,

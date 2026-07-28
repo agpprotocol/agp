@@ -269,3 +269,10 @@ The reusable Go evaluator supports canonical scalar-set membership
 and strict equality between two resolved context paths.
 
 See `PHASE-4.1H-3.md`.
+
+## Phase 4.1I-1 evaluation time projection
+
+The Go TPE preserves authenticated Decision Context `evaluation_time`
+while distinguishing absence from Unix epoch zero.
+
+See `PHASE-4.1I-1.md`.
