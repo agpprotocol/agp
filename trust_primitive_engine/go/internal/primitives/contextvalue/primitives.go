@@ -14,6 +14,8 @@ import (
 const (
 	TypeValuePresent = "context_value_present"
 	TypeValueEquals  = "context_value_equals"
+	TypeValueIn      = "context_value_in"
+	TypePathEquals   = "context_path_equals"
 	TypeIntegerLeast = "context_integer_at_least"
 	TypeIntegerMost  = "context_integer_at_most"
 
@@ -67,6 +69,109 @@ func scalarType(value any) (string, any, error) {
 			"value must be null, boolean, integer, or string",
 		)
 	}
+}
+
+func scalarSetValues(value any) ([]any, error) {
+	switch typed := value.(type) {
+	case []any:
+		return append([]any(nil), typed...), nil
+	case []string:
+		result := make([]any, len(typed))
+		for index, item := range typed {
+			result[index] = item
+		}
+		return result, nil
+	default:
+		return nil, errors.New("values must be an array")
+	}
+}
+
+func compareCanonicalScalars(kind string, left any, right any) int {
+	switch kind {
+	case "null":
+		return 0
+	case "boolean":
+		leftValue := left.(bool)
+		rightValue := right.(bool)
+		if leftValue == rightValue {
+			return 0
+		}
+		if !leftValue {
+			return -1
+		}
+		return 1
+	case "integer":
+		leftValue := left.(int64)
+		rightValue := right.(int64)
+		switch {
+		case leftValue < rightValue:
+			return -1
+		case leftValue > rightValue:
+			return 1
+		default:
+			return 0
+		}
+	case "string":
+		leftValue := left.(string)
+		rightValue := right.(string)
+		switch {
+		case leftValue < rightValue:
+			return -1
+		case leftValue > rightValue:
+			return 1
+		default:
+			return 0
+		}
+	default:
+		panic("unsupported scalar kind")
+	}
+}
+
+func ValidateScalarSet(value any) error {
+	values, err := scalarSetValues(value)
+	if err != nil {
+		return err
+	}
+	if len(values) < 1 || len(values) > 64 {
+		return errors.New("values must contain between 1 and 64 entries")
+	}
+
+	normalized := make([]any, len(values))
+	kind := ""
+	for index, item := range values {
+		itemKind, itemValue, err := scalarType(item)
+		if err != nil {
+			return err
+		}
+		if itemKind == "string" &&
+			utf8.RuneCountInString(itemValue.(string)) >
+				maxExpectedStringLength {
+			return errors.New("values string exceeds maximum length")
+		}
+		if index == 0 {
+			kind = itemKind
+		} else if itemKind != kind {
+			return errors.New(
+				"values must contain one identical JSON scalar type",
+			)
+		}
+		normalized[index] = itemValue
+	}
+
+	for index := 1; index < len(normalized); index++ {
+		comparison := compareCanonicalScalars(
+			kind,
+			normalized[index-1],
+			normalized[index],
+		)
+		if comparison == 0 {
+			return errors.New("values must not contain duplicates")
+		}
+		if comparison > 0 {
+			return errors.New("values must be in canonical order")
+		}
+	}
+	return nil
 }
 
 func ValidateExpectedScalar(value any) error {
@@ -215,6 +320,108 @@ func EvaluateValueEquals(
 		observation(path, resolution),
 		map[string]any{"value": expectedValue},
 		"CONTEXT_VALUE_NOT_EQUAL",
+	)
+	return output, failure, nil
+}
+
+func EvaluateValueIn(
+	requirement map[string]any,
+	ctx model.Context,
+) (map[string]any, string, error) {
+	requirementID, err := parser.AsString(
+		requirement["requirement_id"],
+		"requirement_id",
+	)
+	if err != nil {
+		return nil, "", err
+	}
+	path, err := parser.AsString(requirement["path"], "path")
+	if err != nil {
+		return nil, "", err
+	}
+	values, err := scalarSetValues(requirement["values"])
+	if err != nil {
+		return nil, "", err
+	}
+	resolution, err := ResolvePath(ctx, path)
+	if err != nil {
+		return nil, "", err
+	}
+
+	satisfied := false
+	if resolution.Status == "found" {
+		for _, expected := range values {
+			if strictScalarEqual(
+				resolution.Value,
+				resolution.ValueType,
+				expected,
+			) {
+				satisfied = true
+				break
+			}
+		}
+	}
+
+	output, failure := result(
+		requirementID,
+		TypeValueIn,
+		satisfied,
+		observation(path, resolution),
+		map[string]any{"values": requirement["values"]},
+		"CONTEXT_VALUE_NOT_IN_SET",
+	)
+	return output, failure, nil
+}
+
+func EvaluatePathEquals(
+	requirement map[string]any,
+	ctx model.Context,
+) (map[string]any, string, error) {
+	requirementID, err := parser.AsString(
+		requirement["requirement_id"],
+		"requirement_id",
+	)
+	if err != nil {
+		return nil, "", err
+	}
+	leftPath, err := parser.AsString(
+		requirement["left_path"],
+		"left_path",
+	)
+	if err != nil {
+		return nil, "", err
+	}
+	rightPath, err := parser.AsString(
+		requirement["right_path"],
+		"right_path",
+	)
+	if err != nil {
+		return nil, "", err
+	}
+
+	left, err := ResolvePath(ctx, leftPath)
+	if err != nil {
+		return nil, "", err
+	}
+	right, err := ResolvePath(ctx, rightPath)
+	if err != nil {
+		return nil, "", err
+	}
+
+	satisfied := left.Status == "found" &&
+		right.Status == "found" &&
+		strictScalarEqual(left.Value, left.ValueType, right.Value)
+
+	output, failure := result(
+		requirementID,
+		TypePathEquals,
+		satisfied,
+		map[string]any{
+			"left":  observation(leftPath, left),
+			"right": observation(rightPath, right),
+		},
+		map[string]any{"relation": "strict_equal"},
+		"CONTEXT_PATH_VALUES_NOT_EQUAL",
 	)
 	return output, failure, nil
 }

@@ -206,6 +206,26 @@ func evaluateRequirementNode(
 		)
 		return result, err
 
+	case contextvalue.TypeValueIn:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := contextvalue.EvaluateValueIn(
+			requirement,
+			ctx,
+		)
+		return result, err
+
+	case contextvalue.TypePathEquals:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := contextvalue.EvaluatePathEquals(
+			requirement,
+			ctx,
+		)
+		return result, err
+
 	case contextvalue.TypeIntegerLeast:
 		if err := validation.ValidateRequirement(requirement); err != nil {
 			return nil, err

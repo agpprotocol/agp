@@ -39,6 +39,66 @@ func TestValidateBasicContextRequirements(t *testing.T) {
 	}
 }
 
+func TestValidateContextValueInAndPathEquals(t *testing.T) {
+	valid := []map[string]any{
+		{
+			"requirement_id": "requirement:in",
+			"type":           "context_value_in",
+			"path":           "/proposal/payload/environment",
+			"values":         []any{"production", "staging"},
+		},
+		{
+			"requirement_id": "requirement:path-equals",
+			"type":           "context_path_equals",
+			"left_path":      "/proposal/payload/requested",
+			"right_path":     "/proposal/payload/approved",
+		},
+	}
+	for _, requirement := range valid {
+		if err := ValidateRequirement(requirement); err != nil {
+			t.Fatalf("valid %s rejected: %v", requirement["type"], err)
+		}
+	}
+
+	invalid := []map[string]any{
+		{
+			"requirement_id": "requirement:empty",
+			"type":           "context_value_in",
+			"path":           "/proposal/payload/environment",
+			"values":         []any{},
+		},
+		{
+			"requirement_id": "requirement:mixed",
+			"type":           "context_value_in",
+			"path":           "/proposal/payload/environment",
+			"values":         []any{"one", json.Number("2")},
+		},
+		{
+			"requirement_id": "requirement:unsorted",
+			"type":           "context_value_in",
+			"path":           "/proposal/payload/environment",
+			"values":         []any{"zeta", "alpha"},
+		},
+		{
+			"requirement_id": "requirement:duplicate",
+			"type":           "context_value_in",
+			"path":           "/proposal/payload/environment",
+			"values":         []any{"alpha", "alpha"},
+		},
+		{
+			"requirement_id": "requirement:self",
+			"type":           "context_path_equals",
+			"left_path":      "/proposal/payload/version",
+			"right_path":     "/proposal/payload/version",
+		},
+	}
+	for _, requirement := range invalid {
+		if err := ValidateRequirement(requirement); err == nil {
+			t.Fatalf("invalid requirement accepted: %#v", requirement)
+		}
+	}
+}
+
 func TestRejectInvalidBasicContextRequirements(t *testing.T) {
 	invalid := []map[string]any{
 		{
