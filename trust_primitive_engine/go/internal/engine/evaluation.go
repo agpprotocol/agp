@@ -12,6 +12,7 @@ import (
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/provenance"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/role"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/signer"
+	"agpprotocol.org/agp/trust-primitive-engine/internal/primitives/temporal"
 	"agpprotocol.org/agp/trust-primitive-engine/internal/validation"
 )
 
@@ -185,6 +186,13 @@ func evaluateRequirementNode(
 			return nil, err
 		}
 		return role.EvaluateWeightThreshold(requirement, ctx, matchedSigners)
+
+	case temporal.TypeTimeWindow:
+		if err := validation.ValidateRequirement(requirement); err != nil {
+			return nil, err
+		}
+		result, _, err := temporal.Evaluate(requirement, ctx)
+		return result, err
 
 	case contextvalue.TypeValuePresent:
 		if err := validation.ValidateRequirement(requirement); err != nil {

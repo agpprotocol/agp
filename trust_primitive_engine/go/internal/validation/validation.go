@@ -23,6 +23,7 @@ const (
 	typeContextIntegerMost  = "context_integer_at_most"
 	typeEvidencePresent     = "evidence_present"
 	typeEvidenceCount       = "evidence_count_at_least"
+	typeTimeWindow          = "time_window"
 	typeRequiredSigner      = "required_signer"
 	typeSignerThreshold     = "signer_threshold"
 	typeProhibitedSigner    = "prohibited_signer"
@@ -422,6 +423,52 @@ func ValidateRequirement(requirement map[string]any) error {
 			return fmt.Errorf(
 				"%s must be between one and the maximum safe integer",
 				limitField,
+			)
+		}
+		return nil
+
+	case typeTimeWindow:
+		if err := validateExactMembers(
+			requirement,
+			[]string{"requirement_id", "type", "not_before", "not_after"},
+			nil,
+		); err != nil {
+			return err
+		}
+		if _, err := validateIdentifier(
+			requirement["requirement_id"],
+			"requirement_id",
+		); err != nil {
+			return err
+		}
+		notBefore, err := contextvalue.SafeInteger(
+			requirement["not_before"],
+			"not_before",
+		)
+		if err != nil {
+			return err
+		}
+		notAfter, err := contextvalue.SafeInteger(
+			requirement["not_after"],
+			"not_after",
+		)
+		if err != nil {
+			return err
+		}
+		if notBefore < 0 {
+			return errors.New(
+				"time_window.not_before must be non-negative",
+			)
+		}
+		if notAfter < 0 {
+			return errors.New(
+				"time_window.not_after must be non-negative",
+			)
+		}
+		if notBefore > notAfter {
+			return errors.New(
+				"time_window.not_before must be less than or equal to " +
+					"time_window.not_after",
 			)
 		}
 		return nil

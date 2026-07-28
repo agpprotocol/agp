@@ -276,3 +276,12 @@ The Go TPE preserves authenticated Decision Context `evaluation_time`
 while distinguishing absence from Unix epoch zero.
 
 See `PHASE-4.1I-1.md`.
+
+## Phase 4.1I-2 deterministic temporal evaluation
+
+The Go TPE implements inclusive `time_window` evaluation using only
+the authenticated Decision Context `evaluation_time`, fails closed when
+that consensus input is absent, and preserves the stable top-level
+evaluation shape.
+
+See `PHASE-4.1I-2.md`.
