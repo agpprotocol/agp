@@ -15,7 +15,7 @@ SDC_MODULE = "agpprotocol.org/agp/signed-decision-context"
 SDC_VERSION = "v0.2.0"
 
 TPE_MODULE = "agpprotocol.org/agp/trust-primitive-engine"
-TPE_VERSION = "v0.2.1"
+TPE_VERSION = "v0.2.2"
 
 
 class TestFailure(RuntimeError):

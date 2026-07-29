@@ -309,6 +309,11 @@ SUITES = [
         7,
     ),
     (
+        "public Go release alignment",
+        ROOT / "trust_primitive_engine/tools/test_public_go_release_alignment.py",
+        6,
+    ),
+    (
         "public Go signed end-to-end integration",
         ROOT / "trust_primitive_engine/tools/test_public_go_signed_end_to_end.py",
         8,
