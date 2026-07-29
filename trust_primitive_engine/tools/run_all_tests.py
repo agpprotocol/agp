@@ -357,6 +357,13 @@ SUITES = [
         8,
     ),
     (
+        "Actions execution bounds contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_actions_execution_bounds_contract.py",
+        10,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,

@@ -15,9 +15,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: decision-context-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   conformance:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Check out repository
