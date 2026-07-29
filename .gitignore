@@ -15,6 +15,7 @@ agp-resolver-go
 
 # Go build artifacts
 signed_decision_context/go/agp-signed-decision-context-verify
+signed_decision_context/go/agp-signed-decision-context-sign
 
 # Python package build artifacts
 dist/

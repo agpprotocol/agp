@@ -80,3 +80,39 @@ The public key is encoded as unpadded base64url.
 
 Key lifecycle, revocation, trust roots and authorization policy remain outside
 this implementation stage.
+
+## Go signing and verification
+
+The Go module provides a public deterministic signer and verifier:
+
+    cd signed_decision_context/go
+
+    go run ./cmd/agp-signed-decision-context-sign \
+      context.json \
+      --private-key private-key.json \
+      --signer-id authority:legal \
+      --key-id key:legal:2026-q3 \
+      --signature-id sig:legal:0001 \
+      --signed-at 2026-07-28T20:00:00Z \
+      --output signed-context.json
+
+    go run ./cmd/agp-signed-decision-context-verify \
+      signed-context.json \
+      --keyring keyring.json
+
+To append another signature, pass an existing Signed Decision Context and add
+`--append`.
+
+The public Go package is:
+
+    agpprotocol.org/agp/signed-decision-context/sign
+
+It exposes `ParsePrivateKey`, `Create`, `Append`, `CanonicalBytes`, and stable
+typed signing errors through `ErrorCode`.
+
+Private Ed25519 material must remain in the signing environment. Verification
+uses only the Signed Decision Context and its public keyring.
+
+Run the permanent Python/Go signer parity guard with:
+
+    python signed_decision_context/tools/run_go_signer_parity.py
