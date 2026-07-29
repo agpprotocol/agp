@@ -17,7 +17,7 @@ boundary.
 
 Add the public module to an external Go project:
 
-    go get agpprotocol.org/agp/trust-primitive-engine@v0.2.1
+    go get agpprotocol.org/agp/trust-primitive-engine@v0.2.2
 
 Import:
 

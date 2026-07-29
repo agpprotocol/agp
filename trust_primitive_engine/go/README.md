@@ -346,3 +346,17 @@ that consensus input is absent, and preserves the stable top-level
 evaluation shape.
 
 See `PHASE-4.1I-2.md`.
+
+## Public Go release
+
+Install the current public release with:
+
+    go get agpprotocol.org/agp/trust-primitive-engine@v0.2.2
+
+The current supported public module pair is:
+
+    agpprotocol.org/agp/trust-primitive-engine v0.2.2
+    agpprotocol.org/agp/signed-decision-context v0.2.0
+
+Trust Primitive Engine v0.2.2 declares Signed Decision Context v0.2.0 as its
+minimum dependency. External consumers do not need a `replace` directive.
