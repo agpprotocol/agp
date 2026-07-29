@@ -1,0 +1,81 @@
+name: Go Release Integrity
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "signed_decision_context/go/**"
+      - "trust_primitive_engine/go/**"
+      - "trust_primitive_engine/tools/test_go_release_integrity_contract.py"
+      - ".github/workflows/go-release-integrity.yml"
+  pull_request:
+    paths:
+      - "signed_decision_context/go/**"
+      - "trust_primitive_engine/go/**"
+      - "trust_primitive_engine/tools/test_go_release_integrity_contract.py"
+      - ".github/workflows/go-release-integrity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: go-release-integrity-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integrity:
+    name: Verify public Go release integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository and tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+          check-latest: true
+
+      - name: Install pinned vulnerability scanner
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@v1.6.0
+
+      - name: Verify Signed Decision Context Go
+        working-directory: signed_decision_context/go
+        run: |
+          go mod verify
+          go test ./...
+          go vet ./...
+          govulncheck ./...
+
+      - name: Verify Trust Primitive Engine Go
+        working-directory: trust_primitive_engine/go
+        run: |
+          go mod verify
+          go test ./...
+          go vet ./...
+          govulncheck ./...
+
+      - name: Verify public release tags are annotated
+        shell: bash
+        run: |
+          set -euo pipefail
+          for release_tag in \
+            signed_decision_context/go/v0.2.0 \
+            trust_primitive_engine/go/v0.2.2
+          do
+            tag_type="$(git cat-file -t "$release_tag")"
+            if [ "$tag_type" != "tag" ]; then
+              printf 'Expected annotated tag: %s; got: %s\n' \
+                "$release_tag" \
+                "$tag_type" >&2
+              exit 1
+            fi
+            printf 'ANNOTATED_TAG_PASS %s\n' "$release_tag"
+          done
