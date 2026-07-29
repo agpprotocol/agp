@@ -336,6 +336,13 @@ SUITES = [
         8,
     ),
     (
+        "GitHub Actions runtime contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_actions_runtime_contract.py",
+        9,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,
