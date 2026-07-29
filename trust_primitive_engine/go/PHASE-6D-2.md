@@ -1,0 +1,65 @@
+# Phase 6D-2 — GitHub Actions runtime maintenance
+
+Phase 6D-2 migrates the official repository setup actions to their current
+Node.js 24-compatible major releases.
+
+## Scope
+
+The migration applies to all repository workflows under:
+
+```text
+.github/workflows/
+```
+
+The updated official actions are:
+
+```text
+actions/checkout@v7
+actions/setup-go@v7
+actions/setup-python@v7
+```
+
+The migration preserves each workflow's existing inputs, permissions,
+triggers, timeouts, concurrency rules, language versions, and release
+behavior.
+
+## Explicitly unchanged actions
+
+This phase does not update unrelated action families:
+
+```text
+actions/configure-pages@v5
+actions/upload-pages-artifact@v3
+actions/deploy-pages@v4
+pypa/gh-action-pypi-publish@release/v1
+```
+
+Those actions require separate compatibility and supply-chain review.
+
+## Permanent contract
+
+The repository contract is:
+
+```text
+trust_primitive_engine/tools/test_actions_runtime_contract.py
+```
+
+It validates eight requirements:
+
+1. the expected workflow inventory is present;
+2. checkout usage is migrated to v7;
+3. setup-go usage is migrated to v7;
+4. setup-python usage is migrated to v7;
+5. legacy official action versions are absent;
+6. Go release integrity retains full tag checkout and stable Go;
+7. TPE conformance retains full history and Python 3.12;
+8. unrelated action families remain unchanged.
+
+Expected marker:
+
+```text
+AGP GitHub Actions runtime contract: 8/8 passed
+```
+
+The contract contributes eight checks to complete TPE development
+validation, increasing its expected total from 956 to 964.
