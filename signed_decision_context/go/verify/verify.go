@@ -2,6 +2,8 @@ package verify
 
 import (
 	"bytes"
+
+	"agpprotocol.org/agp/signed-decision-context/internal/canonicaljson"
 	"crypto/ed25519"
 	"crypto/sha256"
 	"encoding/base64"
@@ -12,7 +14,6 @@ import (
 	"io"
 	"os"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -228,139 +229,15 @@ func loadJSON(path string) (any, error) {
 	return parseJSON(raw)
 }
 
-func escapeString(value string) (string, error) {
-	if !utf8.ValidString(value) {
-		return "", invalid(
-			"INVALID_SIGNATURE_STATEMENT",
-			"invalid UTF-8 string",
-		)
-	}
-
-	var builder strings.Builder
-	builder.WriteByte('"')
-
-	for _, current := range value {
-		switch current {
-		case '"':
-			builder.WriteString(`\"`)
-		case '\\':
-			builder.WriteString(`\\`)
-		case '\b':
-			builder.WriteString(`\b`)
-		case '\t':
-			builder.WriteString(`\t`)
-		case '\n':
-			builder.WriteString(`\n`)
-		case '\f':
-			builder.WriteString(`\f`)
-		case '\r':
-			builder.WriteString(`\r`)
-		default:
-			if current <= 0x1F {
-				builder.WriteString(
-					fmt.Sprintf(`\u%04x`, current),
-				)
-			} else {
-				builder.WriteRune(current)
-			}
-		}
-	}
-
-	builder.WriteByte('"')
-	return builder.String(), nil
-}
-
-func canonicalText(value any, depth int) (string, error) {
-	if depth > maxDepth {
-		return "", invalid(
-			"INVALID_SIGNATURE_STATEMENT",
-			"maximum depth exceeded",
-		)
-	}
-
-	switch item := value.(type) {
-	case nil:
-		return "null", nil
-
-	case bool:
-		if item {
-			return "true", nil
-		}
-		return "false", nil
-
-	case int64:
-		if item < minSafeInt || item > maxSafeInt {
-			return "", invalid(
-				"INVALID_SIGNATURE_STATEMENT",
-				"integer outside safe range",
-			)
-		}
-		return strconv.FormatInt(item, 10), nil
-
-	case string:
-		return escapeString(item)
-
-	case []any:
-		parts := make([]string, len(item))
-
-		for index, child := range item {
-			encoded, err := canonicalText(child, depth+1)
-			if err != nil {
-				return "", err
-			}
-			parts[index] = encoded
-		}
-
-		return "[" + strings.Join(parts, ",") + "]", nil
-
-	case map[string]any:
-		keys := make([]string, 0, len(item))
-
-		for key := range item {
-			keys = append(keys, key)
-		}
-
-		sort.Strings(keys)
-
-		parts := make([]string, 0, len(keys))
-
-		for _, key := range keys {
-			encodedKey, err := escapeString(key)
-			if err != nil {
-				return "", err
-			}
-
-			encodedValue, err := canonicalText(
-				item[key],
-				depth+1,
-			)
-			if err != nil {
-				return "", err
-			}
-
-			parts = append(
-				parts,
-				encodedKey+":"+encodedValue,
-			)
-		}
-
-		return "{" + strings.Join(parts, ",") + "}", nil
-
-	default:
-		return "", invalid(
-			"INVALID_SIGNATURE_STATEMENT",
-			fmt.Sprintf("unsupported type %T", value),
-		)
-	}
-}
-
 func canonicalBytes(value any) ([]byte, error) {
-	text, err := canonicalText(value, 0)
+	encoded, err := canonicaljson.Bytes(value)
 	if err != nil {
-		return nil, err
+		return nil, invalid(
+			"INVALID_SIGNATURE_STATEMENT",
+			err.Error(),
+		)
 	}
-
-	return []byte(text), nil
+	return encoded, nil
 }
 
 func exactMembers(value map[string]any, expected ...string) bool {

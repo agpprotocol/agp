@@ -304,6 +304,11 @@ SUITES = [
         1,
     ),
     (
+        "Signed Decision Context Go signer parity",
+        ROOT / "signed_decision_context/tools/run_go_signer_parity.py",
+        4,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,
