@@ -304,6 +304,11 @@ SUITES = [
         1,
     ),
     (
+        "Signed Decision Context Go public API contract",
+        ROOT / "signed_decision_context/tools/test_sdc_go_public_api_contract.py",
+        8,
+    ),
+    (
         "Signed Decision Context Go signer parity",
         ROOT / "signed_decision_context/tools/run_go_signer_parity.py",
         4,

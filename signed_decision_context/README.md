@@ -103,9 +103,14 @@ The Go module provides a public deterministic signer and verifier:
 To append another signature, pass an existing Signed Decision Context and add
 `--append`.
 
-The public Go package is:
+Install the public Go module release with:
+
+    go get agpprotocol.org/agp/signed-decision-context@v0.2.0
+
+The public Go packages are:
 
     agpprotocol.org/agp/signed-decision-context/sign
+    agpprotocol.org/agp/signed-decision-context/verify
 
 It exposes `ParsePrivateKey`, `Create`, `Append`, `CanonicalBytes`, and stable
 typed signing errors through `ErrorCode`.
