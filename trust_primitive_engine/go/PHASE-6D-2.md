@@ -23,18 +23,16 @@ The migration preserves each workflow's existing inputs, permissions,
 triggers, timeouts, concurrency rules, language versions, and release
 behavior.
 
-## Explicitly unchanged actions
+## Privileged action families
 
-This phase does not update unrelated action families:
+Phase 6D-2 originally left the Pages and PyPI publishing action
+families unchanged for separate compatibility and supply-chain
+review.
 
-```text
-actions/configure-pages@v5
-actions/upload-pages-artifact@v3
-actions/deploy-pages@v4
-pypa/gh-action-pypi-publish@release/v1
-```
-
-Those actions require separate compatibility and supply-chain review.
+Phase 6D-3 subsequently completed that review and pinned those
+privileged actions to immutable commit SHAs. The runtime contract now
+verifies that the reviewed references remain present while the
+dedicated Phase 6D-3 contract enforces their supply-chain properties.
 
 ## Permanent contract
 
@@ -44,7 +42,7 @@ The repository contract is:
 trust_primitive_engine/tools/test_actions_runtime_contract.py
 ```
 
-It validates eight requirements:
+It validates nine requirements:
 
 1. the expected workflow inventory is present;
 2. checkout usage is migrated to v7;
@@ -54,7 +52,7 @@ It validates eight requirements:
 6. Go release integrity retains full tag checkout and stable Go;
 7. TPE conformance retains full history and Python 3.12;
 8. historical AGP conformance uses the current stable Go toolchain;
-9. unrelated action families remain unchanged.
+9. privileged action families remain explicitly reviewed.
 
 Expected marker:
 

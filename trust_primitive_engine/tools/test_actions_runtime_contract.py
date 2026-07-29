@@ -21,11 +21,27 @@ EXPECTED_WORKFLOWS = {
     "tpe-conformance.yml",
 }
 
-EXPECTED_OTHER_ACTIONS = {
-    "actions/configure-pages@v5",
-    "actions/upload-pages-artifact@v3",
-    "actions/deploy-pages@v4",
-    "pypa/gh-action-pypi-publish@release/v1",
+EXPECTED_PRIVILEGED_ACTIONS = {
+    (
+        "actions/configure-pages@"
+        "45bfe0192ca1faeb007ade9deae92b16b8254a0d"
+        " # v6.0.0"
+    ),
+    (
+        "actions/upload-pages-artifact@"
+        "7b1f4a764d45c48632c6b24a0339c27f5614fb0b"
+        " # v4.0.0"
+    ),
+    (
+        "actions/deploy-pages@"
+        "cd2ce8fcbc39b97be8ca5fce6e763baed58fa128"
+        " # v5.0.0"
+    ),
+    (
+        "pypa/gh-action-pypi-publish@"
+        "dc37677b2e1c63e2034f94d8a5b11f265b73ba33"
+        " # v1.14.2"
+    ),
 }
 
 LEGACY_OFFICIAL_ACTIONS = {
@@ -165,8 +181,11 @@ def main() -> int:
             ),
         ),
         (
-            "unrelated action families remain unchanged",
-            all(marker in all_text for marker in EXPECTED_OTHER_ACTIONS),
+            "privileged action families remain explicitly reviewed",
+            all(
+                marker in all_text
+                for marker in EXPECTED_PRIVILEGED_ACTIONS
+            ),
         ),
     ]
 
