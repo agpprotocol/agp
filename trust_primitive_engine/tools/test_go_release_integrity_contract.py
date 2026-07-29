@@ -69,7 +69,8 @@ def main() -> int:
                     "actions/checkout@v4",
                     "fetch-depth: 0",
                     "actions/setup-go@v5",
-                    'go-version: "1.22.x"',
+                    'go-version: "stable"',
+                    "check-latest: true",
                 )
             ),
         ),

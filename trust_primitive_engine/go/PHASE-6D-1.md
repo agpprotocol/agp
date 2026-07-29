@@ -31,8 +31,11 @@ The vulnerability scanner is pinned to:
 golang.org/x/vuln/cmd/govulncheck@v1.6.0
 ```
 
-The workflow uses Go 1.22.x, read-only repository permissions, a bounded
-timeout, full tag history, and concurrency cancellation.
+The workflow uses the latest stable Go toolchain, read-only repository
+permissions, a bounded timeout, full tag history, and concurrency
+cancellation. Tracking the current stable patch level prevents the
+integrity gate itself from remaining pinned to a vulnerable standard
+library release.
 
 ## Public tag integrity
 
