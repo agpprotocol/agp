@@ -304,6 +304,11 @@ SUITES = [
         1,
     ),
     (
+        "Trust Primitive Engine Go v0.2.2 release contract",
+        ROOT / "trust_primitive_engine/tools/test_tpe_go_v022_release_contract.py",
+        7,
+    ),
+    (
         "public Go signed end-to-end integration",
         ROOT / "trust_primitive_engine/tools/test_public_go_signed_end_to_end.py",
         8,
