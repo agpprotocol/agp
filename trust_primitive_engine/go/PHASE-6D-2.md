@@ -53,13 +53,14 @@ It validates eight requirements:
 5. legacy official action versions are absent;
 6. Go release integrity retains full tag checkout and stable Go;
 7. TPE conformance retains full history and Python 3.12;
-8. unrelated action families remain unchanged.
+8. historical AGP conformance uses the current stable Go toolchain;
+9. unrelated action families remain unchanged.
 
 Expected marker:
 
 ```text
-AGP GitHub Actions runtime contract: 8/8 passed
+AGP GitHub Actions runtime contract: 9/9 passed
 ```
 
-The contract contributes eight checks to complete TPE development
-validation, increasing its expected total from 956 to 964.
+The contract contributes nine checks to complete TPE development
+validation, increasing its expected total from 956 to 965.

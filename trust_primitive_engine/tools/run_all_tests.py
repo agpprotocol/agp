@@ -340,7 +340,7 @@ SUITES = [
         ROOT
         / "trust_primitive_engine/tools/"
         "test_actions_runtime_contract.py",
-        8,
+        9,
     ),
     (
         "package installation and schema audit",

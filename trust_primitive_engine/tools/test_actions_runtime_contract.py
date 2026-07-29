@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW_DIR = ROOT / ".github/workflows"
-EXPECTED_TOTAL = 8
+EXPECTED_TOTAL = 9
 
 EXPECTED_WORKFLOWS = {
     "canonicalization-conformance.yml",
@@ -150,6 +150,17 @@ def main() -> int:
                     "fetch-depth: 0",
                     "actions/setup-python@v7",
                     'python-version: "3.12"',
+                )
+            ),
+        ),
+        (
+            "historical conformance uses current stable Go",
+            all(
+                marker in workflows.get("conformance.yml", "")
+                for marker in (
+                    "actions/setup-go@v7",
+                    'go-version: "stable"',
+                    "check-latest: true",
                 )
             ),
         ),
