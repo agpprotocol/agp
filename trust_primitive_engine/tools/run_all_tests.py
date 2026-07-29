@@ -350,6 +350,13 @@ SUITES = [
         8,
     ),
     (
+        "official Actions pinning contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_official_actions_pinning_contract.py",
+        8,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,

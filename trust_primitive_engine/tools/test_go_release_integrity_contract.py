@@ -66,9 +66,9 @@ def main() -> int:
             all(
                 marker in workflow_text
                 for marker in (
-                    "actions/checkout@v7",
+                    "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
                     "fetch-depth: 0",
-                    "actions/setup-go@v7",
+                    "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0",
                     'go-version: "stable"',
                     "check-latest: true",
                 )

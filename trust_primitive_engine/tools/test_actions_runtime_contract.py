@@ -83,15 +83,15 @@ def main() -> int:
 
     checkout_workflows = files_using(
         workflows,
-        "actions/checkout@v7",
+        "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
     )
     setup_go_workflows = files_using(
         workflows,
-        "actions/setup-go@v7",
+        "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0",
     )
     setup_python_workflows = files_using(
         workflows,
-        "actions/setup-python@v7",
+        "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0",
     )
 
     checks = [
@@ -149,9 +149,9 @@ def main() -> int:
                 marker
                 in workflows.get("go-release-integrity.yml", "")
                 for marker in (
-                    "actions/checkout@v7",
+                    "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
                     "fetch-depth: 0",
-                    "actions/setup-go@v7",
+                    "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0",
                     'go-version: "stable"',
                     "check-latest: true",
                 )
@@ -162,9 +162,9 @@ def main() -> int:
             all(
                 marker in workflows.get("tpe-conformance.yml", "")
                 for marker in (
-                    "actions/checkout@v7",
+                    "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
                     "fetch-depth: 0",
-                    "actions/setup-python@v7",
+                    "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0",
                     'python-version: "3.12"',
                 )
             ),
@@ -174,7 +174,7 @@ def main() -> int:
             all(
                 marker in workflows.get("conformance.yml", "")
                 for marker in (
-                    "actions/setup-go@v7",
+                    "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0",
                     'go-version: "stable"',
                     "check-latest: true",
                 )
