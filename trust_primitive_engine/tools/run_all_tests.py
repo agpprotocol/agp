@@ -329,6 +329,13 @@ SUITES = [
         4,
     ),
     (
+        "Go release integrity contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_go_release_integrity_contract.py",
+        8,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,

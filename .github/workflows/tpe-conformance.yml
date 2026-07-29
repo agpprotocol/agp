@@ -11,6 +11,7 @@ on:
       - "registry/schemas/agp.trust-policy-2.schema.json"
       - "requirements-v0.4.txt"
       - ".github/workflows/tpe-conformance.yml"
+      - ".github/workflows/go-release-integrity.yml"
   pull_request:
     paths:
       - "trust_primitive_engine/**"
@@ -19,6 +20,7 @@ on:
       - "registry/schemas/agp.trust-policy-2.schema.json"
       - "requirements-v0.4.txt"
       - ".github/workflows/tpe-conformance.yml"
+      - ".github/workflows/go-release-integrity.yml"
   workflow_dispatch:
 
 permissions:
@@ -41,6 +43,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -65,7 +69,7 @@ jobs:
 
       - name: Verify expected validation total
         run: |
-          grep -Fqx             "AGP TPE 2.6 development validation: 948/948 passed"             /tmp/tpe-validation.log
+          grep -Fqx             "AGP TPE 2.6 development validation: 956/956 passed"             /tmp/tpe-validation.log
 
       - name: Run executable policy-reference example
         run: |
