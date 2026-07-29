@@ -304,6 +304,11 @@ SUITES = [
         1,
     ),
     (
+        "public Go signed end-to-end integration",
+        ROOT / "trust_primitive_engine/tools/test_public_go_signed_end_to_end.py",
+        8,
+    ),
+    (
         "Signed Decision Context Go public API contract",
         ROOT / "signed_decision_context/tools/test_sdc_go_public_api_contract.py",
         8,
