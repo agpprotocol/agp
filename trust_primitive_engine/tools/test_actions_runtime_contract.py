@@ -19,6 +19,7 @@ EXPECTED_WORKFLOWS = {
     "publish-pypi.yml",
     "schema-registry-conformance.yml",
     "tpe-conformance.yml",
+    "verify-release-attestations.yml",
 }
 
 EXPECTED_PRIVILEGED_ACTIONS = {
@@ -111,6 +112,7 @@ def main() -> int:
                 "publish-pypi.yml",
                 "schema-registry-conformance.yml",
                 "tpe-conformance.yml",
+                "verify-release-attestations.yml",
             },
         ),
         (

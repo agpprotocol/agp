@@ -251,6 +251,33 @@ jobs:
               --deny-self-hosted-runners
           done
 
+      - name: Generate release verification evidence
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          python trust_primitive_engine/tools/verify_release_attestations.py             --tag "$RELEASE_TAG"             --repository agpprotocol/agp             --signer-workflow agpprotocol/agp/.github/workflows/publish-pypi.yml             --output-dir release-verification-report
+
+      - name: Publish release verification summary
+        if: always()
+        run: |
+          if [ -f release-verification-report/verification-summary.md ]; then
+            cat release-verification-report/verification-summary.md               >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf 'Release verification report was not produced.
+'               >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload release verification evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-verification-${{ github.event.release.tag_name }}
+          path: release-verification-report/
+          if-no-files-found: error
+          retention-days: 90
+
           for package in "$release_dir"/*.whl "$release_dir"/*.tar.gz; do
             gh attestation verify "$package" \
               --repo agpprotocol/agp \

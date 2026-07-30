@@ -9,13 +9,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW_DIR = ROOT / ".github/workflows"
-EXPECTED_TOTAL = 8
+EXPECTED_TOTAL = 9
 
 EXPECTED = {
     "actions/checkout": {
         "sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
         "comment": "# v7.0.1",
-        "count": 8,
+        "count": 9,
     },
     "actions/setup-go": {
         "sha": "b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
@@ -27,10 +27,15 @@ EXPECTED = {
         "comment": "# v7.0.0",
         "count": 6,
     },
+    "actions/upload-artifact": {
+        "sha": "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "comment": "# v7.0.1",
+        "count": 2,
+    },
 }
 
 REFERENCE_PATTERN = re.compile(
-    r"uses:\s*(actions/(?:checkout|setup-go|setup-python))"
+    r"uses:\s*(actions/(?:checkout|setup-go|setup-python|upload-artifact))"
     r"@([^\s#]+)(?:\s+(#\s*v[^\s]+))?"
 )
 
@@ -104,6 +109,17 @@ def main() -> int:
             ),
         ),
         (
+            "upload-artifact references match reviewed v7.0.1 commit",
+            len(grouped["actions/upload-artifact"])
+            == EXPECTED["actions/upload-artifact"]["count"]
+            and all(
+                reference == EXPECTED["actions/upload-artifact"]["sha"]
+                and comment == EXPECTED["actions/upload-artifact"]["comment"]
+                for reference, comment
+                in grouped["actions/upload-artifact"]
+            ),
+        ),
+        (
             "moving official setup tags are absent",
             not any(
                 marker in combined
@@ -115,8 +131,8 @@ def main() -> int:
             ),
         ),
         (
-            "reviewed official setup reference count is nineteen",
-            sum(len(values) for values in grouped.values()) == 19,
+            "reviewed official Actions reference count is twenty-two",
+            sum(len(values) for values in grouped.values()) == 22,
         ),
         (
             "all reviewed version comments remain present",

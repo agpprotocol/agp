@@ -420,6 +420,13 @@ SUITES = [
         20,
     ),
     (
+        "release verification observability contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_release_verification_observability_contract.py",
+        24,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,
