@@ -251,22 +251,37 @@ jobs:
               --deny-self-hosted-runners
           done
 
+          for package in "$release_dir"/*.whl "$release_dir"/*.tar.gz; do
+            gh attestation verify "$package" \
+              --repo agpprotocol/agp \
+              --signer-workflow agpprotocol/agp/.github/workflows/publish-pypi.yml \
+              --source-ref "refs/tags/${RELEASE_TAG}" \
+              --source-digest "${SOURCE_DIGEST}" \
+              --deny-self-hosted-runners \
+              --predicate-type https://cyclonedx.org/bom
+          done
+
       - name: Generate release verification evidence
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          python trust_primitive_engine/tools/verify_release_attestations.py             --tag "$RELEASE_TAG"             --repository agpprotocol/agp             --signer-workflow agpprotocol/agp/.github/workflows/publish-pypi.yml             --output-dir release-verification-report
+          python trust_primitive_engine/tools/verify_release_attestations.py \
+            --tag "$RELEASE_TAG" \
+            --repository agpprotocol/agp \
+            --signer-workflow agpprotocol/agp/.github/workflows/publish-pypi.yml \
+            --output-dir release-verification-report
 
       - name: Publish release verification summary
         if: always()
         run: |
           if [ -f release-verification-report/verification-summary.md ]; then
-            cat release-verification-report/verification-summary.md               >> "$GITHUB_STEP_SUMMARY"
+            cat release-verification-report/verification-summary.md \
+              >> "$GITHUB_STEP_SUMMARY"
           else
-            printf 'Release verification report was not produced.
-'               >> "$GITHUB_STEP_SUMMARY"
+            printf 'Release verification report was not produced.\n' \
+              >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload release verification evidence
@@ -277,13 +292,3 @@ jobs:
           path: release-verification-report/
           if-no-files-found: error
           retention-days: 90
-
-          for package in "$release_dir"/*.whl "$release_dir"/*.tar.gz; do
-            gh attestation verify "$package" \
-              --repo agpprotocol/agp \
-              --signer-workflow agpprotocol/agp/.github/workflows/publish-pypi.yml \
-              --source-ref "refs/tags/${RELEASE_TAG}" \
-              --source-digest "${SOURCE_DIGEST}" \
-              --deny-self-hosted-runners \
-              --predicate-type https://cyclonedx.org/bom
-          done
