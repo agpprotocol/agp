@@ -371,6 +371,13 @@ SUITES = [
         10,
     ),
     (
+        "Python dependency reproducibility contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_python_dependency_reproducibility_contract.py",
+        12,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,
