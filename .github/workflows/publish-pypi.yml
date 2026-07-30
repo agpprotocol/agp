@@ -24,7 +24,7 @@ jobs:
       url: https://pypi.org/project/agp-tpe/
 
     permissions:
-      contents: read
+      contents: write
       id-token: write
       attestations: write
       artifact-metadata: write
@@ -188,6 +188,75 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
+            dist/*.whl \
+            dist/*.tar.gz \
             dist/SHA256SUMS \
             release-assets/agp-tpe.cdx.json \
             --clobber
+
+      - name: Resolve released source identity
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          SOURCE_DIGEST="$(git rev-parse HEAD)"
+          printf 'RELEASE_TAG=%s\n' "$RELEASE_TAG" >> "$GITHUB_ENV"
+          printf 'SOURCE_DIGEST=%s\n' "$SOURCE_DIGEST" >> "$GITHUB_ENV"
+          printf 'release_tag=%s\n' "$RELEASE_TAG"
+          printf 'source_digest=%s\n' "$SOURCE_DIGEST"
+
+      - name: Download published release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release_dir="$RUNNER_TEMP/release-verification"
+          rm -rf "$release_dir"
+          mkdir -p "$release_dir"
+
+          gh release download "$RELEASE_TAG" \
+            --repo agpprotocol/agp \
+            --dir "$release_dir" \
+            --pattern '*.whl' \
+            --pattern '*.tar.gz' \
+            --pattern 'SHA256SUMS' \
+            --pattern 'agp-tpe.cdx.json'
+
+          find "$release_dir" -maxdepth 1 -type f -print | sort
+
+      - name: Verify downloaded release assets
+        run: |
+          set -o pipefail
+          release_dir="$RUNNER_TEMP/release-verification"
+
+          wheel_count="$(find "$release_dir" -maxdepth 1 -type f -name '*.whl' | wc -l | tr -d ' ')"
+          sdist_count="$(find "$release_dir" -maxdepth 1 -type f -name '*.tar.gz' | wc -l | tr -d ' ')"
+          checksum_count="$(find "$release_dir" -maxdepth 1 -type f -name 'SHA256SUMS' | wc -l | tr -d ' ')"
+          sbom_count="$(find "$release_dir" -maxdepth 1 -type f -name 'agp-tpe.cdx.json' | wc -l | tr -d ' ')"
+
+          [ "$wheel_count" -eq 1 ]
+          [ "$sdist_count" -eq 1 ]
+          [ "$checksum_count" -eq 1 ]
+          [ "$sbom_count" -eq 1 ]
+
+          (
+            cd "$release_dir"
+            sha256sum --check SHA256SUMS
+          )
+
+          for artifact in "$release_dir"/*; do
+            gh attestation verify "$artifact" \
+              --repo agpprotocol/agp \
+              --signer-workflow agpprotocol/agp/.github/workflows/publish-pypi.yml \
+              --source-ref "refs/tags/${RELEASE_TAG}" \
+              --source-digest "${SOURCE_DIGEST}" \
+              --deny-self-hosted-runners
+          done
+
+          for package in "$release_dir"/*.whl "$release_dir"/*.tar.gz; do
+            gh attestation verify "$package" \
+              --repo agpprotocol/agp \
+              --signer-workflow agpprotocol/agp/.github/workflows/publish-pypi.yml \
+              --source-ref "refs/tags/${RELEASE_TAG}" \
+              --source-digest "${SOURCE_DIGEST}" \
+              --deny-self-hosted-runners \
+              --predicate-type https://cyclonedx.org/bom
+          done
