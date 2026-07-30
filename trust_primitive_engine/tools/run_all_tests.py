@@ -427,6 +427,13 @@ SUITES = [
         24,
     ),
     (
+        "release recovery trust boundary contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_release_recovery_trust_boundary_contract.py",
+        20,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,

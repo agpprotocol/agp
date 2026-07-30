@@ -66,8 +66,11 @@ def main() -> int:
             and "push:" not in recovery,
         ),
         (
-            "recovery checks out requested tag",
-            "ref: ${{ inputs.tag }}" in recovery,
+            "recovery keeps trusted tooling separate from released source",
+            "Check out trusted recovery tooling" in recovery
+            and "git worktree add --detach released-source" in recovery
+            and "working-directory: released-source" in recovery
+            and "ref: ${{ inputs.tag }}" not in recovery,
         ),
         (
             "recovery has no publication action",

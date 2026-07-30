@@ -35,23 +35,36 @@ jobs:
               ;;
           esac
 
-      - name: Check out released tag
+      - name: Check out trusted recovery tooling
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.tag }}
           persist-credentials: false
 
+      - name: Resolve released source identity
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          git fetch --force --no-tags origin \
+            "refs/tags/${RELEASE_TAG}:refs/tags/${RELEASE_TAG}"
+          release_commit="$(git rev-list -n 1 "$RELEASE_TAG")"
+          test -n "$release_commit"
+          printf 'RELEASE_COMMIT=%s\n' "$release_commit" \
+            >> "$GITHUB_ENV"
+          git worktree add --detach released-source "$release_commit"
+
       - name: Verify published release attestations
+        working-directory: released-source
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
-          python trust_primitive_engine/tools/verify_release_attestations.py \
+          python "$GITHUB_WORKSPACE/trust_primitive_engine/tools/verify_release_attestations.py" \
             --tag "$RELEASE_TAG" \
             --repository agpprotocol/agp \
             --signer-workflow agpprotocol/agp/.github/workflows/publish-pypi.yml \
-            --output-dir release-verification-report
+            --output-dir "$GITHUB_WORKSPACE/release-verification-report"
 
       - name: Publish verification summary
         if: always()
