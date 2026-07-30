@@ -78,3 +78,9 @@ jobs:
             fi
             printf 'ANNOTATED_TAG_PASS %s\n' "$release_tag"
           done
+      - name: Verify Go module dependency integrity
+        env:
+          GOPROXY: https://proxy.golang.org,direct
+          GOSUMDB: sum.golang.org
+        run: |
+          python trust_primitive_engine/tools/verify_go_module_dependency_integrity.py
