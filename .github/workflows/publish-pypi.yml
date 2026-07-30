@@ -26,8 +26,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
-  attestations: write
-  artifact-metadata: write
+      attestations: write
+      artifact-metadata: write
 
     steps:
       - name: Check out the released tag
