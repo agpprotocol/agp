@@ -392,6 +392,13 @@ SUITES = [
         12,
     ),
     (
+        "release artifact checksum contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_release_artifact_checksum_contract.py",
+        10,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,
