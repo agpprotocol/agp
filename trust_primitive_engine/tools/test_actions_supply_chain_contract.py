@@ -120,7 +120,17 @@ def main() -> int:
                     "environment:",
                     "name: pypi",
                     "id-token: write",
-                    "contents: read",
+                    "pypa/gh-action-pypi-publish@",
+                )
+            )
+            and not any(
+                marker in pypi
+                for marker in (
+                    "password:",
+                    "user:",
+                    "username:",
+                    "api-token:",
+                    "repository-url:",
                 )
             ),
         ),
