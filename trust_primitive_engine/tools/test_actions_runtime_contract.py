@@ -144,7 +144,7 @@ def main() -> int:
             ),
         ),
         (
-            "Go release integrity keeps full tag checkout",
+            "Go release integrity keeps reviewed checkout and Go 1.25.x",
             all(
                 marker
                 in workflows.get("go-release-integrity.yml", "")
@@ -152,8 +152,7 @@ def main() -> int:
                     "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
                     "fetch-depth: 0",
                     "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0",
-                    'go-version: "stable"',
-                    "check-latest: true",
+                    'go-version: "1.25.x"',
                 )
             ),
         ),
@@ -170,13 +169,12 @@ def main() -> int:
             ),
         ),
         (
-            "historical conformance uses current stable Go",
+            "historical conformance uses reviewed Go 1.23.x",
             all(
                 marker in workflows.get("conformance.yml", "")
                 for marker in (
                     "actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0",
-                    'go-version: "stable"',
-                    "check-latest: true",
+                    'go-version: "1.23.x"',
                 )
             ),
         ),
