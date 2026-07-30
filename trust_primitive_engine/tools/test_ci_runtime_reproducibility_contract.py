@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW_DIR = ROOT / ".github/workflows"
-EXPECTED_TOTAL = 9
+EXPECTED_TOTAL = 10
 
 EXPECTED_WORKFLOWS = {
     "canonicalization-conformance.yml",
@@ -23,6 +23,9 @@ EXPECTED_WORKFLOWS = {
 
 GO_123_WORKFLOWS = {
     "conformance.yml",
+}
+
+GO_125_WORKFLOWS = {
     "go-release-integrity.yml",
 }
 
@@ -60,8 +63,8 @@ def main() -> int:
             in workflows["conformance.yml"],
         ),
         (
-            "release integrity uses Go 1.23.x",
-            'go-version: "1.23.x"'
+            "release integrity uses Go 1.25.x",
+            'go-version: "1.25.x"'
             in workflows["go-release-integrity.yml"],
         ),
         (
@@ -73,13 +76,22 @@ def main() -> int:
             "check-latest:" not in combined,
         ),
         (
-            "reviewed Go workflows are exact",
+            "reviewed Go 1.23 workflows are exact",
             {
                 name
                 for name, text in workflows.items()
                 if 'go-version: "1.23.x"' in text
             }
             == GO_123_WORKFLOWS,
+        ),
+        (
+            "reviewed Go 1.25 workflows are exact",
+            {
+                name
+                for name, text in workflows.items()
+                if 'go-version: "1.25.x"' in text
+            }
+            == GO_125_WORKFLOWS,
         ),
         (
             "module-file workflows remain module driven",
