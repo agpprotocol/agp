@@ -11,6 +11,8 @@ on:
       - "registry/schemas/agp.trust-policy-2.schema.json"
       - "requirements-v0.4.txt"
       - "constraints-ci.txt"
+      - "requirements-ci-lock.txt"
+      - "requirements-release-lock.txt"
       - ".github/workflows/tpe-conformance.yml"
       - ".github/workflows/go-release-integrity.yml"
   pull_request:
@@ -21,6 +23,8 @@ on:
       - "registry/schemas/agp.trust-policy-2.schema.json"
       - "requirements-v0.4.txt"
       - "constraints-ci.txt"
+      - "requirements-ci-lock.txt"
+      - "requirements-release-lock.txt"
       - ".github/workflows/tpe-conformance.yml"
       - ".github/workflows/go-release-integrity.yml"
   workflow_dispatch:
@@ -56,11 +60,13 @@ jobs:
           cache-dependency-path: |
             requirements-v0.4.txt
             constraints-ci.txt
+            requirements-ci-lock.txt
+            requirements-release-lock.txt
 
       - name: Install Python dependencies
         run: |
           python -m pip install pip==26.1.2
-          python -m pip install -c constraints-ci.txt -r requirements-v0.4.txt
+          python -m pip install --require-hashes -r requirements-ci-lock.txt
 
       - name: Validate Python syntax
         run: |
@@ -73,7 +79,7 @@ jobs:
 
       - name: Verify expected validation total
         run: |
-          grep -Fqx             "AGP TPE 2.6 development validation: 1013/1013 passed"             /tmp/tpe-validation.log
+          grep -Fqx             "AGP TPE 2.6 development validation: 1027/1027 passed"             /tmp/tpe-validation.log
 
       - name: Run executable policy-reference example
         run: |

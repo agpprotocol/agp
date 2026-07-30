@@ -378,6 +378,13 @@ SUITES = [
         12,
     ),
     (
+        "Python transitive lock contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_python_transitive_lock_contract.py",
+        14,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,

@@ -19,9 +19,6 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
 
-    env:
-      PIP_CONSTRAINT: constraints-ci.txt
-
     environment:
       name: pypi
       url: https://pypi.org/project/agp-tpe/
@@ -127,10 +124,10 @@ jobs:
           PY
 
       - name: Install build validation tools
-        run: python -m pip install build==1.5.0 twine==6.2.0
+        run: python -m pip install --require-hashes -r requirements-release-lock.txt
 
       - name: Build distributions
-        run: python -m build
+        run: python -m build --no-isolation
 
       - name: Validate distributions
         run: python -m twine check dist/*
