@@ -129,6 +129,16 @@ jobs:
       - name: Build distributions
         run: python -m build --no-isolation
 
+      - name: Generate release SBOM
+        run: |
+          wheel_file="$(find dist -maxdepth 1 -type f -name '*.whl' -print -quit)"
+          sdist_file="$(find dist -maxdepth 1 -type f -name '*.tar.gz' -print -quit)"
+          python trust_primitive_engine/tools/generate_release_sbom.py \
+            --wheel "$wheel_file" \
+            --sdist "$sdist_file" \
+            --output release-assets/agp-tpe.cdx.json
+          python -m json.tool release-assets/agp-tpe.cdx.json > /dev/null
+
       - name: Generate release checksums
         working-directory: dist
         run: |
@@ -160,4 +170,5 @@ jobs:
         run: |
           gh release upload "${{ github.event.release.tag_name }}" \
             dist/SHA256SUMS \
+            release-assets/agp-tpe.cdx.json \
             --clobber
