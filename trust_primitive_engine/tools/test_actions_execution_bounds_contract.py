@@ -20,6 +20,7 @@ EXPECTED_WORKFLOWS = {
     "publish-pypi.yml",
     "schema-registry-conformance.yml",
     "tpe-conformance.yml",
+    "verify-release-attestations.yml",
 }
 
 EXPECTED_CONCURRENCY = {
@@ -52,6 +53,10 @@ EXPECTED_CONCURRENCY = {
         "tpe-${{ github.workflow }}-${{ github.ref }}",
         "true",
     ),
+    "verify-release-attestations.yml": (
+        "verify-release-attestations-${{ inputs.tag }}",
+        "false",
+    ),
 }
 
 EXPECTED_TIMEOUTS = {
@@ -63,6 +68,7 @@ EXPECTED_TIMEOUTS = {
     "publish-pypi.yml": 15,
     "schema-registry-conformance.yml": 10,
     "tpe-conformance.yml": 15,
+    "verify-release-attestations.yml": 15,
 }
 
 RUNS_ON_PATTERN = re.compile(

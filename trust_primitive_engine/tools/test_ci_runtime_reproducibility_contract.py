@@ -19,6 +19,7 @@ EXPECTED_WORKFLOWS = {
     "publish-pypi.yml",
     "schema-registry-conformance.yml",
     "tpe-conformance.yml",
+    "verify-release-attestations.yml",
 }
 
 GO_123_WORKFLOWS = {
