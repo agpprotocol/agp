@@ -26,6 +26,8 @@ jobs:
     permissions:
       contents: read
       id-token: write
+  attestations: write
+  artifact-metadata: write
 
     steps:
       - name: Check out the released tag
@@ -160,6 +162,23 @@ jobs:
         run: |
           python -m zipfile --list dist/*.whl
           tar -tzf dist/*.tar.gz
+
+      - name: Attest release build provenance
+        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # v4.2.1
+        with:
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/SHA256SUMS
+            release-assets/agp-tpe.cdx.json
+
+      - name: Attest release SBOM
+        uses: actions/attest@508db95dd578ae2727ebd6217d5ba78e4fbda05d # v4.2.1
+        with:
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
+          sbom-path: release-assets/agp-tpe.cdx.json
 
       - name: Publish distributions to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2

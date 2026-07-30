@@ -406,6 +406,13 @@ SUITES = [
         12,
     ),
     (
+        "release provenance attestation contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_release_attestation_contract.py",
+        14,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,
