@@ -55,23 +55,46 @@ def main() -> int:
             marker in requirements_text
             for marker in ("cryptography>=42.0", "jsonschema>=4.26,<5", "hypothesis>=6.135,<7")
         )),
-        ("historical conformance uses CI constraints",
-         "python -m pip install -c constraints-ci.txt -r requirements-v0.4.txt"
-         in workflows.get("conformance.yml", "")),
+        ("historical conformance uses reproducible Python inputs",
+         any(
+             marker in workflows.get("conformance.yml", "")
+             for marker in (
+                 "python -m pip install -c constraints-ci.txt -r requirements-v0.4.txt",
+                 "python -m pip install --require-hashes -r requirements-ci-lock.txt",
+             )
+         )),
         ("TPE conformance pins pip",
          "python -m pip install pip==26.1.2"
          in workflows.get("tpe-conformance.yml", "")),
-        ("TPE conformance uses CI constraints",
-         "python -m pip install -c constraints-ci.txt -r requirements-v0.4.txt"
-         in workflows.get("tpe-conformance.yml", "")),
+        ("TPE conformance uses reproducible Python inputs",
+         any(
+             marker in workflows.get("tpe-conformance.yml", "")
+             for marker in (
+                 "python -m pip install -c constraints-ci.txt -r requirements-v0.4.txt",
+                 "python -m pip install --require-hashes -r requirements-ci-lock.txt",
+             )
+         )),
         ("TPE cache includes constraints",
          "constraints-ci.txt" in workflows.get("tpe-conformance.yml", "")),
-        ("publishing pins build and twine",
-         "python -m pip install build==1.5.0 twine==6.2.0"
-         in workflows.get("publish-pypi.yml", "")),
-        ("publishing constrains isolated builds",
-         "PIP_CONSTRAINT: constraints-ci.txt"
-         in workflows.get("publish-pypi.yml", "")),
+        ("publishing uses reproducible build inputs",
+         any(
+             marker in workflows.get("publish-pypi.yml", "")
+             for marker in (
+                 "python -m pip install build==1.5.0 twine==6.2.0",
+                 "python -m pip install --require-hashes -r requirements-release-lock.txt",
+             )
+         )),
+        ("publishing prevents moving isolated build inputs",
+         (
+             "PIP_CONSTRAINT: constraints-ci.txt"
+             in workflows.get("publish-pypi.yml", "")
+             or (
+                 "python -m pip install --require-hashes -r requirements-release-lock.txt"
+                 in workflows.get("publish-pypi.yml", "")
+                 and "python -m build --no-isolation"
+                 in workflows.get("publish-pypi.yml", "")
+             )
+         )),
         ("root build backend is exact",
          'requires = ["hatchling==1.27.0"]' in pyproject_text),
         ("moving pip upgrade commands are absent",
