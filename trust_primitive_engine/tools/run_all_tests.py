@@ -364,6 +364,13 @@ SUITES = [
         10,
     ),
     (
+        "CI runtime reproducibility contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_ci_runtime_reproducibility_contract.py",
+        9,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,

@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   conformance:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
 
     steps:
@@ -26,8 +26,7 @@ jobs:
 
       - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: "stable"
-          check-latest: true
+          go-version: "1.23.x"
 
       - name: Install Python dependencies
         run: pip install -r requirements-v0.4.txt
