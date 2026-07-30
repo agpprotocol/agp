@@ -1,0 +1,8 @@
+# Phase 6D-6B reviewed direct Python inputs for Python 3.12 CI.
+pip==26.1.2
+build==1.5.0
+twine==6.2.0
+hatchling==1.27.0
+cryptography==49.0.0
+jsonschema==4.26.0
+hypothesis==6.161.1
