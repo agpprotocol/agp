@@ -399,6 +399,13 @@ SUITES = [
         10,
     ),
     (
+        "release SBOM contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_release_sbom_contract.py",
+        12,
+    ),
+    (
         "package installation and schema audit",
         ROOT / "trust_primitive_engine/tools/test_package_install.py",
         4,
