@@ -420,6 +420,13 @@ SUITES = [
         20,
     ),
     (
+        "successful attested release gate contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_release_success_gate_contract.py",
+        18,
+    ),
+    (
         "release verification observability contract",
         ROOT
         / "trust_primitive_engine/tools/"

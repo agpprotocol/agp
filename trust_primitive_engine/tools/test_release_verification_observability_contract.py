@@ -36,8 +36,10 @@ def main() -> int:
         ("tool enforces source tag ref", 'refs/tags/' in tool),
         ("tool enforces checked-out source digest", 'git", "rev-parse", "HEAD' in tool),
         (
-            "publish workflow generates evidence",
-            "Generate release verification evidence" in publish,
+            "publish workflow generates evidence through canonical gate",
+            "Verify published release attestations" in publish
+            and "verify_release_attestations.py" in publish
+            and "--output-dir release-verification-report" in publish,
         ),
         (
             "publish workflow writes job summary",
