@@ -79,7 +79,7 @@ jobs:
 
       - name: Verify expected validation total
         run: |
-          grep -Fqx             "AGP TPE 2.6 development validation: 1157/1157 passed"             /tmp/tpe-validation.log
+          grep -Fqx             "AGP TPE 2.6 development validation: 1177/1177 passed"             /tmp/tpe-validation.log
 
       - name: Run executable policy-reference example
         run: |

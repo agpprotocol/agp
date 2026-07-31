@@ -141,8 +141,8 @@ def main() -> int:
                 for marker in (
                     "ref: ${{ github.event.release.tag_name }}",
                     "persist-credentials: false",
-                    "RELEASE_TAG_CHECKOUT_PASS",
-                    "TAG_VERSION_MATCH_PASS",
+                    "Run release readiness preflight",
+                    "release_readiness_preflight.py",
                 )
             ),
         ),
@@ -154,7 +154,7 @@ def main() -> int:
                     "startsWith("
                     "github.event.release.tag_name, 'tpe-v'"
                     ")",
-                    "Refuse an existing PyPI version",
+                    "--pypi-base-url https://pypi.org/pypi",
                     "python -m twine check dist/*",
                 )
             ),
