@@ -41,89 +41,16 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Verify tag and package version
+      - name: Run release readiness preflight
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          python - <<'PY'
-          import os
-          import tomllib
-          from pathlib import Path
-
-          pyproject = tomllib.loads(
-              Path("pyproject.toml").read_text(encoding="utf-8")
-          )
-
-          project = pyproject["project"]
-          package_name = project["name"]
-          package_version = project["version"]
-
-          expected_tag = f"tpe-v{package_version}"
-          release_tag = os.environ["RELEASE_TAG"]
-
-          print(f"Package: {package_name}")
-          print(f"Version: {package_version}")
-          print(f"Release tag: {release_tag}")
-          print(f"Expected tag: {expected_tag}")
-
-          if package_name != "agp-tpe":
-              raise SystemExit(
-                  f"Unexpected package name: {package_name!r}"
-              )
-
-          if release_tag != expected_tag:
-              raise SystemExit(
-                  "Release tag does not match pyproject.toml version: "
-                  f"{release_tag!r} != {expected_tag!r}"
-              )
-
-          print("TAG_VERSION_MATCH_PASS")
-          PY
-
-      - name: Verify checkout matches released tag
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: |
-          test "$(git rev-parse HEAD)" = \
-            "$(git rev-list -n 1 "$RELEASE_TAG")"
-
-          echo "RELEASE_TAG_CHECKOUT_PASS"
-
-      - name: Refuse an existing PyPI version
-        run: |
-          python - <<'PY'
-          import json
-          import tomllib
-          import urllib.error
-          import urllib.request
-          from pathlib import Path
-
-          pyproject = tomllib.loads(
-              Path("pyproject.toml").read_text(encoding="utf-8")
-          )
-          project = pyproject["project"]
-
-          name = project["name"]
-          version = project["version"]
-          url = f"https://pypi.org/pypi/{name}/{version}/json"
-
-          try:
-              with urllib.request.urlopen(url, timeout=20) as response:
-                  payload = json.load(response)
-          except urllib.error.HTTPError as exc:
-              if exc.code == 404:
-                  print(
-                      f"PYPI_VERSION_AVAILABLE: {name}=={version}"
-                  )
-              else:
-                  raise
-          else:
-              published = payload["info"]["version"]
-              raise SystemExit(
-                  f"Refusing to republish existing version: "
-                  f"{name}=={published}"
-              )
-          PY
+          set -euo pipefail
+          python trust_primitive_engine/tools/release_readiness_preflight.py \
+            --tag "$RELEASE_TAG" \
+            --source-dir . \
+            --expected-package agp-tpe \
+            --pypi-base-url https://pypi.org/pypi
 
       - name: Install build validation tools
         run: python -m pip install --require-hashes -r requirements-release-lock.txt

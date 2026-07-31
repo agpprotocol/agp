@@ -427,6 +427,13 @@ SUITES = [
         18,
     ),
     (
+        "release readiness preflight contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_release_readiness_preflight_contract.py",
+        20,
+    ),
+    (
         "release verification observability contract",
         ROOT
         / "trust_primitive_engine/tools/"
