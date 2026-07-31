@@ -90,9 +90,12 @@ def main() -> int:
             and "global validation did not fully pass" in text,
         ),
         (
-            "validation total is fixed",
-            "EXPECTED_TOTAL = 1317" in text
-            and "unexpected validation total" in text,
+            "validation baseline is explicit and bound",
+            '"--expected-validation-total"' in text
+            and '"--expected-validation-runner-sha256"' in text
+            and "unexpected historical validation total" in text
+            and "historical validation runner SHA-256 mismatch"
+            in text,
         ),
         (
             "canonical candidate format is preserved",
