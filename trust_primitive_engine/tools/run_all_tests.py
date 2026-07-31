@@ -490,6 +490,13 @@ SUITES = [
         21,
     ),
     (
+        "historical validation baseline contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_historical_validation_baseline_contract.py",
+        22,
+    ),
+    (
         "release verification observability contract",
         ROOT
         / "trust_primitive_engine/tools/"

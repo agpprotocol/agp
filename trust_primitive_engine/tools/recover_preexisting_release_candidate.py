@@ -15,8 +15,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Sequence
 
-EXPECTED_TOTAL = 1317
 GIT_OBJECT_ID = re.compile(r"^[0-9a-f]{40,64}$")
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 
 def run(
@@ -216,12 +216,25 @@ def require_pypi_absent(
         )
 
 
-def run_validation(source_dir: Path) -> tuple[int, str]:
+def run_validation(
+    source_dir: Path,
+    *,
+    expected_total: int,
+    expected_runner_sha256: str,
+) -> tuple[int, str, str]:
+    runner_path = (
+        source_dir
+        / "trust_primitive_engine/tools/run_all_tests.py"
+    )
+    runner_raw = runner_path.read_bytes()
+    runner_sha256 = sha256_bytes(runner_raw)
+    if runner_sha256 != expected_runner_sha256:
+        raise RuntimeError(
+            "historical validation runner SHA-256 mismatch"
+        )
+
     result = run(
-        [
-            sys.executable,
-            "trust_primitive_engine/tools/run_all_tests.py",
-        ],
+        [sys.executable, str(runner_path)],
         cwd=source_dir,
     )
     marker = re.compile(
@@ -238,11 +251,11 @@ def run_validation(source_dir: Path) -> tuple[int, str]:
         raise RuntimeError(
             "global validation did not fully pass"
         )
-    if total != EXPECTED_TOTAL:
+    if total != expected_total:
         raise RuntimeError(
-            f"unexpected validation total: {total}"
+            f"unexpected historical validation total: {total}"
         )
-    return total, result.stdout
+    return total, result.stdout, runner_sha256
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -259,6 +272,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--remote", default="origin")
+    parser.add_argument(
+        "--expected-validation-total",
+        type=int,
+        required=True,
+    )
+    parser.add_argument(
+        "--expected-validation-runner-sha256",
+        required=True,
+    )
     parser.add_argument(
         "--pypi-endpoint",
         default="https://pypi.org/pypi/{package}/json",
@@ -313,8 +335,30 @@ def main(argv: Sequence[str] | None = None) -> int:
             endpoint=args.pypi_endpoint,
         )
 
-        validation_total, validation_output = run_validation(
-            source_dir
+        if args.expected_validation_total <= 0:
+            raise RuntimeError(
+                "expected validation total must be positive"
+            )
+        if (
+            SHA256.fullmatch(
+                args.expected_validation_runner_sha256
+            )
+            is None
+        ):
+            raise RuntimeError(
+                "expected validation runner SHA-256 is invalid"
+            )
+
+        (
+            validation_total,
+            validation_output,
+            validation_runner_sha256,
+        ) = run_validation(
+            source_dir,
+            expected_total=args.expected_validation_total,
+            expected_runner_sha256=(
+                args.expected_validation_runner_sha256
+            ),
         )
 
         candidate = {
@@ -352,6 +396,12 @@ def main(argv: Sequence[str] | None = None) -> int:
             "pypi_version_absent": True,
             "validation_total": validation_total,
             "validation_status": "passed",
+            "validation_runner_sha256": (
+                validation_runner_sha256
+            ),
+            "validation_baseline_source": (
+                "explicit-historical-tag-runner"
+            ),
             "recovered_at": datetime.now(
                 timezone.utc
             ).isoformat().replace("+00:00", "Z"),
@@ -388,6 +438,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"RECOVERED_TAG_OBJECT={tag_object}")
     print(f"RECOVERED_CANDIDATE_SHA256={candidate_digest}")
     print(f"RECOVERED_VALIDATION_TOTAL={validation_total}")
+    print(
+        "RECOVERED_VALIDATION_RUNNER_SHA256="
+        f"{validation_runner_sha256}"
+    )
     print(f"CANDIDATE_REPORT={candidate_path}")
     print(f"RECOVERY_REPORT={recovery_path}")
     print("TAG_MUTATION_EXECUTED=no")
