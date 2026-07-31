@@ -441,6 +441,13 @@ SUITES = [
         20,
     ),
     (
+        "authorized candidate tag contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_authorized_candidate_tag_contract.py",
+        20,
+    ),
+    (
         "release verification observability contract",
         ROOT
         / "trust_primitive_engine/tools/"
