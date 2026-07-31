@@ -434,6 +434,13 @@ SUITES = [
         20,
     ),
     (
+        "release candidate preparation contract",
+        ROOT
+        / "trust_primitive_engine/tools/"
+        "test_release_candidate_preparation_contract.py",
+        20,
+    ),
+    (
         "release verification observability contract",
         ROOT
         / "trust_primitive_engine/tools/"
